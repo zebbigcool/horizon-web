@@ -27,7 +27,8 @@ PAGE_FILES = ("index.html", "main.js", "audio.js", "worker.js", "sw.js")
 
 
 def build() -> None:
-    subprocess.run([str(WEB / "build.sh")], env=dict(os.environ), check=True)
+    subprocess.run(["bash", str(WEB / "build.sh")], env=dict(os.environ), check=True)
+
 
 
 def digest(path: Path) -> str:
