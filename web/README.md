@@ -86,10 +86,11 @@ by itself; the game page is `game.html`. It offers two options, set up in `confi
 
 - **chat** shows `CHAT_URL` (chat.zebbigcool.qzz.io) in an iframe.
 - **minecraft** lists the public rooms (code, owner, players), refreshed every
-  `REFRESH_MS`, and a **Launch!** button that opens `game.html`. The list comes from
-  `ROOMS_URL`, a GET that returns JSON and allows cross-origin reads: an array, or
-  `{"rooms": [...]}`, of `{"code", "owner", "players", "maxPlayers"?, "public"?}`
-  (a room with `"public": false` is hidden).
+  `REFRESH_MS`, with an opt-in "list the worlds I share as public rooms" switch and a
+  **Launch!** button that opens `game.html`. Both pages show how many tabs are **online**.
+  The rooms and the count come from the rooms service, `ROOMS_API` in `config.js`
+  ([rooms-service/](rooms-service/README.md): a Cloudflare Worker you deploy yourself; with
+  `ROOMS_API` empty the page says it isn't set up).
 
 Only `game.html` is cross-origin isolated (`serve.py` and `sw.js` skip the headers
 for the launcher), because an isolated page can't embed a site that doesn't opt in,

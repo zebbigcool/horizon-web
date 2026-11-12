@@ -242,14 +242,26 @@ function joinShared(id, code, relays) {
     };
     attempt();
 }
-// Hosting a shared world: the first relay that gives a code.
+// Hosting a shared world: the first relay that gives a code. The page may
+// set globalThis.horizonSharedWorld to hear of it ({ kind: "open", code, name,
+// owner, players }, then "players" as people come and go, then "closed"),
+// as the launcher's public rooms do (web/presence.js).
 const listeners = new Map();
-function listen(lid, name, relays) {
-    let next = 0, closed = false, ws = null;
+const report = (event) => {
+    try {
+        globalThis.horizonSharedWorld?.(event);
+    } catch (e) {
+        console.warn("Horizon: shared world report:", e);
+    }
+};
+function listen(lid, name, owner, relays) {
+    let next = 0, closed = false, ws = null, hosted = null, players = 1;
     const peers = new Map();
     listeners.set(lid, {
         close() {
             closed = true;
+            if (hosted) report({ kind: "closed", code: hosted });
+            hosted = null;
             ws?.close();
             for (const p of peers.values()) if (!p.open) p.pc.close();
         },
@@ -271,6 +283,8 @@ function listen(lid, name, relays) {
                 if (b[0] === 0x00) {
                     code = readStr8(b, 3)[0];
                     console.info(`Horizon: shared world ${code} on ${ws.url}`);
+                    hosted = code;
+                    report({ kind: "open", code, name, owner, players });
                     onListen(lid, 0, code);
                 } else if (b[0] === 0x01) {
                     servers = iceServers(b);
@@ -286,6 +300,12 @@ function listen(lid, name, relays) {
                             const id = onListen(lid, 1, peer);
                             channelSocket(id, channel, pc);
                             onEvent(id, 0, null, "");
+                            players += 1;
+                            if (hosted) report({ kind: "players", code: hosted, players });
+                            channel.addEventListener("close", () => {
+                                players = Math.max(1, players - 1);
+                                if (hosted) report({ kind: "players", code: hosted, players });
+                            }, { once: true });
                         };
                         if (channel.readyState === "open") opened();
                         else channel.onopen = opened;
@@ -313,7 +333,11 @@ function listen(lid, name, relays) {
             if (closed) return;
             console.warn(`Horizon: the relay closed the shared world (${status} ${reason})`);
             if (code === null) attempt();
-            else onListen(lid, 2, "The relay closed the shared world");
+            else {
+                if (hosted) report({ kind: "closed", code: hosted });
+                hosted = null;
+                onListen(lid, 2, "The relay closed the shared world");
+            }
         };
     };
     attempt();
@@ -321,7 +345,7 @@ function listen(lid, name, relays) {
 function onPage(data) {
     if (data.socket === "open") open(data.id, data.url, data.host, data.port, data.code, data.relays);
     else if (data.socket === "flush") flush(data.id);
-    else if (data.socket === "listen") listen(data.id, data.name, data.relays);
+    else if (data.socket === "listen") listen(data.id, data.name, data.owner, data.relays);
     else if (data.socket === "unlisten") {
         listeners.get(data.id)?.close();
         listeners.delete(data.id);
@@ -764,10 +788,11 @@ pub struct SharedWorld {
 }
 
 impl SharedWorld {
-    /// Asks the page to share the world (`name` is what the relay lists) on
+    /// Asks the page to share the world (`name` is what the relay lists,
+    /// `owner` the host's player name, which the page may list publicly) on
     /// the first of `relays` that answers. Returns at once: the code comes
     /// later ([`SharedWorld::code`]).
-    pub fn open(name: &str, relays: &[String]) -> Self {
+    pub fn open(name: &str, owner: &str, relays: &[String]) -> Self {
         let id = next_id();
         let state = Arc::new(Mutex::new(Listening::default()));
         crate::sync::lock(listeners())
@@ -780,6 +805,7 @@ impl SharedWorld {
         set("socket", JsValue::from_str("listen"));
         set("id", JsValue::from(id));
         set("name", JsValue::from_str(name));
+        set("owner", JsValue::from_str(owner));
         set("relays", relays_array(relays).into());
         horizon_socket_ask(&data);
         Self { id, state }

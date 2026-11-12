@@ -3,6 +3,7 @@
 // player's files in the browser's storage (OPFS). A service worker (sw.js)
 // keeps the large files for later visits.
 import "./audio.js"; // before the game's glue, which keeps the AudioContext it finds
+import { startPresence, watchSharedWorld } from "./presence.js";
 
 const ROOT = ".local/horizon-client/26.3";
 const status = document.getElementById("status");
@@ -234,6 +235,8 @@ async function served() {
 }
 
 async function main() {
+    startPresence();
+    watchSharedWorld();
     if (!(await webgpu())) return;
     const { glue, tar, manifest, base } = await served();
     status.textContent = "Installing resources…";

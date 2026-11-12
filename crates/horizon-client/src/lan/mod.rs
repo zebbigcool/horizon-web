@@ -788,10 +788,10 @@ impl Lan {
         Ok(listener)
     }
     /// The browser's [`Lan::bind`]: the world shared on the first relay of
-    /// [`shared_world_relays`] that answers, as `name`.
+    /// [`shared_world_relays`] that answers, as `name`, hosted by `owner`.
     #[cfg(target_arch = "wasm32")]
-    pub fn share(name: &str) -> Listener {
-        horizon_os::net::SharedWorld::open(name, &shared_world_relays())
+    pub fn share(name: &str, owner: &str) -> Listener {
+        horizon_os::net::SharedWorld::open(name, owner, &shared_world_relays())
     }
     /// [`Lan::listen`] on a socket already bound.
     pub fn listen_on(&mut self, listener: Listener, announce: bool) -> io::Result<u16> {

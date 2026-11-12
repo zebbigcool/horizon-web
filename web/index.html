@@ -13,6 +13,7 @@
 <main id="home" class="view home" hidden>
   <h1 class="logo"><span>z's horizon</span></h1>
   <p class="tagline">pick something to launch</p>
+  <p class="online" hidden><i></i><b>0</b> online</p>
   <nav class="tiles" aria-label="Launcher options">
     <a class="tile" href="#chat">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9l-5 4v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>
@@ -37,6 +38,7 @@
   <header class="bar">
     <a class="back" href="#">&larr; back</a>
     <h2>minecraft</h2>
+    <span class="online" hidden><i></i><b>0</b> online</span>
     <button id="refresh" class="ghost" type="button">refresh</button>
   </header>
   <div class="mc-body">
@@ -51,6 +53,10 @@
       </table>
       <p id="rooms-empty" class="empty" hidden></p>
     </div>
+    <label class="opt-in">
+      <input id="public-toggle" type="checkbox">
+      list the worlds I share as public rooms
+    </label>
     <div class="launch-row">
       <a id="launch" class="launch" href="game.html">Launch!</a>
     </div>

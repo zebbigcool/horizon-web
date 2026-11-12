@@ -1080,7 +1080,7 @@ impl Game<'_> {
         // (shared_world.rs tells the player).
         #[cfg(target_arch = "wasm32")]
         let (listener, port) = (
-            Lan::share(&self.level.name),
+            Lan::share(&self.level.name, &shared_world_owner()),
             horizon_client::lan::SHARED_PORT,
         );
         s.flags.published.store(port, Ordering::Relaxed);
@@ -1349,6 +1349,14 @@ fn refused(owner: bool, published: bool, split_seat: bool, memory: bool) -> bool
     } else {
         !published
     }
+}
+
+/// The name the host plays under (the profile's offline name), which a shared
+/// world's page may list as its owner.
+#[cfg(target_arch = "wasm32")]
+fn shared_world_owner() -> String {
+    let dir = horizon_os::env::current_dir().unwrap_or_default();
+    horizon_client::offline_name::load_or_create(&dir)
 }
 
 #[cfg(test)]

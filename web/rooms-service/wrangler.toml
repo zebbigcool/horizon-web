@@ -1,0 +1,12 @@
+name = "horizon-rooms"
+main = "src/index.js"
+compatibility_date = "2025-01-01"
+
+[[durable_objects.bindings]]
+name = "REGISTRY"
+class_name = "RegistryObject"
+
+# SQLite-backed Durable Objects are the ones the free plan includes.
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["RegistryObject"]

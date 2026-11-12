@@ -101,6 +101,13 @@ a { color: inherit; }
 .empty { margin: 0; padding: 28px 16px; text-align: center; color: var(--dim); }
 .empty button { margin-left: 8px; }
 
+.online { margin: 0; display: inline-flex; align-items: center; gap: 7px; color: var(--dim); font-size: 14px; white-space: nowrap; }
+.online i { width: 8px; height: 8px; border-radius: 50%; background: #5dff9a; box-shadow: 0 0 8px #5dff9a; }
+.online b { color: var(--text); font-weight: 600; }
+.home .online { margin-bottom: 22px; }
+.opt-in { display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--dim); font-size: 14px; cursor: pointer; }
+.opt-in input { accent-color: var(--orange); width: 16px; height: 16px; }
+
 .launch-row { display: flex; justify-content: center; padding-bottom: 6px; }
 .launch {
   display: inline-block; text-decoration: none; font-size: 22px; font-weight: 700; padding: 12px 56px; border-radius: 10px;

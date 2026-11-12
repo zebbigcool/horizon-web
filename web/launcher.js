@@ -1,7 +1,8 @@
 // The launcher page: a home screen with "chat" and "minecraft". Chat iframes
 // the chat site; minecraft lists the public rooms and has a Launch! button
 // that opens the game (game.html). Settings live in config.js.
-import { CHAT_URL, GAME_URL, ROOMS_URL, REFRESH_MS } from "./config.js";
+import { CHAT_URL, GAME_URL, ROOMS_API, REFRESH_MS } from "./config.js";
+import { configured, publicRoomsOn, setPublicRooms, startPresence } from "./presence.js";
 
 const $ = (id) => document.getElementById(id);
 const views = { home: $("home"), chat: $("chat"), minecraft: $("minecraft") };
@@ -9,10 +10,24 @@ const chatFrame = $("chat-frame");
 const body = $("rooms-body");
 const empty = $("rooms-empty");
 const note = $("rooms-note");
+const onlineBadges = document.querySelectorAll(".online");
+const publicToggle = $("public-toggle");
 let timer = null;
 let loading = 0; // newest request wins
 
 $("launch").href = GAME_URL;
+
+function showOnline(n) {
+    for (const badge of onlineBadges) {
+        badge.hidden = false;
+        badge.querySelector("b").textContent = n;
+    }
+}
+// Tells the service this tab is here and shows how many are.
+startPresence(showOnline);
+
+publicToggle.checked = publicRoomsOn();
+publicToggle.addEventListener("change", () => setPublicRooms(publicToggle.checked));
 
 // Starts the service worker early, so the game's first launch is already
 // cross-origin isolated (it gives game.html the headers its threads need).
@@ -96,13 +111,23 @@ function render(rooms) {
 }
 
 async function loadRooms() {
+    if (!configured()) {
+        body.replaceChildren();
+        note.textContent = "";
+        setEmpty("the rooms service isn't set up yet (ROOMS_API in config.js).");
+        return;
+    }
     const mine = ++loading;
     note.textContent = "loading…";
     try {
-        const response = await fetch(ROOMS_URL, { headers: { Accept: "application/json" }, cache: "no-store" });
+        const response = await fetch(`${ROOMS_API}/api/rooms`, { headers: { Accept: "application/json" }, cache: "no-store" });
         if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
-        const rooms = roomsOf(await response.json());
-        if (mine === loading) render(rooms);
+        const data = await response.json();
+        const rooms = roomsOf(data);
+        if (mine === loading) {
+            render(rooms);
+            if (Number.isFinite(data.online)) showOnline(data.online);
+        }
     } catch (e) {
         if (mine !== loading) return;
         console.warn(`launcher: could not load rooms: ${e}`);
