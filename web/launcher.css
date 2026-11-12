@@ -1,0 +1,123 @@
+:root {
+  --bg: #0a0612;
+  --panel: rgba(22, 12, 38, 0.72);
+  --line: rgba(180, 76, 255, 0.45);
+  --purple: #b44cff;
+  --orange: #ff8a1f;
+  --text: #f4ecff;
+  --dim: #a99bc4;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { background: var(--bg); }
+html, body { margin: 0; height: 100%; color: var(--text); }
+body {
+  font: 16px/1.5 ui-rounded, "Ubuntu", system-ui, -apple-system, "Segoe UI", sans-serif;
+  overflow: hidden;
+}
+[hidden] { display: none !important; }
+a { color: inherit; }
+
+/* A halftone-dotted horizon glow behind everything. */
+.backdrop {
+  position: fixed; inset: 0; z-index: -1;
+  background:
+    radial-gradient(ellipse 60% 45% at 50% 100%, rgba(255, 138, 31, 0.35), transparent 70%),
+    radial-gradient(ellipse 70% 55% at 50% 0%, rgba(180, 76, 255, 0.35), transparent 70%),
+    var(--bg);
+}
+.backdrop::after {
+  content: ""; position: absolute; inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.28) 1.1px, transparent 1.6px);
+  background-size: 7px 7px;
+  -webkit-mask-image: linear-gradient(to bottom, #000, transparent 45%, transparent 60%, #000);
+  mask-image: linear-gradient(to bottom, #000, transparent 45%, transparent 60%, #000);
+  opacity: 0.55;
+}
+
+.view { position: fixed; inset: 0; }
+
+/* Home */
+.home {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 8px; padding: 24px; text-align: center;
+}
+.logo { margin: 0; font-size: clamp(48px, 11vw, 104px); line-height: 1; letter-spacing: -0.02em; font-weight: 700; }
+.logo span {
+  display: inline-block;
+  background: linear-gradient(100deg, var(--purple) 10%, #ff5fa0 50%, var(--orange) 90%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 0 14px rgba(180, 76, 255, 0.75)) drop-shadow(0 0 28px rgba(255, 138, 31, 0.45));
+}
+.tagline { margin: 0 0 24px; color: var(--dim); }
+.tiles { display: flex; flex-wrap: wrap; gap: 18px; justify-content: center; }
+.tile {
+  width: 148px; height: 148px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+  text-decoration: none; background: var(--panel); border: 2px solid var(--line); border-radius: 10px;
+  backdrop-filter: blur(6px); transition: transform .15s, border-color .15s, box-shadow .15s;
+}
+.tile svg { width: 52px; height: 52px; fill: var(--text); transition: fill .15s; }
+.tile span { font-size: 15px; }
+.tile:hover, .tile:focus-visible {
+  transform: translateY(-3px); border-color: var(--orange); outline: none;
+  box-shadow: 0 0 22px rgba(255, 138, 31, 0.5), 0 0 40px rgba(180, 76, 255, 0.35);
+}
+.tile:hover svg, .tile:focus-visible svg { fill: var(--orange); }
+
+/* Shared top bar */
+.frame-view, .mc-view { display: flex; flex-direction: column; background: rgba(10, 6, 18, 0.6); }
+.bar {
+  display: flex; align-items: center; gap: 16px; padding: 10px 18px;
+  background: var(--panel); border-bottom: 1px solid var(--line); backdrop-filter: blur(6px);
+}
+.bar h2 { margin: 0; font-size: 18px; font-weight: 600; flex: 1; }
+.back { text-decoration: none; color: var(--orange); }
+.back:hover { text-decoration: underline; }
+.ghost {
+  font: inherit; color: var(--text); background: transparent; border: 1px solid var(--line);
+  border-radius: 6px; padding: 4px 12px; cursor: pointer;
+}
+.ghost:hover { border-color: var(--orange); color: var(--orange); }
+
+#chat-frame { flex: 1; width: 100%; border: 0; background: #fff; }
+
+/* Minecraft */
+.mc-body { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 16px; padding: 20px; max-width: 860px; width: 100%; margin: 0 auto; }
+.rooms-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.rooms-head h3 { margin: 0; font-size: 20px; }
+.note { color: var(--dim); font-size: 13px; }
+.table-wrap {
+  flex: 1; min-height: 0; overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+}
+.rooms { width: 100%; border-collapse: collapse; }
+.rooms th, .rooms td { text-align: left; padding: 10px 16px; }
+.rooms th { position: sticky; top: 0; background: #1a0e2c; color: var(--dim); font-weight: 500; font-size: 13px; text-transform: lowercase; }
+.rooms tbody tr + tr td { border-top: 1px solid rgba(180, 76, 255, 0.2); }
+.rooms .code { font: 600 15px ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; color: var(--orange); letter-spacing: .04em; }
+.rooms .count { white-space: nowrap; }
+.rooms td:last-child { text-align: right; }
+.copy { font-size: 13px; padding: 2px 10px; }
+.empty { margin: 0; padding: 28px 16px; text-align: center; color: var(--dim); }
+.empty button { margin-left: 8px; }
+
+.launch-row { display: flex; justify-content: center; padding-bottom: 6px; }
+.launch {
+  display: inline-block; text-decoration: none; font-size: 22px; font-weight: 700; padding: 12px 56px; border-radius: 10px;
+  color: #12081f; background: linear-gradient(100deg, var(--purple), var(--orange));
+  box-shadow: 0 0 20px rgba(180, 76, 255, 0.55), 0 0 36px rgba(255, 138, 31, 0.35); transition: transform .15s, box-shadow .15s;
+}
+.launch:hover, .launch:focus-visible {
+  transform: translateY(-2px) scale(1.03); outline: none;
+  box-shadow: 0 0 28px rgba(180, 76, 255, 0.85), 0 0 52px rgba(255, 138, 31, 0.6);
+}
+
+.noscript { position: fixed; inset: auto 0 20px; text-align: center; color: var(--dim); }
+
+@media (max-width: 520px) {
+  .rooms th, .rooms td { padding: 8px 10px; }
+  .tile { width: 130px; height: 130px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}

@@ -37,7 +37,7 @@ web/build.sh        # the game to web/dist/pkg, the resources to web/dist/fs
 python3 web/serve.py
 ```
 
-and open <http://localhost:8080> in a browser with WebGPU. Chrome and Edge have it
+and open <http://localhost:8080> (the launcher, below) in a browser with WebGPU. Chrome and Edge have it
 on Windows, macOS and ChromeOS. On Linux, Chromium-based browsers need it switched
 on: `brave --enable-unsafe-webgpu --enable-features=Vulkan http://localhost:8080`
 (or the same flags for `chromium` / `google-chrome`).
@@ -67,7 +67,7 @@ threads, which ran single player on green threads and didn't hold up.
 ### Browsers
 
 The game needs WebGPU, and the threaded build a cross-origin isolated page
-(`web/serve.py` sends the headers; any host must send
+(`web/serve.py` sends the headers; any host must send them for `game.html`:
 `Cross-Origin-Opener-Policy: same-origin` and
 `Cross-Origin-Embedder-Policy: require-corp`, or serve the packaged web folder,
 whose service worker adds them):
@@ -76,8 +76,24 @@ A browser without WebGPU, or with no GPU it can use, gets a message saying so
 instead of the game.
 
 The address passes the game its command-line arguments:
-<http://localhost:8080/?args=--world%20Test%20--creative> opens (or creates) the
+<http://localhost:8080/game.html?args=--world%20Test%20--creative> opens (or creates) the
 world `Test` in creative mode at start.
+
+## The launcher
+
+`index.html` is **z's horizon**'s launcher, a home screen that doesn't start the game
+by itself; the game page is `game.html`. It offers two options, set up in `config.js`:
+
+- **chat** shows `CHAT_URL` (chat.zebbigcool.qzz.io) in an iframe.
+- **minecraft** lists the public rooms (code, owner, players), refreshed every
+  `REFRESH_MS`, and a **Launch!** button that opens `game.html`. The list comes from
+  `ROOMS_URL`, a GET that returns JSON and allows cross-origin reads: an array, or
+  `{"rooms": [...]}`, of `{"code", "owner", "players", "maxPlayers"?, "public"?}`
+  (a room with `"public": false` is hidden).
+
+Only `game.html` is cross-origin isolated (`serve.py` and `sw.js` skip the headers
+for the launcher), because an isolated page can't embed a site that doesn't opt in,
+as the chat doesn't have to.
 
 ## How it fits together
 

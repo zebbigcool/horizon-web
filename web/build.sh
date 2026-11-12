@@ -60,7 +60,8 @@ if [ "$profile" = release ] && [ "${WASM_OPT:-1}" != 0 ]; then
         echo "wasm-opt not found: the module is left as rustc made it (install binaryen)" >&2
     fi
 fi
-cp web/index.html web/main.js web/audio.js web/worker.js web/sw.js "$dist/"
+cp web/index.html web/game.html web/launcher.js web/launcher.css web/config.js \
+    web/main.js web/audio.js web/worker.js web/sw.js "$dist/"
 
 [ "${BUNDLE:-1}" = 0 ] && { ls -l "$dist/pkg"/*.wasm; exit 0; }
 if [ ! -f "$dist/fs/boot.tar.gz" ] || [ "$resources/horizon-resources.json" -nt "$dist/fs/boot.tar.gz" ] \

@@ -20,8 +20,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     }
 
     def end_headers(self):
-        self.send_header("Cross-Origin-Opener-Policy", "same-origin")
-        self.send_header("Cross-Origin-Embedder-Policy", "require-corp")
+        # The launcher (index.html) embeds other sites, which an isolated page
+        # would block: only the game's page (game.html) and what it loads are isolated.
+        if self.path.split("?")[0] not in ("/", "/index.html"):
+            self.send_header("Cross-Origin-Opener-Policy", "same-origin")
+            self.send_header("Cross-Origin-Embedder-Policy", "require-corp")
         self.send_header("Cache-Control", "no-cache")
         super().end_headers()
 

@@ -3,8 +3,8 @@
 // packs (from manifest.txt), are asked for with their content hash (`?v=…`)
 // and come from the cache once stored, until a build changes them; the rest goes to the network first and falls back to the cache
 // offline. Files the game fetches when it reads them (fs/res/) aren't kept.
-// Its answers carry the headers that make the page cross-origin isolated (the
-// game's threads share memory only then), for hosts that can't send them.
+// Its answers carry the headers that make the game page (game.html) cross-origin
+// isolated (the game's threads share memory only then), for hosts that can't send them.
 const CACHE = "horizon";
 
 self.addEventListener("install", () => self.skipWaiting());
@@ -15,10 +15,13 @@ self.addEventListener("fetch", (event) => {
     if (event.request.method !== "GET" || url.origin !== location.origin || url.pathname.includes("/fs/res/")) {
         return;
     }
-    event.respondWith((url.searchParams.has("v") ? hashed(event, url) : fresh(event)).then(isolated));
+    event.respondWith((url.searchParams.has("v") ? hashed(event, url) : fresh(event)).then((response) => isolated(response, event.request, url)));
 });
 
-function isolated(response) {
+function isolated(response, request, url) {
+    // The launcher page embeds other sites (the chat), which a cross-origin
+    // isolated page would block: only the game's own page is isolated.
+    if (request.mode === "navigate" && !url.pathname.endsWith("/game.html")) return response;
     if (response.status === 0 || response.headers.get("Cross-Origin-Embedder-Policy")) return response;
     const headers = new Headers(response.headers);
     headers.set("Cross-Origin-Opener-Policy", "same-origin");
