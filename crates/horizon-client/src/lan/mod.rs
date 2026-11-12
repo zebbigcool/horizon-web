@@ -788,10 +788,13 @@ impl Lan {
         Ok(listener)
     }
     /// The browser's [`Lan::bind`]: the world shared on the first relay of
-    /// [`shared_world_relays`] that answers, as `name`, hosted by `owner`.
+    /// [`shared_world_relays`] that answers, as `name`. The page may list the
+    /// world publicly, with the host's profile name as its owner.
     #[cfg(target_arch = "wasm32")]
-    pub fn share(name: &str, owner: &str) -> Listener {
-        horizon_os::net::SharedWorld::open(name, owner, &shared_world_relays())
+    pub fn share(name: &str) -> Listener {
+        let dir = horizon_os::env::current_dir().unwrap_or_default();
+        let owner = crate::offline_name::load_or_create(&dir);
+        horizon_os::net::SharedWorld::open(name, &owner, &shared_world_relays())
     }
     /// [`Lan::listen`] on a socket already bound.
     pub fn listen_on(&mut self, listener: Listener, announce: bool) -> io::Result<u16> {
