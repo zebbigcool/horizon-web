@@ -13,10 +13,14 @@ import urllib.parse
 from pathlib import Path
 
 WEB = Path(__file__).resolve().parent
-# The launcher's own files are served straight from web/, so an edit (config.js
-# above all) shows on reload without rebuilding: build.sh only copies them into
-# dist for hosting. Everything else comes from dist.
-LIVE = {"index.html", "launcher.js", "launcher.css", "config.js", "presence.js", "catalog.json"}
+# The page's own files are served straight from web/, so an edit (config.js above
+# all) shows on reload without rebuilding, and a dist built before the launcher
+# existed still works: build.sh only copies these into dist for hosting.
+# Everything else (the WebAssembly, the resources) comes from dist.
+LIVE = {
+    "index.html", "game.html", "launcher.js", "launcher.css", "config.js", "presence.js",
+    "catalog.json", "main.js", "audio.js", "worker.js", "sw.js",
+}
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
