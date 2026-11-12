@@ -12,5 +12,12 @@ export const GAME_URL = "game.html";
 // minecraft option says the service isn't set up and no online count shows.
 export const ROOMS_API = "";
 
+// Where seraph (github.com/Zebbigcool/seraph) is hosted, for the "games" and
+// "apps" options: every game and app is loaded from there (the list of what
+// exists is catalog.json, made by seraph_catalog.py). Seraph is meant to be
+// rehosted, e.g. on GitHub Pages; with no trailing slash. Left empty, those
+// options say seraph isn't set up.
+export const SERAPH_URL = "https://zebbigcool.github.io/seraph";
+
 // How often the room list refreshes while the minecraft option is open.
 export const REFRESH_MS = 15000;

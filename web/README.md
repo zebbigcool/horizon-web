@@ -82,7 +82,7 @@ world `Test` in creative mode at start.
 ## The launcher
 
 `index.html` is **z's horizon**'s launcher, a home screen that doesn't start the game
-by itself; the game page is `game.html`. It offers two options, set up in `config.js`:
+by itself; the game page is `game.html`. It offers four options, set up in `config.js`:
 
 - **chat** shows `CHAT_URL` (chat.zebbigcool.qzz.io) in an iframe.
 - **minecraft** lists the public rooms (code, owner, players), refreshed every
@@ -91,6 +91,13 @@ by itself; the game page is `game.html`. It offers two options, set up in `confi
   The rooms and the count come from the rooms service, `ROOMS_API` in `config.js`
   ([rooms-service/](rooms-service/README.md): a Cloudflare Worker you deploy yourself; with
   `ROOMS_API` empty the page says it isn't set up).
+
+- **games** and **apps** list [seraph](https://github.com/Zebbigcool/seraph)'s games (360) and
+  apps (12) with search and, for games, a genre filter; a click plays one inside the launcher (with
+  an "open in new tab" button). The list is `catalog.json`; the files themselves stay in seraph
+  (4.7 GB of games) and load from wherever it is hosted, `SERAPH_URL` in `config.js` (seraph is
+  made to be rehosted, e.g. on GitHub Pages). After seraph adds games, refresh the list:
+  `python3 web/seraph_catalog.py <seraph checkout>`.
 
 Only `game.html` is cross-origin isolated (`serve.py` and `sw.js` skip the headers
 for the launcher), because an isolated page can't embed a site that doesn't opt in,

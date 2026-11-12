@@ -1,0 +1,2610 @@
+{
+ "games": [
+  {
+   "id": "1on1soccer",
+   "name": "1 on 1 soccer",
+   "path": "games/1on1soccer/index.html",
+   "thumb": "images/thumbnails/1on1soccer.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "10minutestilldawn",
+   "name": "10 minutes till dawn",
+   "path": "games/10minutestilldawn/index.html",
+   "thumb": "images/thumbnails/10minutestilldawn.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "1v1lol",
+   "name": "1v1lol",
+   "path": "games/1v1lol/index.html",
+   "thumb": "images/thumbnails/1v1lol.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "2048",
+   "name": "2048",
+   "path": "games/2048/index.html",
+   "thumb": "images/thumbnails/2048.jpg",
+   "genre": "puzzle"
+  },
+  {
+   "id": "aceattorney",
+   "name": "ace attorney",
+   "path": "games/aceattorney/index.html",
+   "thumb": "images/thumbnails/aceattorney.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "achievementunlocked",
+   "name": "achievement unlocked",
+   "path": "games/achievementunlocked/index.html",
+   "thumb": "images/thumbnails/achievementunlocked.png",
+   "genre": "puzzle"
+  },
+  {
+   "id": "achievementunlocked2",
+   "name": "achievement unlocked 2",
+   "path": "games/achievementunlocked2/index.html",
+   "thumb": "images/thumbnails/achievementunlocked2.png",
+   "genre": "puzzle"
+  },
+  {
+   "id": "achievementunlocked3",
+   "name": "achievement unlocked 3",
+   "path": "games/achievementunlocked3/index.html",
+   "thumb": "images/thumbnails/achievementunlocked3.png",
+   "genre": "puzzle"
+  },
+  {
+   "id": "adofai",
+   "name": "adofai",
+   "path": "games/adofai/index.html",
+   "thumb": "images/thumbnails/adofai.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "advancewars",
+   "name": "advance wars",
+   "path": "games/advancewars/index.html",
+   "thumb": "images/thumbnails/advancewars.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "advancewars2",
+   "name": "advance wars 2",
+   "path": "games/advancewars2/index.html",
+   "thumb": "images/thumbnails/advancewars2.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "adventurecapitalist",
+   "name": "adventure captialist",
+   "path": "games/adventurecapitalist/index.html",
+   "thumb": "images/thumbnails/adventurecaptialist.png",
+   "genre": "simulation"
+  },
+  {
+   "id": "adventuretime",
+   "name": "adventure time",
+   "path": "games/adventuretime/index.html",
+   "thumb": "images/thumbnails/adventuretimeheyiceking.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "alteredbeast",
+   "name": "altered beast",
+   "path": "games/alteredbeast/index.html",
+   "thumb": "images/thumbnails/alteredbeast.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "amazingropepolice",
+   "name": "amazing rope police",
+   "path": "games/amazingropepolice/index.html",
+   "thumb": "images/thumbnails/amazingropepolice.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "amongus",
+   "name": "among us fangame",
+   "path": "games/amongus/index.html",
+   "thumb": "images/thumbnails/amongus.jpg",
+   "genre": "arcade"
+  },
+  {
+   "id": "animalcrossingwildworld",
+   "name": "animal crossing",
+   "path": "games/animalcrossingwildworld/index.html",
+   "thumb": "images/thumbnails/animalcrossingwildworld.png",
+   "genre": "simulation"
+  },
+  {
+   "id": "aquaparkslides",
+   "name": "aquapark slides",
+   "path": "games/aquaparkslides/index.html",
+   "thumb": "images/thumbnails/aquaparkslides.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "badicecream",
+   "name": "bad ice cream",
+   "path": "games/badicecream/index.html",
+   "thumb": "images/thumbnails/badicecream.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "badicecream2",
+   "name": "bad ice cream 2",
+   "path": "games/badicecream2/index.html",
+   "thumb": "images/thumbnails/badicecream2.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "badicecream3",
+   "name": "bad ice cream 3",
+   "path": "games/badicecream3/index.html",
+   "thumb": "images/thumbnails/badicecream3.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "badpiggies",
+   "name": "bad piggies",
+   "path": "games/badpiggies/index.html",
+   "thumb": "images/thumbnails/badpiggies.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "badtimesimulator",
+   "name": "bad time simulator",
+   "path": "games/badtimesimulator/index.html",
+   "thumb": "images/thumbnails/badtimesimulator.png",
+   "genre": "simulation"
+  },
+  {
+   "id": "baldisbasics",
+   "name": "baldi's basics",
+   "path": "games/baldisbasics/index.html",
+   "thumb": "images/thumbnails/baldisbasics.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "ballisticchickens",
+   "name": "ballistic chickens",
+   "path": "games/ballisticchickens/index.html",
+   "thumb": "images/thumbnails/ballisticchickens.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "banjokazooie",
+   "name": "banjo kazooie",
+   "path": "games/banjokazooie/index.html",
+   "thumb": "images/thumbnails/banjokazooie.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "banjopilot",
+   "name": "banjo pilot",
+   "path": "games/banjopilot/index.html",
+   "thumb": "images/thumbnails/banjopilot.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "basketbrosio",
+   "name": "basketbros io",
+   "path": "games/basketbrosio/index.html",
+   "thumb": "images/thumbnails/basketbrosio.png",
+   "genre": "mobile"
+  },
+  {
+   "id": "battleships",
+   "name": "battleships",
+   "path": "games/battleships/index.html",
+   "thumb": "images/thumbnails/battleships.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "bigredbutton",
+   "name": "big red button",
+   "path": "games/bigredbutton/index.html",
+   "thumb": "images/thumbnails/bigredbutton.png",
+   "genre": "puzzle"
+  },
+  {
+   "id": "bitlife",
+   "name": "bitlife",
+   "path": "games/bitlife/index.html",
+   "thumb": "images/thumbnails/bitlife.jpg",
+   "genre": "simulation"
+  },
+  {
+   "id": "bloxors",
+   "name": "bloxors",
+   "path": "games/bloxors/index.html",
+   "thumb": "images/thumbnails/bloxors.png",
+   "genre": "puzzle"
+  },
+  {
+   "id": "bobtherobber2",
+   "name": "bob the robber 2",
+   "path": "games/bobtherobber2/index.html",
+   "thumb": "images/thumbnails/bobtherobber2.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "bomberman",
+   "name": "bomberman",
+   "path": "games/bomberman/index.html",
+   "thumb": "images/thumbnails/bomberman.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "bowsersinsidestory",
+   "name": "bowsers inside story",
+   "path": "games/bowsersinsidestory/index.html",
+   "thumb": "images/thumbnails/bowsersinsidestory.png",
+   "genre": "simulation"
+  },
+  {
+   "id": "boxingphysics2",
+   "name": "boxing physics 2",
+   "path": "games/boxingphysics2/index.html",
+   "thumb": "images/thumbnails/boxingphysics2.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "boxingrandom",
+   "name": "boxing random",
+   "path": "games/boxingrandom/index.html",
+   "thumb": "images/thumbnails/boxingrandom.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "breakingthebank",
+   "name": "breaking the bank",
+   "path": "games/breakingthebank/index.html",
+   "thumb": "images/thumbnails/breakingthebank.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "btd",
+   "name": "btd",
+   "path": "games/btd/btd/index.html",
+   "thumb": "images/thumbnails/btd.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "bubbletanks2",
+   "name": "bubble tanks 2",
+   "path": "games/bubbletanks2/index.html",
+   "thumb": "images/thumbnails/bubbletanks2.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "burgerandfrights",
+   "name": "burger and frights",
+   "path": "games/burgerandfrights/index.html",
+   "thumb": "images/thumbnails/burgerandfrights.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "burritobison",
+   "name": "burrito bison",
+   "path": "games/burritobison/index.html",
+   "thumb": "images/thumbnails/burritobison.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "cars2",
+   "name": "cars 2",
+   "path": "games/cars2/index.html",
+   "thumb": "images/thumbnails/cars2.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "castlevania",
+   "name": "castlevania",
+   "path": "games/castlevania/index.html",
+   "thumb": "images/thumbnails/castlevania.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "celeste",
+   "name": "celeste",
+   "path": "games/celeste/index.html",
+   "thumb": "images/thumbnails/celeste.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "cellmachine",
+   "name": "cell machine",
+   "path": "games/cellmachine/index.html",
+   "thumb": "images/thumbnails/cellmachine.png",
+   "genre": "puzzle"
+  },
+  {
+   "id": "championisland",
+   "name": "champion island",
+   "path": "games/championisland/index.html",
+   "thumb": "images/thumbnails/championisland.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "chess",
+   "name": "chess",
+   "path": "games/chess/index.html",
+   "thumb": "images/thumbnails/chess.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "chibiknight",
+   "name": "chibi knight",
+   "path": "games/chibiknight/index.html",
+   "thumb": "images/thumbnails/chibiknight.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "chooseyourweapon",
+   "name": "choose your weapon",
+   "path": "games/chooseyourweapon/index.html",
+   "thumb": "images/thumbnails/chooseyourweapon.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "chooseyourweapon2",
+   "name": "choose your weapon 2",
+   "path": "games/chooseyourweapon2/index.html",
+   "thumb": "images/thumbnails/chooseyourweapon2.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "chooseyourweapon3",
+   "name": "choose your weapon 3",
+   "path": "games/chooseyourweapon3/index.html",
+   "thumb": "images/thumbnails/chooseyourweapon3.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "dinogame",
+   "name": "chrome dino game",
+   "path": "games/dinogame/index.html",
+   "thumb": "images/thumbnails/chromedino.jpg",
+   "genre": "arcade"
+  },
+  {
+   "id": "clickerheroes",
+   "name": "clicker heroes",
+   "path": "games/clickerheroes/index.html",
+   "thumb": "images/thumbnails/clickerheroes.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "clusterrush",
+   "name": "cluster rush",
+   "path": "games/clusterrush/index.html",
+   "thumb": "images/thumbnails/clusterrush.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "colorswitch",
+   "name": "color switch",
+   "path": "games/colorswitch/index.html",
+   "thumb": "images/thumbnails/colorswitch.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "connect4",
+   "name": "connect 4",
+   "path": "games/connect4/index.html",
+   "thumb": "images/thumbnails/connect4.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "cookieclicker",
+   "name": "cookie clicker",
+   "path": "games/cookieclicker/index.html",
+   "thumb": "images/thumbnails/cookieclick.jpg",
+   "genre": "arcade"
+  },
+  {
+   "id": "cookingmama",
+   "name": "cooking mama",
+   "path": "games/cookingmama/index.html",
+   "thumb": "images/thumbnails/cookingmama.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "crimsonfantasia",
+   "name": "crimson fantasia",
+   "path": "games/crimsonfantasia/index.html",
+   "thumb": "images/thumbnails/crimsonfantasia.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "crossy",
+   "name": "crossy road",
+   "path": "games/crossy/index.html",
+   "thumb": "images/thumbnails/crossyroad.jpg",
+   "genre": "mobile"
+  },
+  {
+   "id": "cubefield",
+   "name": "cubefield",
+   "path": "games/cubefield/index.html",
+   "thumb": "images/thumbnails/cubefield.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "cuttherope",
+   "name": "cut the rope",
+   "path": "games/cuttherope/index.html",
+   "thumb": "images/thumbnails/cuttherope.png",
+   "genre": "mobile"
+  },
+  {
+   "id": "dadish",
+   "name": "dadish",
+   "path": "games/dadish/index.html",
+   "thumb": "images/thumbnails/dadish.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "dadish2",
+   "name": "dadish 2",
+   "path": "games/dadish2/index.html",
+   "thumb": "images/thumbnails/dadish2.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "dadish3",
+   "name": "dadish 3",
+   "path": "games/dadish3/index.html",
+   "thumb": "images/thumbnails/dadish3.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "dbzsupersonicwarriors",
+   "name": "dbz: supersonic warriors",
+   "path": "games/dbzsupersonicwarriors/index.html",
+   "thumb": "images/thumbnails/goldensun.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "deathrun3d",
+   "name": "death run 3d",
+   "path": "games/deathrun3d/index.html",
+   "thumb": "images/thumbnails/deathrun3d.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "defendthetank",
+   "name": "defend the tank",
+   "path": "games/defendthetank/index.html",
+   "thumb": "images/thumbnails/defendthetank.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "diddykongracing",
+   "name": "diddy kong racing",
+   "path": "games/diddykongracing/index.html",
+   "thumb": "images/thumbnails/diddykongracing.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "dogeminer",
+   "name": "doge miner",
+   "path": "games/dogeminer/index.html",
+   "thumb": "images/thumbnails/dogeminer.png",
+   "genre": "simulation"
+  },
+  {
+   "id": "donkeykong",
+   "name": "donkey kong",
+   "path": "games/donkeykong/index.html",
+   "thumb": "images/thumbnails/donkeykong.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "donkeykong64",
+   "name": "donkey kong 64",
+   "path": "games/donkeykong64/index.html",
+   "thumb": "images/thumbnails/donkeykong64.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "donkeykongcountry",
+   "name": "donkey kong country",
+   "path": "games/donkeykongcountry/index.html",
+   "thumb": "images/thumbnails/donkeykongcountry.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "donkeykongcountry2",
+   "name": "donkey kong country 2",
+   "path": "games/donkeykongcountry2/index.html",
+   "thumb": "images/thumbnails/donkeykongcountry2.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "donkeykongland",
+   "name": "donkey kong land",
+   "path": "games/donkeykongland/index.html",
+   "thumb": "images/thumbnails/donkeykongland.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "doodledefender",
+   "name": "doodle defender",
+   "path": "games/doodledefender/index.html",
+   "thumb": "images/thumbnails/doodledefender.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "doodlejump",
+   "name": "doodle jump",
+   "path": "games/doodlejump/index.html",
+   "thumb": "images/thumbnails/doodlejump.jpg",
+   "genre": "platformer"
+  },
+  {
+   "id": "doom2",
+   "name": "doom 2",
+   "path": "games/doom2/index.html",
+   "thumb": "images/thumbnails/doomii.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "doom64",
+   "name": "doom 64",
+   "path": "games/doom64/index.html",
+   "thumb": "images/thumbnails/doom64.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "drmario",
+   "name": "dr mario",
+   "path": "games/drmario/index.html",
+   "thumb": "images/thumbnails/drmario.png",
+   "genre": "puzzle"
+  },
+  {
+   "id": "driftboss",
+   "name": "drift boss",
+   "path": "games/driftboss/index.html",
+   "thumb": "images/thumbnails/driftboss.jpg",
+   "genre": "mobile"
+  },
+  {
+   "id": "drifthunters",
+   "name": "drift hunters",
+   "path": "games/drifthunters/index.html",
+   "thumb": "images/thumbnails/drifthunters.jpg",
+   "genre": "adventure"
+  },
+  {
+   "id": "driftmania",
+   "name": "drift mania",
+   "path": "games/driftmania/index.html",
+   "thumb": "images/thumbnails/driftmania.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "ducklife",
+   "name": "duck life",
+   "path": "games/ducklife/index.html",
+   "thumb": "images/thumbnails/ducklife.png",
+   "genre": "simulation"
+  },
+  {
+   "id": "ducklife2",
+   "name": "duck life 2",
+   "path": "games/ducklife2/index.html",
+   "thumb": "images/thumbnails/ducklife2.png",
+   "genre": "simulation"
+  },
+  {
+   "id": "ducklife3",
+   "name": "duck life 3",
+   "path": "games/ducklife3/index.html",
+   "thumb": "images/thumbnails/ducklife3.png",
+   "genre": "simulation"
+  },
+  {
+   "id": "ducklife4",
+   "name": "duck life 4",
+   "path": "games/ducklife4/index.html",
+   "thumb": "images/thumbnails/ducklife4.jpg",
+   "genre": "simulation"
+  },
+  {
+   "id": "ducklife5",
+   "name": "duck life 5",
+   "path": "games/ducklife5/index.html",
+   "thumb": "images/thumbnails/ducklife5.png",
+   "genre": "simulation"
+  },
+  {
+   "id": "ducklife6",
+   "name": "duck life 6",
+   "path": "games/ducklife6/index.html",
+   "thumb": "images/thumbnails/ducklife6.png",
+   "genre": "simulation"
+  },
+  {
+   "id": "dukenukem64",
+   "name": "duke nukem 64",
+   "path": "games/dukenukem64/index.html",
+   "thumb": "images/thumbnails/dukenukem64.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "dukenukemadvance",
+   "name": "duke nukem advance",
+   "path": "games/dukenukemadvance/index.html",
+   "thumb": "images/thumbnails/dukenukemadvance.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "surf",
+   "name": "edge surf",
+   "path": "games/surf/index.html",
+   "thumb": "images/thumbnails/surf.jpg",
+   "genre": "arcade"
+  },
+  {
+   "id": "electricbox",
+   "name": "electric box",
+   "path": "games/electricbox/index.html",
+   "thumb": "images/thumbnails/electricbox.png",
+   "genre": "puzzle"
+  },
+  {
+   "id": "electricman2",
+   "name": "electric man 2",
+   "path": "games/electricman2/index.html",
+   "thumb": "images/thumbnails/electricman2.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "escapingtheprison",
+   "name": "escaping the prison",
+   "path": "games/escapingtheprison/index.html",
+   "thumb": "images/thumbnails/escapingtheprison.jpg",
+   "genre": "adventure"
+  },
+  {
+   "id": "excitebike64",
+   "name": "excitebike 64",
+   "path": "games/excitebike64/index.html",
+   "thumb": "images/thumbnails/excitebike64.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "fzerox",
+   "name": "f-zero x",
+   "path": "games/fzerox/index.html",
+   "thumb": "images/thumbnails/fzerox.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "factoryballs",
+   "name": "factory balls",
+   "path": "games/factoryballs/index.html",
+   "thumb": "images/thumbnails/factoryballs.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "fancypantsadventure",
+   "name": "fancy pants adventure",
+   "path": "games/fancypantsadventure/index.html",
+   "thumb": "images/thumbnails/fancypantsadventure.jpg",
+   "genre": "platformer"
+  },
+  {
+   "id": "fancypantsadventure2",
+   "name": "fancy pants adventure 2",
+   "path": "games/fancypantsadventure2/index.html",
+   "thumb": "images/thumbnails/fancypantsadventure2.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "fireemblem",
+   "name": "fire emblem",
+   "path": "games/fireemblem/index.html",
+   "thumb": "images/thumbnails/fireemblem.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "fireboywatergirl",
+   "name": "fireboy and watergirl",
+   "path": "games/fireboywatergirl/index.html",
+   "thumb": "images/thumbnails/fireboyandwatergirl.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "flappy",
+   "name": "flappy bird",
+   "path": "games/flappy/index.html",
+   "thumb": "images/thumbnails/flappybird.jpg",
+   "genre": "mobile"
+  },
+  {
+   "id": "fleeingthecomplex",
+   "name": "fleeing the complex",
+   "path": "games/fleeingthecomplex/index.html",
+   "thumb": "images/thumbnails/fleeingthecomplex.jpg",
+   "genre": "adventure"
+  },
+  {
+   "id": "flippyfish",
+   "name": "flippy fish",
+   "path": "games/flippyfish/index.html",
+   "thumb": "images/thumbnails/flippyfish.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "fnaf",
+   "name": "fnaf 1",
+   "path": "games/fnaf/index.html",
+   "thumb": "images/thumbnails/fnaf.jpg",
+   "genre": "adventure"
+  },
+  {
+   "id": "fnaf-2",
+   "name": "fnaf 2",
+   "path": "games/fnaf-2/index.html",
+   "thumb": "images/thumbnails/fnaf2.jpg",
+   "genre": "adventure"
+  },
+  {
+   "id": "fnaf-3",
+   "name": "fnaf 3",
+   "path": "games/fnaf-3/index.html",
+   "thumb": "images/thumbnails/fnaf3.jpg",
+   "genre": "adventure"
+  },
+  {
+   "id": "fnaf-4",
+   "name": "fnaf 4",
+   "path": "games/fnaf-4/index.html",
+   "thumb": "images/thumbnails/fnaf4.jpg",
+   "genre": "adventure"
+  },
+  {
+   "id": "fnfmidfight",
+   "name": "fnf mid fight masses",
+   "path": "games/fnfmidfight/index.html",
+   "thumb": "images/thumbnails/midfightmasses.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "fnf",
+   "name": "friday night funkin",
+   "path": "games/fnf/index.html",
+   "thumb": "images/thumbnails/fnf.jpg",
+   "genre": "arcade"
+  },
+  {
+   "id": "fruitninja",
+   "name": "fruit ninja",
+   "path": "games/fruitninja/index.html",
+   "thumb": "images/thumbnails/fruitninja.jpg",
+   "genre": "arcade"
+  },
+  {
+   "id": "funnymadracing",
+   "name": "funny mad racing",
+   "path": "games/funnymadracing/index.html",
+   "thumb": "images/thumbnails/funnymadracing.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "garfieldgetsreal",
+   "name": "garfield gets real",
+   "path": "games/garfieldgetsreal/index.html",
+   "thumb": "images/thumbnails/garfieldgetsreal.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "gdlite",
+   "name": "geometry dash lite",
+   "path": "games/gdlite/index.html",
+   "thumb": "images/thumbnails/geometrydashlite.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "geometryrash",
+   "name": "geometry rash",
+   "path": "games/geometryrash/index.html",
+   "thumb": "images/thumbnails/geometryrash.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "getawayshootout",
+   "name": "getaway shootout",
+   "path": "games/getawayshootout/index.html",
+   "thumb": "images/thumbnails/getawayshootout.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "gex64",
+   "name": "gex 64",
+   "path": "games/gex64/index.html",
+   "thumb": "images/thumbnails/gex64.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "goball",
+   "name": "go ball",
+   "path": "games/goball/index.html",
+   "thumb": "images/thumbnails/goball.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "goldenaxe",
+   "name": "golden axe",
+   "path": "games/goldenaxe/index.html",
+   "thumb": "images/thumbnails/goldenaxe.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "goldeneye007",
+   "name": "golden eye 007",
+   "path": "games/goldeneye007/index.html",
+   "thumb": "images/thumbnails/goldeneye007.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "goldensun",
+   "name": "golden sun",
+   "path": "games/goldensun/index.html",
+   "thumb": "images/thumbnails/goldensun.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "grandtheftgrotto",
+   "name": "grand theft grotto",
+   "path": "games/grandtheftgrotto/index.html",
+   "thumb": "images/thumbnails/grandtheftgrotto.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "gunmayhem",
+   "name": "gun mayhem",
+   "path": "games/gunmayhem/index.html",
+   "thumb": "images/thumbnails/gunmayhem.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "gunmayhem2",
+   "name": "gun mayhem 2",
+   "path": "games/gunmayhem2/index.html",
+   "thumb": "images/thumbnails/gunmayhem2.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "gunmayhemredux",
+   "name": "gun mayhem redux",
+   "path": "games/gunmayhemredux/index.html",
+   "thumb": "images/thumbnails/gunmayhemredux.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "happywheels",
+   "name": "happy wheels",
+   "path": "games/happywheels/index.html",
+   "thumb": "images/thumbnails/happywheels.jpg",
+   "genre": "arcade"
+  },
+  {
+   "id": "harvestmoon",
+   "name": "harvest moon",
+   "path": "games/harvestmoon/index.html",
+   "thumb": "images/thumbnails/harvestmoon.png",
+   "genre": "simulation"
+  },
+  {
+   "id": "helixjump",
+   "name": "helix jump",
+   "path": "games/helixjump/index.html",
+   "thumb": "images/thumbnails/helixjump.png",
+   "genre": "mobile"
+  },
+  {
+   "id": "holeio",
+   "name": "hole io",
+   "path": "games/holeio/index.html",
+   "thumb": "images/thumbnails/holeio.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "iceclimber",
+   "name": "ice climber",
+   "path": "games/iceclimber/index.html",
+   "thumb": "images/thumbnails/iceclimber.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "infiltratingtheairship",
+   "name": "infiltrating the airship",
+   "path": "games/infiltratingtheairship/index.html",
+   "thumb": "images/thumbnails/infiltratingtheairship.jpg",
+   "genre": "adventure"
+  },
+  {
+   "id": "jetpackjoyride",
+   "name": "jetpack joyride",
+   "path": "games/jetpackjoyride/index.html",
+   "thumb": "images/thumbnails/jetpackjoyride.jpg",
+   "genre": "arcade"
+  },
+  {
+   "id": "justfalllol",
+   "name": "just fall lol",
+   "path": "games/justfalllol/index.html",
+   "thumb": "images/thumbnails/justfalllol.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "kirby64",
+   "name": "kirby 64",
+   "path": "games/kirby64/index.html",
+   "thumb": "images/thumbnails/kirby64.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "kirbyamazingmirror",
+   "name": "kirby amazing mirror",
+   "path": "games/kirbyamazingmirror/index.html",
+   "thumb": "images/thumbnails/kirbyamazingmirror.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "kirbymassattack",
+   "name": "kirby mass attack",
+   "path": "games/kirbymassattack/index.html",
+   "thumb": "images/thumbnails/kirbymassattack.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "kirbypowerpaintbrush",
+   "name": "kirby power paintbrush",
+   "path": "games/kirbypowerpaintbrush/index.html",
+   "thumb": "images/thumbnails/kirbypowerpaintbrush.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "kirbysdreamland",
+   "name": "kirby's dream land",
+   "path": "games/kirbysdreamland/index.html",
+   "thumb": "images/thumbnails/kirbysdreamland.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "knifehit",
+   "name": "knife hit",
+   "path": "games/knifehit/index.html",
+   "thumb": "images/thumbnails/knifehit.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "lazyjump3d",
+   "name": "lazy jump 3d",
+   "path": "games/lazyjump3d/index.html",
+   "thumb": "images/thumbnails/lazyjump3d.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "learntofly",
+   "name": "learn to fly",
+   "path": "games/learntofly/index.html",
+   "thumb": "images/thumbnails/learntofly.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "learntofly2",
+   "name": "learn to fly 2",
+   "path": "games/learntofly2/index.html",
+   "thumb": "images/thumbnails/learntofly2.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "learntofly3",
+   "name": "learn to fly 3",
+   "path": "games/learntofly3/index.html",
+   "thumb": "images/thumbnails/learntofly3.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "legobatman",
+   "name": "lego batman",
+   "path": "games/legobatman/index.html",
+   "thumb": "images/thumbnails/legobatman.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "linerider",
+   "name": "line rider",
+   "path": "games/linerider/index.html",
+   "thumb": "images/thumbnails/linerider.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "linktothepast",
+   "name": "link to the past",
+   "path": "games/linktothepast/index.html",
+   "thumb": "images/thumbnails/linktothepast.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "majorasmask",
+   "name": "majora's mask",
+   "path": "games/majorasmask/index.html",
+   "thumb": "images/thumbnails/majorasmask.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "mariocombat",
+   "name": "mario combat",
+   "path": "games/mariocombat/index.html",
+   "thumb": "images/thumbnails/mariocombat.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "mariogolf",
+   "name": "mario golf",
+   "path": "games/mariogolf/index.html",
+   "thumb": "images/thumbnails/mariogolf.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "mariokart64",
+   "name": "mario kart 64",
+   "path": "games/mariokart64/index.html",
+   "thumb": "images/thumbnails/mariokart64.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "mariokartds",
+   "name": "mario kart ds",
+   "path": "games/mariokartds/index.html",
+   "thumb": "images/thumbnails/mariokartds.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "mariokartsupercircuit",
+   "name": "mario kart super circuit",
+   "path": "games/mariokartsupercircuit/index.html",
+   "thumb": "images/thumbnails/mariokartsupercircuit.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "mariopaint",
+   "name": "mario paint",
+   "path": "games/mariopaint/index.html",
+   "thumb": "images/thumbnails/mariopaint.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "marioparty",
+   "name": "mario party",
+   "path": "games/marioparty/index.html",
+   "thumb": "images/thumbnails/marioparty.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "marioparty2",
+   "name": "mario party 2",
+   "path": "games/marioparty2/index.html",
+   "thumb": "images/thumbnails/marioparty2.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "marioparty3",
+   "name": "mario party 3",
+   "path": "games/marioparty3/index.html",
+   "thumb": "images/thumbnails/marioparty3.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "mariopartyadvance",
+   "name": "mario party advance",
+   "path": "games/mariopartyadvance/index.html",
+   "thumb": "images/thumbnails/mariopartyadvance.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "mariopartyds",
+   "name": "mario party ds",
+   "path": "games/mariopartyds/index.html",
+   "thumb": "images/thumbnails/mariopartyds.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "mariopinballland",
+   "name": "mario pinball land",
+   "path": "games/mariopinballland/index.html",
+   "thumb": "images/thumbnails/mariopinballland.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "mariotennis",
+   "name": "mario tennis",
+   "path": "games/mariotennis/index.html",
+   "thumb": "images/thumbnails/mariotennis.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "mctowerdefence2",
+   "name": "mc tower defence 2",
+   "path": "games/mctowerdefence2/index.html",
+   "thumb": "images/thumbnails/mctowerdefence2.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "megamanx",
+   "name": "mega man x",
+   "path": "games/megamanx/index.html",
+   "thumb": "images/thumbnails/megamanx.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "megamanzero",
+   "name": "mega man zero",
+   "path": "games/megamanzero/index.html",
+   "thumb": "images/thumbnails/megamanzero.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "metalgearsolid",
+   "name": "metal gear solid",
+   "path": "games/metalgearsolid/index.html",
+   "thumb": "images/thumbnails/metalgearsolid.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "metroid",
+   "name": "metroid",
+   "path": "games/metroid/index.html",
+   "thumb": "images/thumbnails/metroid.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "metroidfusion",
+   "name": "metroid fusion",
+   "path": "games/metroidfusion/index.html",
+   "thumb": "images/thumbnails/metroidfusion.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "mc",
+   "name": "minecraft [v1.5.2]",
+   "path": "games/mc/index.html",
+   "thumb": "images/thumbnails/mc.jpg",
+   "genre": "other"
+  },
+  {
+   "id": "mcclassic",
+   "name": "minecraft classic",
+   "path": "games/mcclassic/index.html",
+   "thumb": "images/thumbnails/mcclassic.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "minesweeper",
+   "name": "minesweeper",
+   "path": "games/minesweeper/index.html",
+   "thumb": "images/thumbnails/minesweeper.png",
+   "genre": "puzzle"
+  },
+  {
+   "id": "monkeymart",
+   "name": "monkey mart",
+   "path": "games/monkeymart/index.html",
+   "thumb": "images/thumbnails/monkeymart.png",
+   "genre": "simulation"
+  },
+  {
+   "id": "monopoly",
+   "name": "monopoly",
+   "path": "games/monopoly/index.html",
+   "thumb": "images/thumbnails/monopoly.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "monsterbrawl",
+   "name": "monster brawl",
+   "path": "games/monsterbrawl/index.html",
+   "thumb": "images/thumbnails/monsterbrawl.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "mortalkombat4",
+   "name": "mortal kombat 4",
+   "path": "games/mortalkombat4/index.html",
+   "thumb": "images/thumbnails/mortalkombat4.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "mother3",
+   "name": "mother 3",
+   "path": "games/mother3/index.html",
+   "thumb": "images/thumbnails/mother3.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "motox3m",
+   "name": "motox3m",
+   "path": "games/motox3m/index.html",
+   "thumb": "images/thumbnails/motox3m.jpeg",
+   "genre": "platformer"
+  },
+  {
+   "id": "motox3mpool",
+   "name": "motox3m pool",
+   "path": "games/motox3mpool/index.html",
+   "thumb": "images/thumbnails/motox3mpool.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "motox3mspooky",
+   "name": "motox3m spooky",
+   "path": "games/motox3mspooky/index.html",
+   "thumb": "images/thumbnails/motox3mspooky.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "motox3mwinter",
+   "name": "motox3m winter",
+   "path": "games/motox3mwinter/index.html",
+   "thumb": "images/thumbnails/motox3mwinter.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "multitask",
+   "name": "multitask",
+   "path": "games/multitask/index.html",
+   "thumb": "images/thumbnails/multitask.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "pokemonmysterydungeon",
+   "name": "mystery dungeon",
+   "path": "games/pokemonmysterydungeon/index.html",
+   "thumb": "images/thumbnails/pokemonmysterydungeon.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "newsupermariobros",
+   "name": "new super mario bros",
+   "path": "games/newsupermariobros/index.html",
+   "thumb": "images/thumbnails/newsupermariobros.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "ngon",
+   "name": "ngon",
+   "path": "games/ngon/index.html",
+   "thumb": "images/thumbnails/ngon.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "nintendogs",
+   "name": "nintendogs",
+   "path": "games/nintendogs/index.html",
+   "thumb": "images/thumbnails/nintendogs.png",
+   "genre": "simulation"
+  },
+  {
+   "id": "ocarinaoftime",
+   "name": "ocarina of time",
+   "path": "games/ocarinaoftime/index.html",
+   "thumb": "images/thumbnails/ocarinaoftime.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "offlineparadise",
+   "name": "offline paradise",
+   "path": "games/offlineparadise/index.html",
+   "thumb": "images/thumbnails/offlineparadise.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "osumania",
+   "name": "osu!mania",
+   "path": "games/osumania/index.html",
+   "thumb": "images/thumbnails/osumania.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "ovo",
+   "name": "ovo",
+   "path": "games/ovo/index.html",
+   "thumb": "images/thumbnails/ovo.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "pacman",
+   "name": "pacman",
+   "path": "games/pacman/index.html",
+   "thumb": "images/thumbnails/pacman.jpg",
+   "genre": "arcade"
+  },
+  {
+   "id": "pacmanworld",
+   "name": "pacman world",
+   "path": "games/pacmanworld/index.html",
+   "thumb": "images/thumbnails/pacmanworld.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "papasbakeria",
+   "name": "papa's bakeria",
+   "path": "games/papasbakeria/index.html",
+   "thumb": "images/thumbnails/papasbakeria.png",
+   "genre": "simulation"
+  },
+  {
+   "id": "papasburgeria",
+   "name": "papa's burgeria",
+   "path": "games/papasburgeria/index.html",
+   "thumb": "images/thumbnails/papasburgeria.jpg",
+   "genre": "simulation"
+  },
+  {
+   "id": "papascheeseria",
+   "name": "papa's cheeseria",
+   "path": "games/papascheeseria/index.html",
+   "thumb": "images/thumbnails/papascheeseria.png",
+   "genre": "simulation"
+  },
+  {
+   "id": "papascupcakeria",
+   "name": "papa's cupcakeria",
+   "path": "games/papascupcakeria/index.html",
+   "thumb": "images/thumbnails/papascupcakeria.png",
+   "genre": "simulation"
+  },
+  {
+   "id": "papasdonuteria",
+   "name": "papa's donuteria",
+   "path": "games/papasdonuteria/index.html",
+   "thumb": "images/thumbnails/papasdonuteria.png",
+   "genre": "simulation"
+  },
+  {
+   "id": "papasfreezeria",
+   "name": "papa's freezeria",
+   "path": "games/papasfreezeria/index.html",
+   "thumb": "images/thumbnails/papasfreezeria.png",
+   "genre": "simulation"
+  },
+  {
+   "id": "papashotdoggeria",
+   "name": "papa's hotdoggeria",
+   "path": "games/papashotdoggeria/index.html",
+   "thumb": "images/thumbnails/papashotdoggeria.jpg",
+   "genre": "simulation"
+  },
+  {
+   "id": "papaspancakeria",
+   "name": "papa's pancakeria",
+   "path": "games/papaspancakeria/index.html",
+   "thumb": "images/thumbnails/papaspancakeria.jpg",
+   "genre": "simulation"
+  },
+  {
+   "id": "papaspastaria",
+   "name": "papa's pastaria",
+   "path": "games/papaspastaria/index.html",
+   "thumb": "images/thumbnails/papaspastaria.png",
+   "genre": "simulation"
+  },
+  {
+   "id": "papaspizzaria",
+   "name": "papa's pizzaria",
+   "path": "games/papaspizzaria/index.html",
+   "thumb": "images/thumbnails/papaspizzeria.jpg",
+   "genre": "simulation"
+  },
+  {
+   "id": "papasscooperia",
+   "name": "papa's scooperia",
+   "path": "games/papasscooperia/index.html",
+   "thumb": "images/thumbnails/papasscooperia.png",
+   "genre": "simulation"
+  },
+  {
+   "id": "papassushiria",
+   "name": "papa's sushiria",
+   "path": "games/papassushiria/index.html",
+   "thumb": "images/thumbnails/papaswingeria.png",
+   "genre": "simulation"
+  },
+  {
+   "id": "papastacomia",
+   "name": "papa's tacomia",
+   "path": "games/papastacomia/index.html",
+   "thumb": "images/thumbnails/papastacomia.png",
+   "genre": "simulation"
+  },
+  {
+   "id": "papaswingeria",
+   "name": "papa's wingeria",
+   "path": "games/papaswingeria/index.html",
+   "thumb": "images/thumbnails/papassushiria.png",
+   "genre": "simulation"
+  },
+  {
+   "id": "paperio3d",
+   "name": "paper io 3d",
+   "path": "games/paperio3d/index.html",
+   "thumb": "images/thumbnails/paperio3d.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "papermario",
+   "name": "paper mario",
+   "path": "games/papermario/index.html",
+   "thumb": "images/thumbnails/papermario.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "paperio2",
+   "name": "paperio2",
+   "path": "games/paperio2/index.html",
+   "thumb": "images/thumbnails/paperio2.jpg",
+   "genre": "arcade"
+  },
+  {
+   "id": "picrossds",
+   "name": "picross ds",
+   "path": "games/picrossds/index.html",
+   "thumb": "images/thumbnails/picrossds.png",
+   "genre": "puzzle"
+  },
+  {
+   "id": "pizzatower",
+   "name": "pizza tower",
+   "path": "games/pizzatower/index.html",
+   "thumb": "images/thumbnails/pizzatower.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "pokemondiamond",
+   "name": "pokemon diamond",
+   "path": "games/pokemondiamond/index.html",
+   "thumb": "images/thumbnails/pokemondiamond.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "pokemonemerald",
+   "name": "pokemon emerald",
+   "path": "games/pokemonemerald/index.html",
+   "thumb": "images/thumbnails/pokemonemerald.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "pokemonfirered",
+   "name": "pokemon fire red",
+   "path": "games/pokemonfirered/index.html",
+   "thumb": "images/thumbnails/pokemonfirered.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "pokemonleafgreen",
+   "name": "pokemon leaf green",
+   "path": "games/pokemonleafgreen/index.html",
+   "thumb": "images/thumbnails/pokemonleafgreen.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "pokemonplatinum",
+   "name": "pokemon platinum",
+   "path": "games/pokemonplatinum/index.html",
+   "thumb": "images/thumbnails/pokemonplatinum.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "pokemonruby",
+   "name": "pokemon ruby",
+   "path": "games/pokemonruby/index.html",
+   "thumb": "images/thumbnails/pokemonruby.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "pokemonsapphire",
+   "name": "pokemon sapphire",
+   "path": "games/pokemonsapphire/index.html",
+   "thumb": "images/thumbnails/pokemonsapphire.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "pokemonsnap",
+   "name": "pokemon snap",
+   "path": "games/pokemonsnap/index.html",
+   "thumb": "images/thumbnails/pokemonsnap.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "pokemonsoulsilver",
+   "name": "pokemon soulsilver",
+   "path": "games/pokemonsoulsilver/index.html",
+   "thumb": "images/thumbnails/pokemonsoulsilver.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "pokemonstadium",
+   "name": "pokemon stadium",
+   "path": "games/pokemonstadium/index.html",
+   "thumb": "images/thumbnails/pokemonstadium.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "pokemonunbound",
+   "name": "pokemon unbound",
+   "path": "games/pokemonunbound/index.html",
+   "thumb": "images/thumbnails/pokemonunbound.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "pool",
+   "name": "pool",
+   "path": "games/pool/index.html",
+   "thumb": "images/thumbnails/pool.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "portal",
+   "name": "portal",
+   "path": "games/portal/index.html",
+   "thumb": "images/thumbnails/portal.png",
+   "genre": "puzzle"
+  },
+  {
+   "id": "portal2",
+   "name": "portal 2",
+   "path": "games/portal2/index.html",
+   "thumb": "images/thumbnails/portal2.png",
+   "genre": "puzzle"
+  },
+  {
+   "id": "professorlayton",
+   "name": "professor layton",
+   "path": "games/professorlayton/index.html",
+   "thumb": "images/thumbnails/professorlayton.png",
+   "genre": "puzzle"
+  },
+  {
+   "id": "quest64",
+   "name": "quest 64",
+   "path": "games/quest64/index.html",
+   "thumb": "images/thumbnails/quest64.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "rabbitsamurai",
+   "name": "rabbit samurai",
+   "path": "games/rabbitsamurai/index.html",
+   "thumb": "images/thumbnails/rabbitsamurai.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "raftwars",
+   "name": "raft wars",
+   "path": "games/raftwars/index.html",
+   "thumb": "images/thumbnails/raftwars.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "raftwars2",
+   "name": "raft wars 2",
+   "path": "games/raftwars2/index.html",
+   "thumb": "images/thumbnails/raftwars2.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "rayman3",
+   "name": "rayman 3",
+   "path": "games/rayman3/index.html",
+   "thumb": "images/thumbnails/rayman3.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "redball1",
+   "name": "redball",
+   "path": "games/redball1/index.html",
+   "thumb": "images/thumbnails/redball.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "redball3",
+   "name": "redball 3",
+   "path": "games/redball3/index.html",
+   "thumb": "images/thumbnails/redball3.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "redball4",
+   "name": "redball 4",
+   "path": "games/redball4/index.html",
+   "thumb": "images/thumbnails/redball4.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "redballv2",
+   "name": "redball 4 vol 2",
+   "path": "games/redballv2/index.html",
+   "thumb": "images/thumbnails/redball4vol2.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "redballv3",
+   "name": "retro 4 vol 3",
+   "path": "games/redballv3/index.html",
+   "thumb": "images/thumbnails/redball4vol3.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "retrobowl",
+   "name": "retro bowl",
+   "path": "games/retrobowl/index.html",
+   "thumb": "images/thumbnails/retrobowl.jpg",
+   "genre": "arcade"
+  },
+  {
+   "id": "riddleschool",
+   "name": "riddle school",
+   "path": "games/riddleschool/riddleschool1/index.html",
+   "thumb": "images/thumbnails/riddleschool.jpg",
+   "genre": "puzzle"
+  },
+  {
+   "id": "risehigher",
+   "name": "rise higher",
+   "path": "games/risehigher/index.html",
+   "thumb": "images/thumbnails/risehigher.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "rocketsoccer",
+   "name": "rocket soccer",
+   "path": "games/rocketsoccer/index.html",
+   "thumb": "images/thumbnails/rocketsoccer.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "rooftop",
+   "name": "rooftop snipers",
+   "path": "games/rooftop/index.html",
+   "thumb": "images/thumbnails/rooftopsnipers.jpg",
+   "genre": "arcade"
+  },
+  {
+   "id": "rooftop2",
+   "name": "rooftop snipers 2",
+   "path": "games/rooftop2/index.html",
+   "thumb": "images/thumbnails/rooftopsnipers2.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "roughdino",
+   "name": "rough dino",
+   "path": "games/roughdino/index.html",
+   "thumb": "images/thumbnails/roughdino.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "run",
+   "name": "run",
+   "path": "games/run/index.html",
+   "thumb": "images/thumbnails/run.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "run2",
+   "name": "run 2",
+   "path": "games/run2/index.html",
+   "thumb": "images/thumbnails/run2.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "run3",
+   "name": "run 3",
+   "path": "games/run3/index.html",
+   "thumb": "images/thumbnails/run3.jpg",
+   "genre": "platformer"
+  },
+  {
+   "id": "sandtrix",
+   "name": "sandtrix",
+   "path": "games/sandtrix/index.html",
+   "thumb": "images/thumbnails/sandtrix.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "scribblenauts",
+   "name": "scribblenauts",
+   "path": "games/scribblenauts/index.html",
+   "thumb": "images/thumbnails/scribblenauts.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "shapeshipper",
+   "name": "shapeshipper",
+   "path": "games/shapeshipper/index.html",
+   "thumb": "images/thumbnails/shapeshipper.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "shift",
+   "name": "shift",
+   "path": "games/shift/index.html",
+   "thumb": "images/thumbnails/shift.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "shift2",
+   "name": "shift 2",
+   "path": "games/shift2/index.html",
+   "thumb": "images/thumbnails/shift2.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "shift3",
+   "name": "shift 3",
+   "path": "games/shift3/index.html",
+   "thumb": "images/thumbnails/shift3.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "shift4",
+   "name": "shift 4",
+   "path": "games/shift4/index.html",
+   "thumb": "images/thumbnails/shift4.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "shopempire",
+   "name": "shop empire",
+   "path": "games/shopempire/index.html",
+   "thumb": "images/thumbnails/shopempire.png",
+   "genre": "simulation"
+  },
+  {
+   "id": "shrek2",
+   "name": "shrek 2",
+   "path": "games/shrek2/index.html",
+   "thumb": "images/thumbnails/shrek2.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "simcity",
+   "name": "simcity 2000",
+   "path": "games/simcity/index.html",
+   "thumb": "images/thumbnails/simcity2000.png",
+   "genre": "simulation"
+  },
+  {
+   "id": "simpsonsroadrage",
+   "name": "simpsons road rage",
+   "path": "games/simpsonsroadrage/index.html",
+   "thumb": "images/thumbnails/simpsonsroadrage.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "skibidi1v100",
+   "name": "skibidi toilet 1v100",
+   "path": "games/skibidi1v100/index.html",
+   "thumb": "images/thumbnails/skibiditoilet1v100.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "skibiditoiletattack",
+   "name": "skibidi toilet attack",
+   "path": "games/skibiditoiletattack/index.html",
+   "thumb": "images/thumbnails/skibiditoiletattack.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "skywire",
+   "name": "skywire",
+   "path": "games/skywire/index.html",
+   "thumb": "images/thumbnails/skywire.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "skywire2",
+   "name": "skywire 2",
+   "path": "games/skywire2/index.html",
+   "thumb": "images/thumbnails/skywire2.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "slope",
+   "name": "slope",
+   "path": "games/slope/index.html",
+   "thumb": "images/thumbnails/slope.jpg",
+   "genre": "platformer"
+  },
+  {
+   "id": "slope2",
+   "name": "slope 2",
+   "path": "games/slope2/index.html",
+   "thumb": "images/thumbnails/slope2.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "slopeball",
+   "name": "slope ball",
+   "path": "games/slopeball/index.html",
+   "thumb": "images/thumbnails/slopeball.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "snake",
+   "name": "snake",
+   "path": "games/snake/index.html",
+   "thumb": "images/thumbnails/snake.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "snowbattleio",
+   "name": "snow battle io",
+   "path": "games/snowbattleio/index.html",
+   "thumb": "images/thumbnails/snowbattleio.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "snowrider3d",
+   "name": "snow rider 3d",
+   "path": "games/snowrider3d/index.html",
+   "thumb": "images/thumbnails/snowrider3d.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "soccerrandom",
+   "name": "soccer random",
+   "path": "games/soccerrandom/index.html",
+   "thumb": "images/thumbnails/soccerrandom.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "solitaire",
+   "name": "solitaire",
+   "path": "games/solitaire/index.html",
+   "thumb": "images/thumbnails/solitaire.jpg",
+   "genre": "puzzle"
+  },
+  {
+   "id": "sonicadvance",
+   "name": "sonic advance",
+   "path": "games/sonicadvance/index.html",
+   "thumb": "images/thumbnails/sonicadvance.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "sonicadvance2",
+   "name": "sonic advance 2",
+   "path": "games/sonicadvance2/index.html",
+   "thumb": "images/thumbnails/sonicadvance2.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "sonicandknuckles",
+   "name": "sonic and knuckles",
+   "path": "games/sonicandknuckles/index.html",
+   "thumb": "images/thumbnails/sonicandknuckles.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "sonicrush",
+   "name": "sonic rush",
+   "path": "games/sonicrush/index.html",
+   "thumb": "images/thumbnails/sonicrush.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "sonicspinball",
+   "name": "sonic spinball",
+   "path": "games/sonicspinball/index.html",
+   "thumb": "images/thumbnails/sonicspinball.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "sonicthehedgehog3",
+   "name": "sonic the hedgehog 3",
+   "path": "games/sonicthehedgehog3/index.html",
+   "thumb": "images/thumbnails/sonicthehedgehog3.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "sortthecourt",
+   "name": "sort the court",
+   "path": "games/sortthecourt/index.html",
+   "thumb": "images/thumbnails/sortthecourt.png",
+   "genre": "simulation"
+  },
+  {
+   "id": "spaceinvaders",
+   "name": "space invaders",
+   "path": "games/spaceinvaders/index.html",
+   "thumb": "images/thumbnails/spaceinvaders.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "spirittracks",
+   "name": "spirit tracks",
+   "path": "games/spirittracks/index.html",
+   "thumb": "images/thumbnails/spirittracks.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "sprinter",
+   "name": "sprinter",
+   "path": "games/sprinter/index.html",
+   "thumb": "images/thumbnails/sprinter.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "stack",
+   "name": "stack",
+   "path": "games/stack/index.html",
+   "thumb": "images/thumbnails/stack.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "stairrace3d",
+   "name": "stair race 3d",
+   "path": "games/stairrace3d/index.html",
+   "thumb": "images/thumbnails/stairrace3d.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "starfox64",
+   "name": "star fox 64",
+   "path": "games/starfox64/index.html",
+   "thumb": "images/thumbnails/starfox64.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "stealingthediamond",
+   "name": "stealing the diamond",
+   "path": "games/stealingthediamond/index.html",
+   "thumb": "images/thumbnails/stealingthediamond.jpg",
+   "genre": "adventure"
+  },
+  {
+   "id": "stickmanboost",
+   "name": "stickman boost",
+   "path": "games/stickmanboost/index.html",
+   "thumb": "images/thumbnails/stickmanboost.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "stickmanclimb",
+   "name": "stickman climb",
+   "path": "games/stickmanclimb/index.html",
+   "thumb": "images/thumbnails/stickmanclimb.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "stickmangolf",
+   "name": "stickman golf",
+   "path": "games/stickmangolf/index.html",
+   "thumb": "images/thumbnails/stickmangolf.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "stickmanhook",
+   "name": "stickman hook",
+   "path": "games/stickmanhook/index.html",
+   "thumb": "images/thumbnails/stickmanhook.png",
+   "genre": "mobile"
+  },
+  {
+   "id": "streetfighter2",
+   "name": "street fighter 2",
+   "path": "games/streetfighter2/index.html",
+   "thumb": "images/thumbnails/streetfighter2.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "streetsofrage",
+   "name": "streets of rage",
+   "path": "games/streetsofrage/index.html",
+   "thumb": "images/thumbnails/streetsofrage.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "subwaysurfers",
+   "name": "subway surfers",
+   "path": "games/subwaysurfers/index.html",
+   "thumb": "images/thumbnails/subwaysurfers.jpeg",
+   "genre": "platformer"
+  },
+  {
+   "id": "superbomberman",
+   "name": "super bomberman",
+   "path": "games/superbomberman/index.html",
+   "thumb": "images/thumbnails/superbomberman.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "superhot",
+   "name": "super hot",
+   "path": "games/superhot/index.html",
+   "thumb": "images/thumbnails/superhot.jpg",
+   "genre": "adventure"
+  },
+  {
+   "id": "sm64",
+   "name": "super mario 64",
+   "path": "games/sm64/index.html",
+   "thumb": "images/thumbnails/sm64.jpg",
+   "genre": "platformer"
+  },
+  {
+   "id": "sm64ds",
+   "name": "super mario 64 ds",
+   "path": "games/sm64ds/index.html",
+   "thumb": "images/thumbnails/sm64ds.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "supermariobros",
+   "name": "super mario bros",
+   "path": "games/supermariobros/index.html",
+   "thumb": "images/thumbnails/supermariobros.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "supermariobros2",
+   "name": "super mario bros 2",
+   "path": "games/supermariobros2/index.html",
+   "thumb": "images/thumbnails/supermariobros2.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "supermariobros3",
+   "name": "super mario bros 3",
+   "path": "games/supermariobros3/index.html",
+   "thumb": "images/thumbnails/supermariobros3.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "supermarioconstruct",
+   "name": "super mario construct",
+   "path": "games/supermarioconstruct/index.html",
+   "thumb": "images/thumbnails/supermarioconstruct.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "supermarioflash",
+   "name": "super mario flash",
+   "path": "games/supermarioflash/index.html",
+   "thumb": "images/thumbnails/supermarioflash.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "supermarioflash2",
+   "name": "super mario flash 2",
+   "path": "games/supermarioflash2/index.html",
+   "thumb": "images/thumbnails/supermarioflash2.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "supermariokart",
+   "name": "super mario kart",
+   "path": "games/supermariokart/index.html",
+   "thumb": "images/thumbnails/supermariokart.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "supermarioland",
+   "name": "super mario land",
+   "path": "games/supermarioland/index.html",
+   "thumb": "images/thumbnails/supermarioland.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "supermariorpg",
+   "name": "super mario rpg",
+   "path": "games/supermariorpg/index.html",
+   "thumb": "images/thumbnails/supermariorpg.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "supermarioworld",
+   "name": "super mario world",
+   "path": "games/supermarioworld/index.html",
+   "thumb": "images/thumbnails/supermarioworld.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "supermeatboy",
+   "name": "super meat boy",
+   "path": "games/supermeatboy/index.html",
+   "thumb": "images/thumbnails/supermeatboy.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "supermonkeyballjr",
+   "name": "super monkey ball jr",
+   "path": "games/supermonkeyballjr/index.html",
+   "thumb": "images/thumbnails/supermonkeyballjr.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "superprincesspeach",
+   "name": "super princess peach",
+   "path": "games/superprincesspeach/index.html",
+   "thumb": "images/thumbnails/superprincesspeach.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "supersmashbros",
+   "name": "super smash bros",
+   "path": "games/supersmashbros/index.html",
+   "thumb": "images/thumbnails/supersmashbros.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "supersmashflash",
+   "name": "super smash flash",
+   "path": "games/supersmashflash/index.html",
+   "thumb": "images/thumbnails/supersmashflash.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "supertennis",
+   "name": "super tennis",
+   "path": "games/supertennis/index.html",
+   "thumb": "images/thumbnails/supertennis.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "superstarsaga",
+   "name": "superstar saga",
+   "path": "games/superstarsaga/index.html",
+   "thumb": "images/thumbnails/superstarsaga.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "swordsandsandals",
+   "name": "swords and sandals",
+   "path": "games/swordsandsandals/index.html",
+   "thumb": "images/thumbnails/swordsandsandals.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "swordsandsandals2",
+   "name": "swords and sandals 2",
+   "path": "games/swordsandsandals2/index.html",
+   "thumb": "images/thumbnails/swordsandsandals2.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "tanukisunset",
+   "name": "tanuki sunset",
+   "path": "games/tanukisunset/index.html",
+   "thumb": "images/thumbnails/tanukisunset.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "templerun2",
+   "name": "temple run 2",
+   "path": "games/templerun2/index.html",
+   "thumb": "images/thumbnails/templerun2.jpg",
+   "genre": "platformer"
+  },
+  {
+   "id": "territorialio",
+   "name": "territorial io",
+   "path": "games/territorialio/index.html",
+   "thumb": "images/thumbnails/territorialio.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "tetris",
+   "name": "tetris",
+   "path": "games/tetris/index.html",
+   "thumb": "images/thumbnails/tetris.jpg",
+   "genre": "other"
+  },
+  {
+   "id": "tetrisds",
+   "name": "tetris ds",
+   "path": "games/tetrisds/index.html",
+   "thumb": "images/thumbnails/tetrisds.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "thebindingofisaac",
+   "name": "the binding of isaac",
+   "path": "games/thebindingofisaac/index.html",
+   "thumb": "images/thumbnails/thebindingofisaac.jpg",
+   "genre": "adventure"
+  },
+  {
+   "id": "theimpossiblequiz",
+   "name": "the impossible quiz",
+   "path": "games/theimpossiblequiz/index.html",
+   "thumb": "images/thumbnails/theimpossiblequiz.jpg",
+   "genre": "arcade"
+  },
+  {
+   "id": "theimpossiblequiz2",
+   "name": "the impossible quiz 2",
+   "path": "games/theimpossiblequiz2/index.html",
+   "thumb": "images/thumbnails/theimpossiblequiz2.png",
+   "genre": "puzzle"
+  },
+  {
+   "id": "thelegendofzelda",
+   "name": "the legend of zelda",
+   "path": "games/thelegendofzelda/index.html",
+   "thumb": "images/thumbnails/thelegendofzelda.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "thesims2",
+   "name": "the sims 2",
+   "path": "games/thesims2/index.html",
+   "thumb": "images/thumbnails/thesims2.png",
+   "genre": "simulation"
+  },
+  {
+   "id": "thesims3",
+   "name": "the sims 3",
+   "path": "games/thesims3/index.html",
+   "thumb": "images/thumbnails/thesims3.png",
+   "genre": "simulation"
+  },
+  {
+   "id": "themehotel",
+   "name": "theme hotel",
+   "path": "games/themehotel/index.html",
+   "thumb": "images/thumbnails/themehotel.jpg",
+   "genre": "simulation"
+  },
+  {
+   "id": "thereisnogame",
+   "name": "there is no game",
+   "path": "games/thereisnogame/index.html",
+   "thumb": "images/thumbnails/thereisnogame.png",
+   "genre": "mobile"
+  },
+  {
+   "id": "thisistheonlylevel",
+   "name": "this is the only level",
+   "path": "games/thisistheonlylevel/index.html",
+   "thumb": "images/thumbnails/thisistheonlylevel.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "thumbfighter",
+   "name": "thumb fighter",
+   "path": "games/thumbfighter/index.html",
+   "thumb": "images/thumbnails/thumbfighter.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "timeshooter1",
+   "name": "time shooter",
+   "path": "games/timeshooter1/index.html",
+   "thumb": "images/thumbnails/timeshooter.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "timeshooter2",
+   "name": "time shooter 2",
+   "path": "games/timeshooter2/index.html",
+   "thumb": "images/thumbnails/timeshooter2.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "timeshooter3",
+   "name": "time shooter 3",
+   "path": "games/timeshooter3/index.html",
+   "thumb": "images/thumbnails/timeshooter3.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "tinyfishing",
+   "name": "tiny fishing",
+   "path": "games/tinyfishing/index.html",
+   "thumb": "images/thumbnails/tinyfishing.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "tabs",
+   "name": "totally accurate battle sim",
+   "path": "games/tabs/index.html",
+   "thumb": "images/thumbnails/totallyaccuratebattlesim.png",
+   "genre": "simulation"
+  },
+  {
+   "id": "townscaper",
+   "name": "townscaper",
+   "path": "games/townscaper/index.html",
+   "thumb": "images/thumbnails/townscaper.jpg",
+   "genre": "simulation"
+  },
+  {
+   "id": "tron",
+   "name": "tron",
+   "path": "games/tron/index.html",
+   "thumb": "images/thumbnails/tron.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "tubejumpers",
+   "name": "tube jumpers",
+   "path": "games/tubejumpers/index.html",
+   "thumb": "images/thumbnails/tubejumpers.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "tunnelrush",
+   "name": "tunnel rush",
+   "path": "games/tunnelrush/index.html",
+   "thumb": "images/thumbnails/tunnelrush.jpg",
+   "genre": "arcade"
+  },
+  {
+   "id": "unfairmario",
+   "name": "unfair mario",
+   "path": "games/unfairmario/index.html",
+   "thumb": "images/thumbnails/unfairmario.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "vex",
+   "name": "vex",
+   "path": "games/vex/index.html",
+   "thumb": "images/thumbnails/vex.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "vex2",
+   "name": "vex 2",
+   "path": "games/vex2/index.html",
+   "thumb": "images/thumbnails/vex2.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "vex3",
+   "name": "vex 3",
+   "path": "games/vex3/index.html",
+   "thumb": "images/thumbnails/vex3.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "vex4",
+   "name": "vex 4",
+   "path": "games/vex4/index.html",
+   "thumb": "images/thumbnails/vex4.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "vex5",
+   "name": "vex 5",
+   "path": "games/vex5/index.html",
+   "thumb": "images/thumbnails/vex5.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "vex6",
+   "name": "vex 6",
+   "path": "games/vex6/index.html",
+   "thumb": "images/thumbnails/vex6.jpg",
+   "genre": "platformer"
+  },
+  {
+   "id": "vex7",
+   "name": "vex 7",
+   "path": "games/vex7/index.html",
+   "thumb": "images/thumbnails/vex7.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "volleyrandom",
+   "name": "volley random",
+   "path": "games/volleyrandom/index.html",
+   "thumb": "images/thumbnails/volleyrandom.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "wallsmash",
+   "name": "wall smash",
+   "path": "games/wallsmash/index.html",
+   "thumb": "images/thumbnails/wallsmash.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "warioland4",
+   "name": "wario land 4",
+   "path": "games/warioland4/index.html",
+   "thumb": "images/thumbnails/warioland4.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "warioswoods",
+   "name": "wario's woods",
+   "path": "games/warioswoods/index.html",
+   "thumb": "images/thumbnails/warioswoods.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "warioware",
+   "name": "warioware",
+   "path": "games/warioware/index.html",
+   "thumb": "images/thumbnails/warioware.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "wariowarediy",
+   "name": "warioware diy",
+   "path": "games/wariowarediy/index.html",
+   "thumb": "images/thumbnails/wariowarediy.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "wariowaretouched",
+   "name": "warioware touched",
+   "path": "games/wariowaretouched/index.html",
+   "thumb": "images/thumbnails/wariowaretouched.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "watermelongame",
+   "name": "watermelon game",
+   "path": "games/watermelongame/index.html",
+   "thumb": "images/thumbnails/watermelongame.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "waterworks",
+   "name": "waterworks",
+   "path": "games/waterworks/index.html",
+   "thumb": "images/thumbnails/waterworks.png",
+   "genre": "simulation"
+  },
+  {
+   "id": "waverace64",
+   "name": "wave race 64",
+   "path": "games/waverace64/index.html",
+   "thumb": "images/thumbnails/waveracing.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "wordle",
+   "name": "wordle",
+   "path": "games/wordle/index.html",
+   "thumb": "images/thumbnails/wordle.png",
+   "genre": "arcade"
+  },
+  {
+   "id": "worldshardestgame",
+   "name": "world's hardest game",
+   "path": "games/worldshardestgame/index.html",
+   "thumb": "images/thumbnails/worldshardestgame.png",
+   "genre": "puzzle"
+  },
+  {
+   "id": "worldshardestgame2",
+   "name": "worlds hardest game 2",
+   "path": "games/worldshardestgame2/index.html",
+   "thumb": "images/thumbnails/worldshardestgame2.png",
+   "genre": "platformer"
+  },
+  {
+   "id": "wormsworldparty",
+   "name": "worms world party",
+   "path": "games/wormsworldparty/index.html",
+   "thumb": "images/thumbnails/wormsworldparty.png",
+   "genre": "adventure"
+  },
+  {
+   "id": "yohoho",
+   "name": "yohoho io",
+   "path": "games/yohoho/index.html",
+   "thumb": "images/thumbnails/yohoho.png",
+   "genre": "mobile"
+  },
+  {
+   "id": "yoshisisland",
+   "name": "yoshi's island",
+   "path": "games/yoshisisland/index.html",
+   "thumb": "images/thumbnails/yoshisisland.png",
+   "genre": "platformer"
+  }
+ ],
+ "apps": [
+  {
+   "id": "emulatorjs",
+   "name": "emulatorjs",
+   "path": "apps/emulatorjs/index.html",
+   "thumb": "images/thumbnails/emulatorjs.png",
+   "desc": "run hundreds of roms from popular retro game consoles (for example: game boy advance, snes, game boy, nes, atari, nintendo ds, n64, atari 2600)"
+  },
+  {
+   "id": "htmlcoder",
+   "name": "html coder",
+   "path": "apps/htmlcoder/index.html",
+   "thumb": "images/thumbnails/htmleditor.png",
+   "desc": "a fully functioning html code editor! upload from your device, or create static html pages from scratch"
+  },
+  {
+   "id": "ruffle",
+   "name": "ruffle",
+   "path": "apps/ruffle/index.html",
+   "thumb": "images/thumbnails/ruffle.png",
+   "desc": "emulate thousands of flash games with ruffle! upload a file here and run it directly inside seraph"
+  },
+  {
+   "id": "thirtydollarwebsite",
+   "name": "thirty dollar website",
+   "path": "apps/thirtydollarwebsite/index.html",
+   "thumb": "images/thumbnails/thirtydollarwebsite.png",
+   "desc": "a tool which can be used to make music entirely through meme sound effects and simple instruments"
+  },
+  {
+   "id": "turbowarp",
+   "name": "turbowarp",
+   "path": "apps/turbowarp/index.html",
+   "thumb": "images/thumbnails/turbowarp.png",
+   "desc": "a scratch mod which introduces lots of quality of life changes + compiles projects to javascript, making them run faster"
+  },
+  {
+   "id": "turbowarppkg",
+   "name": "turbowarp packager",
+   "path": "apps/turbowarppkg/index.html",
+   "thumb": "images/thumbnails/turbowarppkg.png",
+   "desc": "a tool that converts scratch projects into HTML files, zip archives, or applications for windows, macos, and linux."
+  },
+  {
+   "id": "turbowarpunpkg",
+   "name": "turbowarp unpackager",
+   "path": "apps/turbowarpunpkg/index.html",
+   "thumb": "images/thumbnails/turbowarpunpkg.png",
+   "desc": "a tool that unpackages html/zip files generated by turbowarp's packager, forkphorous or htmlfier into their original scratch project."
+  },
+  {
+   "id": "v86",
+   "name": "v86",
+   "path": "apps/v86/index.html",
+   "thumb": "images/thumbnails/v86.png",
+   "desc": "online emulation of x86-compatible cpu's and hardware - translated to webassembly for optimal performance"
+  },
+  {
+   "id": "weavesilk",
+   "name": "weavesilk",
+   "path": "apps/weavesilk/index.html",
+   "thumb": "images/thumbnails/weavesilk.png",
+   "desc": "create beautiful flowing art with weavesilk"
+  },
+  {
+   "id": "fluidsim",
+   "name": "webgl fluids",
+   "path": "apps/fluidsim/index.html",
+   "thumb": "images/thumbnails/fluidsim.png",
+   "desc": "a full fluid simulation ran entirely in webgl with support for mobile devices"
+  },
+  {
+   "id": "webretro",
+   "name": "webretro",
+   "path": "apps/webretro/index.html",
+   "thumb": "images/thumbnails/webretro.png",
+   "desc": "upload your roms to old retro devices here!"
+  },
+  {
+   "id": "windows11",
+   "name": "windows 11",
+   "path": "apps/windows11/index.html",
+   "thumb": "images/thumbnails/windows11.png",
+   "desc": "a recreation of windows 11 inside of react, which can be run through a web browwser"
+  }
+ ]
+}
