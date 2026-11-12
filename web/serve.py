@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Serves web/dist on http://localhost:8080 for testing.
+"""Serves web/dist on http://localhost:8080 for testing (the launcher's files from web/).
 
 The headers make the page cross-origin isolated, which the browser requires
 before it lets a page share memory between threads (needed once the game's
@@ -9,7 +9,14 @@ workers run in Web Workers).
 import functools
 import http.server
 import sys
+import urllib.parse
 from pathlib import Path
+
+WEB = Path(__file__).resolve().parent
+# The launcher's own files are served straight from web/, so an edit (config.js
+# above all) shows on reload without rebuilding: build.sh only copies them into
+# dist for hosting. Everything else comes from dist.
+LIVE = {"index.html", "launcher.js", "launcher.css", "config.js", "presence.js", "catalog.json"}
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
@@ -18,6 +25,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         ".wasm": "application/wasm",
         ".js": "text/javascript",
     }
+
+    def translate_path(self, path):
+        name = urllib.parse.unquote(urllib.parse.urlsplit(path).path).lstrip("/") or "index.html"
+        if name in LIVE and (WEB / name).is_file():
+            return str(WEB / name)
+        return super().translate_path(path)
 
     def end_headers(self):
         # The launcher (index.html) embeds other sites, which an isolated page

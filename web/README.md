@@ -99,6 +99,12 @@ by itself; the game page is `game.html`. It offers four options, set up in `conf
   made to be rehosted, e.g. on GitHub Pages). After seraph adds games, refresh the list:
   `python3 web/seraph_catalog.py <seraph checkout>`.
 
+Editing `config.js`: `python3 web/serve.py` serves the launcher's files (`index.html`,
+`launcher.*`, `config.js`, `presence.js`, `catalog.json`) straight from `web/`, so a reload
+picks up an edit. A hosted site serves `dist`, which gets those files from `build.sh`: copy the
+changed file into the deployed folder (or rebuild), then hard-refresh (Ctrl+F5), since hosts
+like GitHub Pages let browsers keep files for about ten minutes.
+
 Only `game.html` is cross-origin isolated (`serve.py` and `sw.js` skip the headers
 for the launcher), because an isolated page can't embed a site that doesn't opt in,
 as the chat doesn't have to.
