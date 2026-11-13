@@ -71,12 +71,21 @@ export class RelayObject extends DurableObject {
 }
 
 export default {
+    // Any failure still answers with the CORS headers, so a page sees the real
+    // error instead of a blocked request.
     async fetch(request, env) {
-        if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS });
-        const url = new URL(request.url);
-        if (url.pathname === "/") return json(200, { service: "z's horizon rooms" });
-        if (url.pathname === "/relay") return env.RELAY.get(env.RELAY.idFromName("relay")).fetch(request);
-        const stub = env.REGISTRY.get(env.REGISTRY.idFromName("registry"));
-        return stub.fetch(request);
+        try {
+            return await route(request, env);
+        } catch (e) {
+            return json(500, { error: String(e?.message ?? e) });
+        }
     },
 };
+
+async function route(request, env) {
+    if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS });
+    const url = new URL(request.url);
+    if (url.pathname === "/") return json(200, { service: "z's horizon rooms" });
+    if (url.pathname === "/relay") return env.RELAY.get(env.RELAY.idFromName("relay")).fetch(request);
+    return env.REGISTRY.get(env.REGISTRY.idFromName("registry")).fetch(request);
+}
