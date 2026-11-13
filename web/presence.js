@@ -2,10 +2,10 @@
 //  - startPresence(): tells it this tab is here and hears how many are online.
 //  - watchSharedWorld(): lists the shared world this tab hosts as a public room,
 //    unless the player switched it off (the launcher's minecraft page has the switch).
-import { RELAY_URL, ROOMS_API } from "./config.js";
+import { RELAY_URLS, ROOMS_APIS } from "./config.js";
 
 // Tried before the game's own relay list, for hosting and for joining.
-if (RELAY_URL) globalThis.horizonRelays = [RELAY_URL];
+if (RELAY_URLS.length) globalThis.horizonRelays = [...RELAY_URLS];
 
 const PRESENCE_MS = 20_000;
 const HEARTBEAT_MS = 10_000;
@@ -20,7 +20,25 @@ const safe = (fn, fallback) => {
 };
 const uuid = () => crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
-export const configured = () => Boolean(ROOMS_API);
+export const configured = () => ROOMS_APIS.length > 0;
+
+// Fetches from the rooms service, trying each address (the one that last worked
+// first) until one answers; only a failure to connect moves on, not an HTTP error.
+let preferred = 0;
+export async function roomsFetch(path, init) {
+    let last;
+    for (let i = 0; i < ROOMS_APIS.length; i++) {
+        const at = (preferred + i) % ROOMS_APIS.length;
+        try {
+            const response = await fetch(`${ROOMS_APIS[at]}${path}`, init);
+            preferred = at;
+            return response;
+        } catch (e) {
+            last = e;
+        }
+    }
+    throw last ?? new Error("rooms service not set up");
+}
 // On unless the player turned it off: only an explicit "0" is off.
 export const publicRoomsOn = () => safe(() => localStorage.getItem(PUBLIC_KEY) !== "0", true);
 export const setPublicRooms = (on) => safe(() => localStorage.setItem(PUBLIC_KEY, on ? "1" : "0"));
@@ -35,7 +53,7 @@ const sessionId = safe(() => {
 
 // Sent as text/plain so the browser makes no CORS preflight; the body is JSON.
 function post(path, body, keepalive = false) {
-    return fetch(`${ROOMS_API}${path}`, {
+    return roomsFetch(path, {
         method: "POST",
         headers: { "Content-Type": "text/plain" },
         body: JSON.stringify(body),
@@ -84,7 +102,7 @@ export function watchSharedWorld() {
         if (room && listed) {
             const close = JSON.stringify({ code: room.code, key: room.key });
             // keepalive so it still goes if the tab is closing.
-            fetch(`${ROOMS_API}/api/rooms/close`, {
+            roomsFetch("/api/rooms/close", {
                 method: "POST", headers: { "Content-Type": "text/plain" }, body: close, keepalive: true,
             }).catch(() => {});
         }

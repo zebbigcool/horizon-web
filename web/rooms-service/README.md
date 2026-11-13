@@ -13,7 +13,7 @@ npx wrangler login
 npx wrangler deploy        # prints https://horizon-rooms.<you>.workers.dev
 ```
 
-Then set `ROOMS_API` in `web/config.js` to that address (no trailing slash) and publish the site.
+Then list its addresses in `ROOMS_APIS` in `web/config.js` (no trailing slash; tried in order, so a network that blocks one falls back to the next) and publish the site. `wrangler.toml` also routes `rooms.bonziworld.lol` and `rooms.zebbigcool.qzz.io` to it; those domains' DNS zones must be on your Cloudflare account.
 The Worker allows any origin (CORS `*`); it holds no secrets and no accounts.
 
 ## API
@@ -50,7 +50,7 @@ node web/rooms-service/registry.test.mjs
 
 The same Worker also runs an EaglerSPRelay-compatible relay at `/relay` (WebSocket). Hosts get a join
 code from it and players are introduced to hosts through it; the game itself then flows over WebRTC.
-`web/config.js` points the game at it automatically (`RELAY_URL`, derived from `ROOMS_API`), ahead of the
+`web/config.js` points the game at it automatically (`RELAY_URLS`, derived from `ROOMS_APIS`), ahead of the
 public relays the game knows, so worlds shared from one site or device can be joined from any other.
 
 After pulling, redeploy (`npx wrangler deploy` here; it applies the `v2` migration). Players behind strict

@@ -3,8 +3,8 @@
 // button that opens the game (game.html); games and apps list seraph's catalog
 // (catalog.json) and open each one, loaded from where seraph is hosted.
 // Settings live in config.js.
-import { CHAT_URL, GAME_URL, ROOMS_API, REFRESH_MS, SERAPH_URL } from "./config.js";
-import { configured, publicRoomsOn, setPublicRooms, startPresence } from "./presence.js";
+import { CHAT_URL, GAME_URL, REFRESH_MS, SERAPH_URL } from "./config.js";
+import { configured, publicRoomsOn, roomsFetch, setPublicRooms, startPresence } from "./presence.js";
 
 const $ = (id) => document.getElementById(id);
 const views = { home: $("home"), chat: $("chat"), minecraft: $("minecraft"), browse: $("browse"), player: $("player") };
@@ -124,13 +124,13 @@ async function loadRooms() {
     if (!configured()) {
         body.replaceChildren();
         note.textContent = "";
-        setEmpty("the rooms service isn't set up yet (ROOMS_API in config.js).");
+        setEmpty("the rooms service isn't set up yet (ROOMS_APIS in config.js).");
         return;
     }
     const mine = ++loading;
     note.textContent = "loading…";
     try {
-        const response = await fetch(`${ROOMS_API}/api/rooms`, { headers: { Accept: "application/json" }, cache: "no-store" });
+        const response = await roomsFetch("/api/rooms", { headers: { Accept: "application/json" }, cache: "no-store" });
         if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
         const data = await response.json();
         const rooms = roomsOf(data);

@@ -2,6 +2,14 @@ name = "horizon-rooms"
 main = "src/index.js"
 compatibility_date = "2025-01-01"
 
+# The Worker answers on these as well as on workers.dev (which some networks
+# block). Each domain's DNS zone must be on the Cloudflare account that deploys
+# this; wrangler creates the rooms.* records itself.
+routes = [
+  { pattern = "rooms.bonziworld.lol", custom_domain = true },
+  { pattern = "rooms.zebbigcool.qzz.io", custom_domain = true },
+]
+
 [[durable_objects.bindings]]
 name = "REGISTRY"
 class_name = "RegistryObject"
