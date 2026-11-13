@@ -13,10 +13,59 @@
     pointer-events: none; white-space: pre-line;
   }
   #status:empty { display: none; }
+  #debug {
+    position: fixed; left: 0; right: 0; bottom: 0; max-height: 45vh; margin: 0; overflow: auto; z-index: 9;
+    padding: 8px 12px; background: rgba(0, 0, 0, .85); color: #ffd23f; font: 12px/1.4 ui-monospace, monospace;
+    white-space: pre-wrap; word-break: break-word; user-select: text;
+  }
 </style>
 </head>
 <body>
 <div id="status">Starting…</div>
+<pre id="debug" hidden></pre>
+<script>
+// For devices where DevTools isn't available (school Chromebooks): keeps the
+// game's console output and shows it on screen if the game panics, errors or
+// shows no frame within 45 s. "?debug" in the address shows it always.
+(() => {
+  const lines = [];
+  const box = document.getElementById("debug");
+  let shown = new URLSearchParams(location.search).has("debug");
+  let drawn = false;
+  const text = (a) => { try { return a instanceof Error ? (a.stack || a.message) : typeof a === "string" ? a : JSON.stringify(a); } catch { return String(a); } };
+  const render = () => {
+    box.hidden = !shown;
+    if (shown) {
+      box.textContent = lines.slice(-40).join("\n");
+      box.scrollTop = box.scrollHeight;
+    }
+  };
+  const add = (kind, args) => {
+    const line = `${kind}: ${args.map(text).join(" ")}`.slice(0, 600);
+    lines.push(line);
+    if (lines.length > 200) lines.shift();
+    if (/first frame/i.test(line)) drawn = true;
+    if (kind === "error" || /panicked/i.test(line)) shown = true;
+    render();
+  };
+  for (const kind of ["log", "info", "warn", "error"]) {
+    const original = console[kind].bind(console);
+    console[kind] = (...args) => { original(...args); add(kind, args); };
+  }
+  addEventListener("error", (e) => add("error", [e.message || e.error]));
+  addEventListener("unhandledrejection", (e) => add("error", ["unhandled", e.reason]));
+  (async () => {
+    const info = [`isolated: ${self.crossOriginIsolated}`, `cores: ${navigator.hardwareConcurrency}`, `memory: ${navigator.deviceMemory ?? "?"} GB`];
+    try {
+      const adapter = navigator.gpu && (await navigator.gpu.requestAdapter());
+      info.push(adapter ? `gpu: ${[adapter.info?.vendor, adapter.info?.architecture, adapter.info?.description].filter(Boolean).join(" ") || "adapter found"}` : "gpu: no WebGPU adapter");
+    } catch (e) { info.push(`gpu: ${e}`); }
+    lines.unshift(...info);
+    render();
+  })();
+  setTimeout(() => { if (!drawn) { shown = true; add("warn", ["no frame after 45 s"]); } }, 45000);
+})();
+</script>
 <script type="module" src="main.js"></script>
 </body>
 </html>
