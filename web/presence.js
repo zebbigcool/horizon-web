@@ -1,7 +1,7 @@
 // Talks to the rooms service (web/rooms-service) for both pages:
 //  - startPresence(): tells it this tab is here and hears how many are online.
 //  - watchSharedWorld(): lists the shared world this tab hosts as a public room,
-//    when the player opted in (the launcher's minecraft page has the switch).
+//    unless the player switched it off (the launcher's minecraft page has the switch).
 import { ROOMS_API } from "./config.js";
 
 const PRESENCE_MS = 20_000;
@@ -18,7 +18,8 @@ const safe = (fn, fallback) => {
 const uuid = () => crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
 export const configured = () => Boolean(ROOMS_API);
-export const publicRoomsOn = () => safe(() => localStorage.getItem(PUBLIC_KEY) === "1", false);
+// On unless the player turned it off: only an explicit "0" is off.
+export const publicRoomsOn = () => safe(() => localStorage.getItem(PUBLIC_KEY) !== "0", true);
 export const setPublicRooms = (on) => safe(() => localStorage.setItem(PUBLIC_KEY, on ? "1" : "0"));
 
 // One id per tab, kept when the launcher opens the game in the same tab, so

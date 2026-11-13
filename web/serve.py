@@ -48,11 +48,20 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def log_message(self, format, *args):
         pass
 
+    def log_request(self, code="-", size="-"):
+        # Only failures. A request that 404s shows up here; one that never
+        # appears reached some other server (a tunnel pointed at the wrong port).
+        if str(code)[:1] in "45":
+            print(f"{code} {self.command} {self.path}", flush=True)
+
 
 def main() -> None:
     port = int(sys.argv[1]) if len(sys.argv) > 1 else 8080
     root = Path(__file__).resolve().parent / "dist"
     handler = functools.partial(Handler, directory=str(root))
+    for rel in ("pkg/horizon-client_bg.wasm", "fs/boot.tar.gz", "build.json"):
+        if not (root / rel).is_file():
+            print(f"warning: {root / rel} is missing: run web/build.sh", flush=True)
     with http.server.ThreadingHTTPServer(("127.0.0.1", port), handler) as server:
         print(f"Serving {root} on http://localhost:{port}")
         server.serve_forever()
