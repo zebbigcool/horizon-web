@@ -45,3 +45,14 @@ kept in the browser's localStorage). The owner is the host's profile name; `play
 ```sh
 node web/rooms-service/registry.test.mjs
 ```
+
+## Shared-world relay
+
+The same Worker also runs an EaglerSPRelay-compatible relay at `/relay` (WebSocket). Hosts get a join
+code from it and players are introduced to hosts through it; the game itself then flows over WebRTC.
+`web/config.js` points the game at it automatically (`RELAY_URL`, derived from `ROOMS_API`), ahead of the
+public relays the game knows, so worlds shared from one site or device can be joined from any other.
+
+After pulling, redeploy (`npx wrangler deploy` here; it applies the `v2` migration). Players behind strict
+NATs may need a TURN server: set `TURN_URL` in `wrangler.toml` and `TURN_USER` / `TURN_PASS` with
+`npx wrangler secret put`. Test the logic with `node relay.test.mjs`.

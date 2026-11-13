@@ -21,3 +21,10 @@ export const SERAPH_URL = "https://zebbigcool.github.io/seraph";
 
 // How often the room list refreshes while the minecraft option is open.
 export const REFRESH_MS = 15000;
+
+// The shared-world relay: where hosts get join codes and players are introduced
+// to hosts. By default it is the rooms service's own (its /relay endpoint), so
+// codes work from any site or device that uses it; the public relays the game
+// knows stay as fallbacks. Set to a "wss://..." address to use another, or to
+// "" to use only the game's defaults.
+export const RELAY_URL = ROOMS_API ? ROOMS_API.replace(/^http/, "ws") + "/relay" : "";

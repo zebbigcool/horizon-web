@@ -161,7 +161,10 @@ function channelSocket(id, channel, pc) {
     });
 }
 // Joining a shared world: each relay in turn until one knows the code.
+// The page's own relay (globalThis.horizonRelays) goes first.
+const withPageRelays = (relays) => [...new Set([...(globalThis.horizonRelays ?? []), ...relays])];
 function joinShared(id, code, relays) {
+    relays = withPageRelays(relays);
     let next = 0, why = "No relay could be reached";
     const fail = (reason) => onEvent(id, 2, null, reason);
     const attempt = () => {
@@ -255,6 +258,7 @@ const report = (event) => {
     }
 };
 function listen(lid, name, owner, relays) {
+    relays = withPageRelays(relays);
     let next = 0, closed = false, ws = null, hosted = null, players = 1;
     const peers = new Map();
     listeners.set(lid, {

@@ -6,7 +6,21 @@ compatibility_date = "2025-01-01"
 name = "REGISTRY"
 class_name = "RegistryObject"
 
+[[durable_objects.bindings]]
+name = "RELAY"
+class_name = "RelayObject"
+
 # SQLite-backed Durable Objects are the ones the free plan includes.
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["RegistryObject"]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["RelayObject"]
+
+# Optional TURN server for players behind strict NATs (the relay only does
+# STUN otherwise): set TURN_URL here, and TURN_USER / TURN_PASS with
+# `npx wrangler secret put`.
+# [vars]
+# TURN_URL = "turn:turn.example.com:3478"

@@ -2,7 +2,10 @@
 //  - startPresence(): tells it this tab is here and hears how many are online.
 //  - watchSharedWorld(): lists the shared world this tab hosts as a public room,
 //    unless the player switched it off (the launcher's minecraft page has the switch).
-import { ROOMS_API } from "./config.js";
+import { RELAY_URL, ROOMS_API } from "./config.js";
+
+// Tried before the game's own relay list, for hosting and for joining.
+if (RELAY_URL) globalThis.horizonRelays = [RELAY_URL];
 
 const PRESENCE_MS = 20_000;
 const HEARTBEAT_MS = 10_000;
