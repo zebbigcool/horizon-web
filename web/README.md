@@ -86,7 +86,7 @@ by itself; the game page is `game.html`. It offers four options, set up in `conf
 
 - **chat** shows `CHAT_URL` (chat.zebbigcool.qzz.io) in an iframe.
 - **minecraft** lists the public rooms (code, owner, players), refreshed every
-  `REFRESH_MS`, with an opt-in "list the worlds I share as public rooms" switch and a
+  `REFRESH_MS`, with a "list the worlds I share as public rooms" switch (on by default) and a
   **Launch!** button that opens `game.html`. Both pages show how many tabs are **online**.
   The rooms and the count come from the rooms service, `ROOMS_API` in `config.js`
   ([rooms-service/](rooms-service/README.md): a Cloudflare Worker you deploy yourself; with

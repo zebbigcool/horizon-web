@@ -1,7 +1,7 @@
 # Rooms service
 
 A small Cloudflare Worker behind z's horizon's launcher: the **public rooms** list and the
-**online** count. Each open browser tab sends a presence ping, and a host who opted in sends a
+**online** count. Each open browser tab sends a presence ping, and a host who hasn't switched it off sends a
 heartbeat for the shared world it hosts. Entries expire by themselves (a tab after 45 s, a room
 after 30 s of silence), so nothing needs cleaning up. The state lives in one Durable Object's memory.
 
@@ -37,7 +37,7 @@ convenience list, not a trust boundary.
 
 `horizon-os` (`net.rs`) tells the page about shared worlds it hosts (`globalThis.horizonSharedWorld`:
 `open`, `players`, `closed`). `web/presence.js` turns those into heartbeats, only while the player has
-ticked "list the worlds I share as public rooms" on the launcher's minecraft page (off by default,
+ticked "list the worlds I share as public rooms" on the launcher's minecraft page (on by default,
 kept in the browser's localStorage). The owner is the host's profile name; `players` counts the host.
 
 ## Test
