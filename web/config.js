@@ -10,7 +10,7 @@ export const GAME_URL = "game.html";
 // and the online count. Its address once deployed, with no trailing slash, e.g.
 // "https://horizon-rooms.<your-subdomain>.workers.dev". Left empty, the
 // minecraft option says the service isn't set up and no online count shows.
-export const ROOMS_API = "";
+export const ROOMS_API = "https://horizon-rooms.zebsother.workers.dev";
 
 // Where seraph (github.com/Zebbigcool/seraph) is hosted, for the "games" and
 // "apps" options: every game and app is loaded from there (the list of what
