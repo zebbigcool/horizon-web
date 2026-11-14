@@ -3,9 +3,11 @@
 //  - watchSharedWorld(): lists the shared world this tab hosts as a public room,
 //    unless the player switched it off (the launcher's minecraft page has the switch).
 import { RELAY_URLS, ROOMS_APIS } from "./config.js";
+import { customRelays } from "./settings.js";
 
-// Tried before the game's own relay list, for hosting and for joining.
-if (RELAY_URLS.length) globalThis.horizonRelays = [...RELAY_URLS];
+// Relays the player added, then ours: tried before the game's own list, for hosting and joining.
+const relays = [...customRelays().map((r) => r.url), ...RELAY_URLS];
+if (relays.length) globalThis.horizonRelays = relays;
 
 const PRESENCE_MS = 20_000;
 const HEARTBEAT_MS = 10_000;

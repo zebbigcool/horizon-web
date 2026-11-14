@@ -121,6 +121,14 @@
             </div>
           </div>
           <div class="row">
+            <label id="theme-label">Theme</label>
+            <div class="field">
+              <div class="seg" id="theme-seg" role="group" aria-labelledby="theme-label">
+                <button type="button" data-value="system">System</button><button type="button" data-value="light">Light</button><button type="button" data-value="dark">Dark</button>
+              </div>
+            </div>
+          </div>
+          <div class="row">
             <label id="public-label">Show my worlds publicly</label>
             <div class="field">
               <div class="seg" id="public-seg" role="group" aria-labelledby="public-label">
@@ -138,11 +146,36 @@
               <p class="hint">Prints what the game reports on the screen. Useful on a device without developer tools, if the game stays black.</p>
             </div>
           </div>
+          <div class="row">
+            <label id="fs-label">Full screen</label>
+            <div class="field">
+              <div class="seg" id="fs-seg" role="group" aria-labelledby="fs-label">
+                <button type="button" data-value="on">On</button><button type="button" data-value="off">Off</button>
+              </div>
+              <p class="hint">The launcher goes full screen on your first tap or key press. Esc leaves it, and it stays out until you reload.</p>
+            </div>
+          </div>
+          <div class="section">
+            <h3>Relays</h3>
+            <p class="hint wide-hint">A relay hands out join codes for shared worlds and introduces players to each other. This site's own relay is built in; add the address of another (wss://host) and it is tried first. Takes effect the next time the game starts.</p>
+            <ul id="relay-list" class="relay-list"></ul>
+            <form id="relay-form" class="relay-form" autocomplete="off">
+              <input id="relay-name" type="text" placeholder="Name" aria-label="relay name" maxlength="40">
+              <input id="relay-url" type="text" placeholder="wss://host" aria-label="relay address" required>
+              <button type="submit" class="ghost">Add relay</button>
+            </form>
+            <p id="relay-error" class="hint err" hidden></p>
+          </div>
         </div>
         <div class="panel tabpanel" id="tab-about" hidden>
           <h3>z's horizon</h3>
           <p class="hint wide-hint">A launcher for Horizon, Minecraft Java 26.3 rewritten in Rust and run in the browser with WebGPU. Shared worlds connect through this site's own relay, so a join code works from any device.</p>
           <p class="hint wide-hint" id="about-device"></p>
+          <div class="section">
+            <h3>Launcher data</h3>
+            <p class="hint wide-hint">Settings and relays are kept in this browser. Clearing them does not delete your worlds.</p>
+            <button id="clear-data" type="button" class="danger">Clear launcher data</button>
+          </div>
         </div>
       </div>
     </section>

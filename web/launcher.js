@@ -5,8 +5,12 @@
 // settings holds the memory limit and whether worlds are listed publicly.
 // Addresses live in config.js, the player's choices in settings.js.
 import { CHAT_URL, GAME_URL, REFRESH_MS, SERAPH_URL } from "./config.js";
-import { configured, roomsFetch, startPresence } from "./presence.js";
-import { RAM_CHOICES, debugOn, publicRoomsOn, ramMb, setDebug, setPublicRooms, setRamMb } from "./settings.js";
+import { configured, publicRoomsOn, roomsFetch, setPublicRooms, startPresence } from "./presence.js";
+import {
+    RAM_CHOICES, clearSettings, customRelays, debugOn, fullscreenOn, ramMb, setCustomRelays, setDebug, setFullscreen,
+    setRamMb, setTheme, theme,
+} from "./settings.js";
+import { RELAY_URLS } from "./config.js";
 
 const $ = (id) => document.getElementById(id);
 const pages = { play: $("play"), chat: $("chat"), browse: $("browse"), player: $("player"), settings: $("settings") };
@@ -292,21 +296,107 @@ genre.addEventListener("change", renderGrid);
 
 // ---- settings
 
+// A row of buttons, one lit: get() is the current value, set(value) saves a click.
 const segment = (id, get, set) => {
     const seg = $(id);
     const paint = () => {
-        for (const button of seg.querySelectorAll("button")) button.classList.toggle("on", (button.dataset.value === "on") === get());
+        for (const button of seg.querySelectorAll("button")) button.classList.toggle("on", button.dataset.value === get());
     };
     seg.addEventListener("click", (e) => {
         const button = e.target.closest("button");
         if (!button) return;
-        set(button.dataset.value === "on");
+        set(button.dataset.value);
         paint();
     });
     paint();
 };
-segment("public-seg", publicRoomsOn, setPublicRooms);
-segment("debug-seg", debugOn, setDebug);
+const onOff = (on) => (on ? "on" : "off");
+segment("public-seg", () => onOff(publicRoomsOn()), (v) => setPublicRooms(v === "on"));
+segment("debug-seg", () => onOff(debugOn()), (v) => setDebug(v === "on"));
+segment("fs-seg", () => onOff(fullscreenOn()), (v) => setFullscreen(v === "on"));
+
+// Theme: "system" follows the device; the page always carries the one in use.
+const dark = matchMedia("(prefers-color-scheme: dark)");
+const applyTheme = () => {
+    document.documentElement.dataset.theme = theme() === "system" ? (dark.matches ? "dark" : "light") : theme();
+};
+applyTheme();
+dark.addEventListener("change", applyTheme);
+segment("theme-seg", theme, (v) => {
+    setTheme(v);
+    applyTheme();
+});
+
+// Full screen on the first tap or key press, once per page load.
+if (fullscreenOn()) {
+    const enter = () => {
+        removeEventListener("pointerdown", enter, true);
+        removeEventListener("keydown", enter, true);
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(() => {});
+    };
+    addEventListener("pointerdown", enter, true);
+    addEventListener("keydown", enter, true);
+}
+
+// Relays: ours is built in (and in use unless the player added others, which go first).
+const relayList = $("relay-list");
+const relayError = $("relay-error");
+function renderRelays() {
+    relayList.replaceChildren();
+    const row = (name, url, remove) => {
+        const li = document.createElement("li");
+        const info = document.createElement("div");
+        info.className = "info";
+        const title = document.createElement("b");
+        title.textContent = name;
+        const address = document.createElement("small");
+        address.textContent = url;
+        info.append(title, address);
+        li.append(info);
+        if (remove) {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "ghost";
+            button.textContent = "Remove";
+            button.addEventListener("click", remove);
+            li.append(button);
+        } else {
+            const tag = document.createElement("span");
+            tag.className = "tag";
+            tag.textContent = "Built in";
+            li.append(tag);
+        }
+        relayList.append(li);
+    };
+    customRelays().forEach((relay, i) => {
+        row(relay.name, relay.url, () => {
+            setCustomRelays(customRelays().filter((_, at) => at !== i));
+            renderRelays();
+        });
+    });
+    if (RELAY_URLS[0]) row("z's horizon", RELAY_URLS[0], null);
+}
+$("relay-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const url = $("relay-url").value.trim();
+    const name = $("relay-name").value.trim() || url;
+    if (!/^wss?:\/\/[^\s/]+/.test(url)) {
+        relayError.textContent = "An address starts with wss:// (or ws://) and a host.";
+        relayError.hidden = false;
+        return;
+    }
+    relayError.hidden = true;
+    setCustomRelays([...customRelays(), { name, url }]);
+    $("relay-name").value = $("relay-url").value = "";
+    renderRelays();
+});
+renderRelays();
+
+$("clear-data").addEventListener("click", () => {
+    if (!confirm("Clear the launcher's settings and added relays? Your worlds are not deleted.")) return;
+    clearSettings();
+    location.reload();
+});
 
 const ram = $("ram");
 const gb = (mb) => (mb % 1024 === 0 ? `${mb / 1024} GB` : `${mb} MB`);
