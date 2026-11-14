@@ -245,6 +245,35 @@ button, select, input { font: inherit; }
 .relay-form { display: flex; gap: 10px; flex-wrap: wrap; }
 .relay-form input { color: var(--text); background: var(--ctl); border: 1px solid var(--line); border-radius: 8px; padding: 7px 12px; flex: 1; min-width: 140px; }
 .relay-form input:focus { outline: none; border-color: var(--orange); }
+.servers { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.server {
+  position: relative; display: flex; align-items: center; gap: 14px; padding: 12px 14px; overflow: hidden;
+  border-radius: 10px; border: 1px solid var(--line); background: var(--panel);
+}
+.server::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .5;
+  background: linear-gradient(100deg, transparent 30%, rgba(180, 76, 255, .22) 70%, rgba(255, 138, 31, .22));
+}
+.server > * { position: relative; }
+.server .icon {
+  width: 56px; height: 56px; flex: none; border-radius: 8px; display: grid; place-items: center; font-size: 24px; font-weight: 700;
+  color: #12081f; background: linear-gradient(var(--spin), var(--purple), var(--yellow), var(--purple)); animation: spin 6s linear infinite;
+}
+.server .meta { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.server .meta b { font-size: 16px; }
+.server .motd { color: var(--orange); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.server .motd2 { color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.server .stat { color: var(--dim); font: 13px ui-monospace, Menlo, Consolas, monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.server .stat i { display: inline-block; width: 9px; height: 9px; margin-right: 6px; border-radius: 2px; background: var(--dim); }
+.server .stat i.up { background: #5dff9a; box-shadow: 0 0 6px #5dff9a; }
+.server .stat i.down { background: #ff6b6b; }
+.server .join {
+  padding: 8px 26px; border: 0; border-radius: 8px; cursor: pointer; font-weight: 700; color: #12081f; text-decoration: none;
+  background: linear-gradient(var(--spin), var(--purple), var(--yellow), var(--purple)); animation: spin 4s linear infinite;
+}
+.server .join:hover { filter: brightness(1.12); }
+.server .x { background: none; border: 0; color: var(--dim); cursor: pointer; font-size: 20px; line-height: 1; padding: 4px 6px; }
+.server .x:hover { color: #ff7a59; }
 .drop {
   display: flex; align-items: center; gap: 14px; padding: 22px; margin-top: 8px; border: 1px dashed var(--line); border-radius: 8px;
   background: var(--ctl); color: var(--dim);
@@ -269,11 +298,14 @@ button, select, input { font: inherit; }
   .row { grid-template-columns: 1fr; gap: 4px; }
   .row > label { padding-top: 0; }
   .rooms th, .rooms td { padding: 8px 10px; }
+  .server { flex-wrap: wrap; }
+  .server .meta { flex-basis: calc(100% - 80px); }
+  .server .join { margin-left: auto; }
   .launch { padding: 0 28px; font-size: 18px; }
   .hero { min-height: 220px; }
   .hero-sun { right: 8%; width: 84px; height: 84px; opacity: .5; }
 }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
-  .mark, .launch, .seg button.on, .relay-list .tag { animation: none; }
+  .mark, .launch, .seg button.on, .relay-list .tag, .server .icon, .server .join { animation: none; }
 }

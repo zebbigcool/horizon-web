@@ -12,9 +12,10 @@ import {
 } from "./settings.js";
 import { RELAY_URLS } from "./config.js";
 import * as packs from "./packs.js";
+import * as servers from "./servers.js";
 
 const $ = (id) => document.getElementById(id);
-const pages = { play: $("play"), chat: $("chat"), browse: $("browse"), player: $("player"), settings: $("settings"), packs: $("packs") };
+const pages = { play: $("play"), chat: $("chat"), browse: $("browse"), player: $("player"), settings: $("settings"), packs: $("packs"), servers: $("servers") };
 const chatFrame = $("chat-frame");
 const body = $("rooms-body");
 const empty = $("rooms-empty");
@@ -44,7 +45,7 @@ function show() {
     const [name, id] = location.hash.slice(1).split("/");
     let page = "play";
     let nav = "play";
-    if (name === "chat" || name === "settings" || name === "packs") page = nav = name;
+    if (name === "chat" || name === "settings" || name === "packs" || name === "servers") page = nav = name;
     else if (name === "games" || name === "apps") {
         page = id ? "player" : "browse";
         nav = name;
@@ -62,6 +63,7 @@ function show() {
     // Leaving a game unloads it, so its sound stops.
     if (page !== "player" && playerFrame.getAttribute("src") !== "about:blank") playerFrame.src = "about:blank";
     if (page === "packs") renderPacks();
+    if (page === "servers") renderServers();
     if (page === "browse") openBrowse(name);
     if (page === "player") openPlayer(name, decodeURIComponent(id));
 }
@@ -295,6 +297,101 @@ async function openPlayer(which, id) {
 
 search.addEventListener("input", renderGrid);
 genre.addEventListener("change", renderGrid);
+
+// ---- servers
+
+const serverList = $("server-list");
+const serverError = $("server-error");
+let serverRun = 0; // newest refresh wins
+
+function serverRow(server, index) {
+    const li = document.createElement("li");
+    li.className = "server";
+    const icon = document.createElement("div");
+    icon.className = "icon";
+    icon.textContent = (server.name[0] ?? "?").toUpperCase();
+    const meta = document.createElement("div");
+    meta.className = "meta";
+    const name = document.createElement("b");
+    name.textContent = server.name;
+    const motd = document.createElement("span");
+    motd.className = "motd";
+    const motd2 = document.createElement("span");
+    motd2.className = "motd2";
+    const stat = document.createElement("span");
+    stat.className = "stat";
+    const dot = document.createElement("i");
+    const detail = document.createElement("span");
+    detail.textContent = `${server.address} · checking…`;
+    stat.append(dot, detail);
+    meta.append(name, motd, motd2, stat);
+    const join = document.createElement("a");
+    join.className = "join";
+    join.textContent = "Join";
+    join.href = servers.joinUrl(GAME_URL, server.address);
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "x";
+    remove.title = "remove";
+    remove.setAttribute("aria-label", `remove ${server.name}`);
+    remove.textContent = "×";
+    remove.addEventListener("click", () => {
+        servers.save(servers.load().filter((_, at) => at !== index));
+        renderServers();
+    });
+    li.append(icon, meta, join, remove);
+    return { li, motd, motd2, dot, detail };
+}
+
+function renderServers() {
+    const list = servers.load();
+    const run = ++serverRun;
+    serverList.replaceChildren();
+    $("server-empty").textContent = list.length ? "" : "No servers yet: add one below.";
+    list.forEach((server, index) => {
+        const row = serverRow(server, index);
+        serverList.append(row.li);
+        servers.query(server.address).then(
+            (status) => {
+                if (run !== serverRun) return;
+                row.dot.className = "up";
+                row.motd.textContent = status.motd[0] ?? "";
+                row.motd2.textContent = status.motd[1] ?? "";
+                const players = status.max ? `${status.online}/${status.max} online` : `${status.online} online`;
+                row.detail.textContent = `${server.address} · ${status.ping} ms · ${players}`;
+            },
+            (e) => {
+                if (run !== serverRun) return;
+                row.dot.className = "down";
+                row.detail.textContent = `${server.address} · ${e.message}`;
+            },
+        );
+    });
+}
+$("server-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const address = servers.normalize($("server-address").value);
+    if (!address) {
+        serverError.textContent = "An address is host or host:port, or a wss:// address for an Eaglercraft server.";
+        serverError.hidden = false;
+        return;
+    }
+    serverError.hidden = true;
+    const list = servers.load();
+    if (list.some((s) => s.address.toLowerCase() === address.toLowerCase())) {
+        serverError.textContent = "That server is already in the list.";
+        serverError.hidden = false;
+        return;
+    }
+    list.push({ name: $("server-name").value.trim() || address, address });
+    servers.save(list);
+    $("server-name").value = $("server-address").value = "";
+    renderServers();
+});
+// Status goes stale: ask again while the page is open.
+setInterval(() => {
+    if (!pages.servers.hidden) renderServers();
+}, 30000);
 
 // ---- packs
 

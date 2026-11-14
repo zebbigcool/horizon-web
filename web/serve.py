@@ -18,7 +18,7 @@ WEB = Path(__file__).resolve().parent
 # existed still works: build.sh only copies these into dist for hosting.
 # Everything else (the WebAssembly, the resources) comes from dist.
 LIVE = {
-    "index.html", "game.html", "launcher.js", "launcher.css", "config.js", "presence.js", "settings.js", "packs.js",
+    "index.html", "game.html", "launcher.js", "launcher.css", "config.js", "presence.js", "settings.js", "packs.js", "servers.js",
     "catalog.json", "main.js", "audio.js", "worker.js", "sw.js",
 }
 
