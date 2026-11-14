@@ -245,6 +245,12 @@ button, select, input { font: inherit; }
 .relay-form { display: flex; gap: 10px; flex-wrap: wrap; }
 .relay-form input { color: var(--text); background: var(--ctl); border: 1px solid var(--line); border-radius: 8px; padding: 7px 12px; flex: 1; min-width: 140px; }
 .relay-form input:focus { outline: none; border-color: var(--orange); }
+.drop {
+  display: flex; align-items: center; gap: 14px; padding: 22px; margin-top: 8px; border: 1px dashed var(--line); border-radius: 8px;
+  background: var(--ctl); color: var(--dim);
+}
+.drop.over { border-color: var(--orange); background: rgba(255, 138, 31, .12); }
+.relay-list .size { color: var(--dim); font-size: 13px; white-space: nowrap; }
 .err { color: #ff6b6b; }
 .danger { width: 100%; margin-top: 14px; padding: 9px; cursor: pointer; color: #ff7a59; background: var(--ctl); border: 1px solid var(--line); border-radius: 8px; }
 .danger:hover { border-color: #ff7a59; background: rgba(255, 90, 60, .12); }

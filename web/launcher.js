@@ -11,9 +11,10 @@ import {
     setRamMb, setTheme, theme,
 } from "./settings.js";
 import { RELAY_URLS } from "./config.js";
+import * as packs from "./packs.js";
 
 const $ = (id) => document.getElementById(id);
-const pages = { play: $("play"), chat: $("chat"), browse: $("browse"), player: $("player"), settings: $("settings") };
+const pages = { play: $("play"), chat: $("chat"), browse: $("browse"), player: $("player"), settings: $("settings"), packs: $("packs") };
 const chatFrame = $("chat-frame");
 const body = $("rooms-body");
 const empty = $("rooms-empty");
@@ -43,7 +44,7 @@ function show() {
     const [name, id] = location.hash.slice(1).split("/");
     let page = "play";
     let nav = "play";
-    if (name === "chat" || name === "settings") page = nav = name;
+    if (name === "chat" || name === "settings" || name === "packs") page = nav = name;
     else if (name === "games" || name === "apps") {
         page = id ? "player" : "browse";
         nav = name;
@@ -60,6 +61,7 @@ function show() {
     }
     // Leaving a game unloads it, so its sound stops.
     if (page !== "player" && playerFrame.getAttribute("src") !== "about:blank") playerFrame.src = "about:blank";
+    if (page === "packs") renderPacks();
     if (page === "browse") openBrowse(name);
     if (page === "player") openPlayer(name, decodeURIComponent(id));
 }
@@ -294,6 +296,115 @@ async function openPlayer(which, id) {
 search.addEventListener("input", renderGrid);
 genre.addEventListener("change", renderGrid);
 
+// ---- packs
+
+const PACK_TEXT = {
+    resource: {
+        intro: "Resource packs (.zip). Turn them on, and order them, in the game: Options, Resource Packs.",
+        empty: "No resource packs yet.",
+    },
+    shader: {
+        intro: "Shader packs for WebGPU (.hshader). Pick one in the game: Options, Video Settings, Shader Packs.",
+        empty: "No shader packs yet.",
+    },
+    mod: {
+        intro: "Content mods (.hmod: blocks, items and data, no code). They start off: turn each on in the game's Mods screen. Mods that need compiling (.hnmod) can't run in a browser.",
+        empty: "No mods yet.",
+    },
+};
+let packKind = "resource";
+const packMsg = $("pack-msg");
+const sizeText = (n) => (n >= 1048576 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(n / 1024))} KB`);
+
+function packNote(text, bad) {
+    packMsg.textContent = text;
+    packMsg.classList.toggle("err", Boolean(bad));
+    packMsg.hidden = !text;
+}
+
+async function renderPacks() {
+    const kind = packKind;
+    $("pack-intro").textContent = PACK_TEXT[kind].intro;
+    $("pack-input").accept = packs.KINDS[kind].ext;
+    const listEl = $("pack-list");
+    if (!packs.supported()) {
+        listEl.replaceChildren();
+        $("pack-empty").textContent = "This browser can't keep files for the game (no private file system), so packs can't be added here.";
+        $("pack-drop").hidden = true;
+        return;
+    }
+    $("pack-drop").hidden = false;
+    let files;
+    try {
+        files = await packs.list(kind);
+    } catch (e) {
+        packNote(`Couldn't read the packs: ${e.message}`, true);
+        return;
+    }
+    if (kind !== packKind) return; // switched tabs meanwhile
+    listEl.replaceChildren(...files.map((file) => {
+        const li = document.createElement("li");
+        const info = document.createElement("div");
+        info.className = "info";
+        const title = document.createElement("b");
+        title.textContent = file.name;
+        info.append(title);
+        const size = document.createElement("span");
+        size.className = "size";
+        size.textContent = sizeText(file.size);
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "ghost";
+        button.textContent = "Remove";
+        button.addEventListener("click", async () => {
+            try {
+                await packs.remove(kind, file.name);
+            } catch (e) {
+                packNote(`Couldn't remove ${file.name}: ${e.message}`, true);
+            }
+            renderPacks();
+        });
+        li.append(info, size, button);
+        return li;
+    }));
+    $("pack-empty").textContent = files.length ? "" : PACK_TEXT[kind].empty;
+}
+
+async function addPacks(files) {
+    const { added, problems } = await packs.add(packKind, [...files]);
+    const parts = [];
+    if (added.length) parts.push(`Added ${added.join(", ")}. It's found the next time the game starts.`);
+    parts.push(...problems);
+    packNote(parts.join(" "), problems.length > 0 && added.length === 0);
+    renderPacks();
+}
+
+for (const tab of document.querySelectorAll("[data-pack]")) {
+    tab.addEventListener("click", () => {
+        packKind = tab.dataset.pack;
+        for (const other of document.querySelectorAll("[data-pack]")) other.classList.toggle("on", other === tab);
+        packNote("");
+        renderPacks();
+    });
+}
+$("pack-add").addEventListener("click", () => $("pack-input").click());
+$("pack-input").addEventListener("change", (e) => {
+    addPacks(e.target.files);
+    e.target.value = "";
+});
+const drop = $("pack-drop");
+for (const type of ["dragenter", "dragover"]) {
+    drop.addEventListener(type, (e) => {
+        e.preventDefault();
+        drop.classList.add("over");
+    });
+}
+for (const type of ["dragleave", "drop"]) drop.addEventListener(type, () => drop.classList.remove("over"));
+drop.addEventListener("drop", (e) => {
+    e.preventDefault();
+    addPacks(e.dataTransfer.files);
+});
+
 // ---- settings
 
 // A row of buttons, one lit: get() is the current value, set(value) saves a click.
@@ -409,9 +520,9 @@ $("ram-hint").textContent =
     "The most the game may use. A lower limit helps on devices with little memory (a black screen right after loading is often that), but too low and the game can run out. Takes effect the next time the game starts." + device;
 ram.addEventListener("change", () => setRamMb(Number(ram.value)));
 
-for (const tab of document.querySelectorAll(".tab")) {
+for (const tab of document.querySelectorAll(".tab[data-tab]")) {
     tab.addEventListener("click", () => {
-        for (const other of document.querySelectorAll(".tab")) {
+        for (const other of document.querySelectorAll(".tab[data-tab]")) {
             other.classList.toggle("on", other === tab);
             $(`tab-${other.dataset.tab}`).hidden = other !== tab;
         }
