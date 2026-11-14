@@ -281,6 +281,8 @@ button, select, input { font: inherit; }
 .server .join { padding: 8px 26px; }
 .server .x { background: none; border: 0; color: var(--dim); cursor: pointer; font-size: 20px; line-height: 1; padding: 4px 6px; }
 .server .x:hover { color: #ff7a59; }
+.code-form { padding: 12px 16px; border-top: 1px solid var(--soft); }
+.rooms .join-room { margin-right: 6px; font-size: 13px; padding: 2px 12px; }
 .drop {
   display: flex; align-items: center; gap: 14px; padding: 22px; margin-top: 8px; border: 1px dashed var(--line); border-radius: 8px;
   background: var(--ctl); color: var(--dim);

@@ -124,7 +124,12 @@ function render(rooms) {
         const count = row.insertCell();
         count.className = "count";
         count.textContent = players(room);
-        row.insertCell().append(copyButton(String(room.code)));
+        const actions = row.insertCell();
+        const join = document.createElement("a");
+        join.className = "ghost join-room";
+        join.textContent = "join";
+        join.href = servers.joinUrl(GAME_URL, `shared:${room.code}`);
+        actions.append(join, copyButton(String(room.code)));
     }
     if (rooms.length) {
         empty.hidden = true;
@@ -639,6 +644,17 @@ $("about-device").textContent =
     `This browser: ${navigator.gpu ? "WebGPU available" : "no WebGPU"}, ${navigator.hardwareConcurrency ?? "?"} CPU threads` +
     (navigator.deviceMemory ? `, about ${navigator.deviceMemory} GB RAM` : "") + ".";
 
+$("code-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const code = $("code-input").value.trim();
+    if (!/^[A-Za-z0-9]{1,31}$/.test(code)) {
+        $("code-input").setCustomValidity("A join code is letters and digits.");
+        $("code-input").reportValidity();
+        return;
+    }
+    location.href = servers.joinUrl(GAME_URL, `shared:${code}`);
+});
+$("code-input").addEventListener("input", () => $("code-input").setCustomValidity(""));
 $("refresh").addEventListener("click", loadRooms);
 addEventListener("hashchange", show);
 show();
