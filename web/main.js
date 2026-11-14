@@ -4,6 +4,7 @@
 // keeps the large files for later visits.
 import "./audio.js"; // before the game's glue, which keeps the AudioContext it finds
 import { startPresence, watchSharedWorld } from "./presence.js";
+import { ramMb } from "./settings.js";
 
 const ROOT = ".local/horizon-client/26.3";
 const status = document.getElementById("status");
@@ -216,6 +217,76 @@ function saveChanges(glue, root) {
     return saving;
 }
 
+const PAGE = 65536;
+
+// The memory limits the module declares for its imported memory, read from the
+// import section of the .wasm binary: { min, max } in 64 KiB pages.
+function declaredMemory(bytes) {
+    const b = new Uint8Array(bytes);
+    let o = 8;
+    const leb = () => {
+        let result = 0, shift = 0, byte;
+        do {
+            byte = b[o++];
+            result += (byte & 0x7f) * 2 ** shift;
+            shift += 7;
+        } while (byte & 0x80);
+        return result;
+    };
+    const skipName = () => {
+        const length = leb();
+        o += length;
+    };
+    const limits = () => {
+        const flags = b[o++];
+        const min = leb();
+        const max = flags & 1 ? leb() : undefined;
+        return { min, max };
+    };
+    while (o < b.length) {
+        const id = b[o++];
+        const size = leb();
+        const end = o + size;
+        if (id === 2) {
+            for (let n = leb(); n > 0; n--) {
+                skipName();
+                skipName();
+                const kind = b[o++];
+                if (kind === 2) return limits();
+                if (kind === 0) leb();
+                else if (kind === 1) { o++; limits(); }
+                else if (kind === 3) o += 2;
+                else if (kind === 4) { o++; leb(); }
+                else return null;
+            }
+        }
+        o = end;
+    }
+    return null;
+}
+
+// The player's memory limit (settings page): the page makes the game's shared
+// memory itself with a lower maximum. Null when none is set or anything about
+// the module is unexpected, and the game then makes its own as before.
+async function limitedMemory(url) {
+    const mb = ramMb();
+    if (!mb) return null;
+    try {
+        const response = await fetch(url);
+        if (!response.ok) return null;
+        const bytes = await response.arrayBuffer();
+        const declared = declaredMemory(bytes);
+        if (!declared) return null;
+        const maximum = Math.min(declared.max ?? 65536, Math.max(declared.min, Math.floor((mb * 1024 * 1024) / PAGE)));
+        const memory = new WebAssembly.Memory({ initial: declared.min, maximum, shared: true });
+        console.log(`Horizon: memory limited to ${Math.round((maximum * PAGE) / 1048576)} MB`);
+        return { bytes, memory };
+    } catch (e) {
+        console.warn(`Horizon: could not apply the memory limit: ${e}`);
+        return null;
+    }
+}
+
 // The game's glue, its module and the resources, from the server.
 async function served() {
     await cacheWorker();
@@ -226,7 +297,9 @@ async function served() {
     status.textContent = "Loading the game…";
     const glue = await import("./pkg/horizon-client.js");
     // Runs the game's main, which only registers the game to start.
-    await glue.default({ module_or_path: files.wasm });
+    const limited = await limitedMemory(files.wasm);
+    if (limited) await glue.default({ module_or_path: limited.bytes, memory: limited.memory });
+    else await glue.default({ module_or_path: files.wasm });
     const gz = await download(files.boot, "Downloading resources");
     const tar = new Uint8Array(
         await new Response(gz.pipeThrough(new DecompressionStream("gzip"))).arrayBuffer());

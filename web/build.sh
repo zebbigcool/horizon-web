@@ -60,7 +60,7 @@ if [ "$profile" = release ] && [ "${WASM_OPT:-1}" != 0 ]; then
         echo "wasm-opt not found: the module is left as rustc made it (install binaryen)" >&2
     fi
 fi
-cp web/index.html web/game.html web/launcher.js web/launcher.css web/config.js web/presence.js web/catalog.json \
+cp web/index.html web/game.html web/launcher.js web/launcher.css web/config.js web/presence.js web/settings.js web/catalog.json \
     web/main.js web/audio.js web/worker.js web/sw.js "$dist/"
 
 [ "${BUNDLE:-1}" = 0 ] && { ls -l "$dist/pkg"/*.wasm; exit 0; }

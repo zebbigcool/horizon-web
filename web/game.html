@@ -30,7 +30,7 @@
 (() => {
   const lines = [];
   const box = document.getElementById("debug");
-  let shown = new URLSearchParams(location.search).has("debug");
+  let shown = new URLSearchParams(location.search).has("debug") || (() => { try { return localStorage.getItem("horizon-debug") === "1"; } catch { return false; } })();
   let drawn = false;
   const text = (a) => { try { return a instanceof Error ? (a.stack || a.message) : typeof a === "string" ? a : JSON.stringify(a); } catch { return String(a); } };
   const render = () => {

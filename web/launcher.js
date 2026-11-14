@@ -1,19 +1,20 @@
-// The launcher page: a home screen with "chat", "minecraft", "games" and "apps".
-// Chat iframes the chat site; minecraft lists the public rooms and has a Launch!
-// button that opens the game (game.html); games and apps list seraph's catalog
-// (catalog.json) and open each one, loaded from where seraph is hosted.
-// Settings live in config.js.
+// The launcher page: a sidebar with Play, Chat, Games, Apps and Settings.
+// Play lists the public shared worlds and has the Launch! button that opens the
+// game (game.html); chat iframes the chat site; games and apps list seraph's
+// catalog (catalog.json) and open each one, loaded from where seraph is hosted;
+// settings holds the memory limit and whether worlds are listed publicly.
+// Addresses live in config.js, the player's choices in settings.js.
 import { CHAT_URL, GAME_URL, REFRESH_MS, SERAPH_URL } from "./config.js";
-import { configured, publicRoomsOn, roomsFetch, setPublicRooms, startPresence } from "./presence.js";
+import { configured, roomsFetch, startPresence } from "./presence.js";
+import { RAM_CHOICES, debugOn, publicRoomsOn, ramMb, setDebug, setPublicRooms, setRamMb } from "./settings.js";
 
 const $ = (id) => document.getElementById(id);
-const views = { home: $("home"), chat: $("chat"), minecraft: $("minecraft"), browse: $("browse"), player: $("player") };
+const pages = { play: $("play"), chat: $("chat"), browse: $("browse"), player: $("player"), settings: $("settings") };
 const chatFrame = $("chat-frame");
 const body = $("rooms-body");
 const empty = $("rooms-empty");
 const note = $("rooms-note");
 const onlineBadges = document.querySelectorAll(".online");
-const publicToggle = $("public-toggle");
 let timer = null;
 let loading = 0; // newest request wins
 
@@ -28,33 +29,35 @@ function showOnline(n) {
 // Tells the service this tab is here and shows how many are.
 startPresence(showOnline);
 
-publicToggle.checked = publicRoomsOn();
-publicToggle.addEventListener("change", () => setPublicRooms(publicToggle.checked));
-
 // Starts the service worker early, so the game's first launch is already
 // cross-origin isolated (it gives game.html the headers its threads need).
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
 
-// Routes: #chat, #minecraft, #games, #apps, and #games/<id> or #apps/<id> for
-// one game or app playing.
+// Routes: #play (also #minecraft), #chat, #games, #apps, #settings, and
+// #games/<id> or #apps/<id> for one game or app playing.
 function show() {
     const [name, id] = location.hash.slice(1).split("/");
-    let view = "home";
-    if (name === "chat" || name === "minecraft") view = name;
-    else if (name === "games" || name === "apps") view = id ? "player" : "browse";
-    for (const [key, el] of Object.entries(views)) el.hidden = key !== view;
+    let page = "play";
+    let nav = "play";
+    if (name === "chat" || name === "settings") page = nav = name;
+    else if (name === "games" || name === "apps") {
+        page = id ? "player" : "browse";
+        nav = name;
+    }
+    for (const [key, el] of Object.entries(pages)) el.hidden = key !== page;
+    for (const link of document.querySelectorAll("[data-nav]")) link.classList.toggle("on", link.dataset.nav === nav);
     // The chat loads when first opened, and stays loaded when you come back.
-    if (view === "chat" && !chatFrame.src) chatFrame.src = CHAT_URL;
+    if (page === "chat" && !chatFrame.src) chatFrame.src = CHAT_URL;
     clearInterval(timer);
     timer = null;
-    if (view === "minecraft") {
+    if (page === "play") {
         loadRooms();
         timer = setInterval(loadRooms, REFRESH_MS);
     }
     // Leaving a game unloads it, so its sound stops.
-    if (view !== "player" && playerFrame.getAttribute("src") !== "about:blank") playerFrame.src = "about:blank";
-    if (view === "browse") openBrowse(name);
-    if (view === "player") openPlayer(name, decodeURIComponent(id));
+    if (page !== "player" && playerFrame.getAttribute("src") !== "about:blank") playerFrame.src = "about:blank";
+    if (page === "browse") openBrowse(name);
+    if (page === "player") openPlayer(name, decodeURIComponent(id));
 }
 
 function setEmpty(text, retry) {
@@ -115,7 +118,7 @@ function render(rooms) {
     if (rooms.length) {
         empty.hidden = true;
     } else {
-        setEmpty("no public rooms right now");
+        setEmpty("no public worlds right now");
     }
     note.textContent = `${rooms.length} room${rooms.length === 1 ? "" : "s"} · updated ${new Date().toLocaleTimeString()}`;
 }
@@ -286,6 +289,47 @@ async function openPlayer(which, id) {
 
 search.addEventListener("input", renderGrid);
 genre.addEventListener("change", renderGrid);
+
+// ---- settings
+
+const segment = (id, get, set) => {
+    const seg = $(id);
+    const paint = () => {
+        for (const button of seg.querySelectorAll("button")) button.classList.toggle("on", (button.dataset.value === "on") === get());
+    };
+    seg.addEventListener("click", (e) => {
+        const button = e.target.closest("button");
+        if (!button) return;
+        set(button.dataset.value === "on");
+        paint();
+    });
+    paint();
+};
+segment("public-seg", publicRoomsOn, setPublicRooms);
+segment("debug-seg", debugOn, setDebug);
+
+const ram = $("ram");
+const gb = (mb) => (mb % 1024 === 0 ? `${mb / 1024} GB` : `${mb} MB`);
+for (const mb of RAM_CHOICES) ram.add(new Option(mb ? `Up to ${gb(mb)}` : "Automatic (up to 4 GB)", String(mb)));
+// A value saved by hand that isn't a listed choice is still shown.
+if (!RAM_CHOICES.includes(ramMb())) ram.add(new Option(`Up to ${gb(ramMb())}`, String(ramMb())));
+ram.value = String(ramMb());
+const device = navigator.deviceMemory ? ` This device reports about ${navigator.deviceMemory} GB of RAM.` : "";
+$("ram-hint").textContent =
+    "The most the game may use. A lower limit helps on devices with little memory (a black screen right after loading is often that), but too low and the game can run out. Takes effect the next time the game starts." + device;
+ram.addEventListener("change", () => setRamMb(Number(ram.value)));
+
+for (const tab of document.querySelectorAll(".tab")) {
+    tab.addEventListener("click", () => {
+        for (const other of document.querySelectorAll(".tab")) {
+            other.classList.toggle("on", other === tab);
+            $(`tab-${other.dataset.tab}`).hidden = other !== tab;
+        }
+    });
+}
+$("about-device").textContent =
+    `This browser: ${navigator.gpu ? "WebGPU available" : "no WebGPU"}, ${navigator.hardwareConcurrency ?? "?"} CPU threads` +
+    (navigator.deviceMemory ? `, about ${navigator.deviceMemory} GB RAM` : "") + ".";
 
 $("refresh").addEventListener("click", loadRooms);
 addEventListener("hashchange", show);
