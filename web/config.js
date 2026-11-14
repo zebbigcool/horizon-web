@@ -6,6 +6,11 @@ export const CHAT_URL = "https://chat.zebbigcool.qzz.io";
 // The game page the "Launch!" button opens.
 export const GAME_URL = "game.html";
 
+// The newer client (one self-contained page, with touch controls, a WebGL renderer
+// and its own settings), chosen in Settings, Game version. It has no shared worlds
+// or public rooms of ours and starts without a server to join; empty hides the choice.
+export const NEW_GAME_URL = "NEWgame.html";
+
 // The rooms service (rooms-service/, a Cloudflare Worker): the public rooms, the
 // online count and the shared-world relay. Every address it answers on, with no
 // trailing slash, tried in this order: if a network blocks one (schools often

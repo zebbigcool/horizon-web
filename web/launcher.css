@@ -11,6 +11,7 @@
   --side: rgba(12, 7, 22, 0.88);
   --ctl: rgba(10, 6, 18, 0.5);
   --th: #1a0e2c;
+  --fill: #130a21;
   --dot: rgba(255, 255, 255, 0.24);
   color-scheme: dark;
 }
@@ -24,6 +25,7 @@
   --dim: #66557f;
   --ctl: rgba(255, 255, 255, 0.7);
   --th: #efe4ff;
+  --fill: #ffffff;
   --dot: rgba(130, 40, 200, 0.22);
   --orange: #d96a00;
   color-scheme: light;
@@ -163,17 +165,26 @@ button, select, input { font: inherit; }
 .empty button { margin-left: 8px; }
 
 .playbar {
-  display: flex; align-items: stretch; gap: 0; border-radius: 10px; overflow: hidden;
+  display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 10px;
   background: var(--panel); border: 1px solid var(--line);
 }
-.who { flex: 1; min-width: 0; padding: 14px 18px; display: flex; flex-direction: column; justify-content: center; }
+.who { flex: 1; min-width: 0; padding: 4px 8px; display: flex; flex-direction: column; justify-content: center; }
 .who small { color: var(--dim); }
-.launch {
-  display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 22px; font-weight: 700;
-  padding: 0 56px; color: #12081f; background: linear-gradient(var(--spin), var(--purple), var(--yellow), var(--purple));
-  animation: spin 4s linear infinite; transition: filter .15s;
+/* The gradient is the outline; hovering fills the button with it. */
+.launch, .server .join {
+  display: inline-flex; align-items: center; justify-content: center; text-decoration: none; font-weight: 700; cursor: pointer;
+  color: var(--text); border: 2px solid transparent; border-radius: 8px;
+  background:
+    linear-gradient(var(--fill), var(--fill)) padding-box,
+    linear-gradient(var(--spin), var(--purple), var(--yellow), var(--purple)) border-box;
+  animation: spin 4s linear infinite; transition: color .15s, box-shadow .15s;
 }
-.launch:hover, .launch:focus-visible { outline: none; animation-duration: 1.5s; filter: brightness(1.12) saturate(1.1); }
+.launch { font-size: 22px; padding: 12px 52px; box-shadow: 0 0 16px rgba(180, 76, 255, 0.35); }
+.launch:hover, .launch:focus-visible, .server .join:hover, .server .join:focus-visible {
+  outline: none; color: #12081f; animation-duration: 1.6s;
+  background: linear-gradient(var(--spin), var(--purple), var(--yellow), var(--purple)) border-box;
+  box-shadow: 0 0 24px rgba(180, 76, 255, 0.7), 0 0 40px rgba(255, 210, 63, 0.4);
+}
 
 /* Chat and the game player */
 .frame-page { display: flex; flex-direction: column; background: rgba(10, 6, 18, 0.6); }
@@ -267,11 +278,7 @@ button, select, input { font: inherit; }
 .server .stat i { display: inline-block; width: 9px; height: 9px; margin-right: 6px; border-radius: 2px; background: var(--dim); }
 .server .stat i.up { background: #5dff9a; box-shadow: 0 0 6px #5dff9a; }
 .server .stat i.down { background: #ff6b6b; }
-.server .join {
-  padding: 8px 26px; border: 0; border-radius: 8px; cursor: pointer; font-weight: 700; color: #12081f; text-decoration: none;
-  background: linear-gradient(var(--spin), var(--purple), var(--yellow), var(--purple)); animation: spin 4s linear infinite;
-}
-.server .join:hover { filter: brightness(1.12); }
+.server .join { padding: 8px 26px; }
 .server .x { background: none; border: 0; color: var(--dim); cursor: pointer; font-size: 20px; line-height: 1; padding: 4px 6px; }
 .server .x:hover { color: #ff7a59; }
 .drop {
@@ -301,7 +308,7 @@ button, select, input { font: inherit; }
   .server { flex-wrap: wrap; }
   .server .meta { flex-basis: calc(100% - 80px); }
   .server .join { margin-left: auto; }
-  .launch { padding: 0 28px; font-size: 18px; }
+  .launch { padding: 10px 24px; font-size: 18px; }
   .hero { min-height: 220px; }
   .hero-sun { right: 8%; width: 84px; height: 84px; opacity: .5; }
 }

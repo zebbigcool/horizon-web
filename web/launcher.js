@@ -4,11 +4,11 @@
 // catalog (catalog.json) and open each one, loaded from where seraph is hosted;
 // settings holds the memory limit and whether worlds are listed publicly.
 // Addresses live in config.js, the player's choices in settings.js.
-import { CHAT_URL, GAME_URL, REFRESH_MS, SERAPH_URL } from "./config.js";
+import { CHAT_URL, GAME_URL, NEW_GAME_URL, REFRESH_MS, SERAPH_URL } from "./config.js";
 import { configured, publicRoomsOn, roomsFetch, setPublicRooms, startPresence } from "./presence.js";
 import {
-    RAM_CHOICES, clearSettings, customRelays, debugOn, fullscreenOn, ramMb, setCustomRelays, setDebug, setFullscreen,
-    setRamMb, setTheme, theme,
+    RAM_CHOICES, client, clearSettings, customRelays, debugOn, fullscreenOn, ramMb, setCustomRelays, setDebug, setFullscreen,
+    setClient, setRamMb, setTheme, theme,
 } from "./settings.js";
 import { RELAY_URLS } from "./config.js";
 import * as packs from "./packs.js";
@@ -24,7 +24,10 @@ const onlineBadges = document.querySelectorAll(".online");
 let timer = null;
 let loading = 0; // newest request wins
 
-$("launch").href = GAME_URL;
+// Which game page Launch! opens: the classic one, or the new one chosen in settings.
+const newClient = () => Boolean(NEW_GAME_URL) && client() === "new";
+const launchTarget = () => (newClient() ? NEW_GAME_URL : GAME_URL);
+$("launch").href = launchTarget();
 
 function showOnline(n) {
     for (const badge of onlineBadges) {
@@ -328,7 +331,8 @@ function serverRow(server, index) {
     const join = document.createElement("a");
     join.className = "join";
     join.textContent = "Join";
-    join.href = servers.joinUrl(GAME_URL, server.address);
+    // The new client has no way to be told a server to join: it opens on its own menus.
+    join.href = newClient() ? NEW_GAME_URL : servers.joinUrl(GAME_URL, server.address);
     const remove = document.createElement("button");
     remove.type = "button";
     remove.className = "x";
@@ -521,6 +525,12 @@ const segment = (id, get, set) => {
 const onOff = (on) => (on ? "on" : "off");
 segment("public-seg", () => onOff(publicRoomsOn()), (v) => setPublicRooms(v === "on"));
 segment("debug-seg", () => onOff(debugOn()), (v) => setDebug(v === "on"));
+if (!NEW_GAME_URL) $("client-row").hidden = true;
+segment("client-seg", client, (v) => {
+    setClient(v);
+    $("launch").href = launchTarget();
+    renderServers();
+});
 segment("fs-seg", () => onOff(fullscreenOn()), (v) => setFullscreen(v === "on"));
 
 // Theme: "system" follows the device; the page always carries the one in use.

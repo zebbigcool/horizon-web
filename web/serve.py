@@ -19,7 +19,7 @@ WEB = Path(__file__).resolve().parent
 # Everything else (the WebAssembly, the resources) comes from dist.
 LIVE = {
     "index.html", "game.html", "launcher.js", "launcher.css", "config.js", "presence.js", "settings.js", "packs.js", "servers.js",
-    "catalog.json", "main.js", "audio.js", "worker.js", "sw.js",
+    "catalog.json", "NEWgame.html", "main.js", "audio.js", "worker.js", "sw.js",
 }
 
 
@@ -39,7 +39,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def end_headers(self):
         # The launcher (index.html) embeds other sites, which an isolated page
         # would block: only the game's page (game.html) and what it loads are isolated.
-        if self.path.split("?")[0] not in ("/", "/index.html"):
+        if self.path.split("?")[0] not in ("/", "/index.html", "/NEWgame.html"):
             self.send_header("Cross-Origin-Opener-Policy", "same-origin")
             self.send_header("Cross-Origin-Embedder-Policy", "require-corp")
         self.send_header("Cache-Control", "no-cache")

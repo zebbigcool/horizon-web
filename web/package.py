@@ -46,6 +46,9 @@ def folder(out: Path) -> None:
     site.mkdir(parents=True)
     for name in PAGE_FILES:
         shutil.copy2(WEB / name, site / name)
+    # The newer single-file client, when there is one.
+    if (WEB / "NEWgame.html").is_file():
+        shutil.copy2(WEB / "NEWgame.html", site / "NEWgame.html")
     shutil.copytree(DIST / "pkg", site / "pkg")
     fs = site / "fs"
     fs.mkdir()

@@ -3,6 +3,7 @@
 const RAM_KEY = "horizon-ram-mb";
 const DEBUG_KEY = "horizon-debug";
 const THEME_KEY = "horizon-theme";
+const CLIENT_KEY = "horizon-client";
 const FULLSCREEN_KEY = "horizon-fullscreen";
 const RELAYS_KEY = "horizon-relays";
 const PUBLIC_KEY = "horizon-public-room";
@@ -35,6 +36,10 @@ export const setRamMb = (mb) => write(RAM_KEY, String(mb));
 export const debugOn = () => read(DEBUG_KEY) === "1";
 export const setDebug = (on) => write(DEBUG_KEY, on ? "1" : "0");
 
+// "classic" (game.html) or "new" (NEWgame.html).
+export const client = () => (read(CLIENT_KEY) === "new" ? "new" : "classic");
+export const setClient = (value) => write(CLIENT_KEY, value);
+
 // "system", "light" or "dark".
 export const theme = () => {
     const value = read(THEME_KEY);
@@ -62,7 +67,7 @@ export const setCustomRelays = (list) => write(RELAYS_KEY, JSON.stringify(list))
 // Forgets every setting above and the public-worlds choice; the game's saves
 // are not touched.
 export const clearSettings = () => {
-    for (const key of [RAM_KEY, DEBUG_KEY, THEME_KEY, FULLSCREEN_KEY, RELAYS_KEY, PUBLIC_KEY]) {
+    for (const key of [RAM_KEY, DEBUG_KEY, THEME_KEY, CLIENT_KEY, FULLSCREEN_KEY, RELAYS_KEY, PUBLIC_KEY]) {
         try {
             localStorage.removeItem(key);
         } catch {
