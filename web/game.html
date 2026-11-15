@@ -24,6 +24,19 @@
 <div id="status">Starting…</div>
 <pre id="debug" hidden></pre>
 <script>
+// Browsers sometimes report one huge mouse movement while the pointer is locked
+// (when the lock starts, after the window loses focus, or from a stalled frame),
+// which flicks the camera to another position. No real hand moves hundreds of
+// pixels in a single event, so such an event is dropped before the game sees it.
+(() => {
+  const LIMIT = 500;
+  const spike = (e) => document.pointerLockElement && (Math.abs(e.movementX) > LIMIT || Math.abs(e.movementY) > LIMIT);
+  for (const type of ["pointermove", "mousemove"]) {
+    addEventListener(type, (e) => { if (spike(e)) e.stopImmediatePropagation(); }, true);
+  }
+})();
+</script>
+<script>
 // For devices where DevTools isn't available (school Chromebooks): keeps the
 // game's console output and shows it on screen only if the game panics. "?debug" in the address, or
 // Settings, Show the game's log, shows it always.
