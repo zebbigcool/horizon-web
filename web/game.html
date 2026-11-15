@@ -24,15 +24,35 @@
 <div id="status">Starting…</div>
 <pre id="debug" hidden></pre>
 <script>
-// Browsers sometimes report one huge mouse movement while the pointer is locked
-// (when the lock starts, after the window loses focus, or from a stalled frame),
-// which flicks the camera to another position. No real hand moves hundreds of
-// pixels in a single event, so such an event is dropped before the game sees it.
+// Mouse look. Two things, both set in the launcher's Settings:
+//  - Raw mouse input (on by default): the pointer lock asks for unadjusted
+//    movement, the browser's own game mode, without the operating system's
+//    acceleration and smoothing, which can make the camera jump while moving.
+//    A browser that can't do it falls back to the usual lock.
+//  - Spike filter: a single event that moves further than a hand could (the
+//    browser sometimes reports a huge or reversed one while the pointer is
+//    locked) is dropped before the game sees it.
 (() => {
-  const LIMIT = 500;
-  const spike = (e) => document.pointerLockElement && (Math.abs(e.movementX) > LIMIT || Math.abs(e.movementY) > LIMIT);
-  for (const type of ["pointermove", "mousemove"]) {
-    addEventListener(type, (e) => { if (spike(e)) e.stopImmediatePropagation(); }, true);
+  const get = (key) => { try { return localStorage.getItem(key); } catch { return null; } };
+  const LIMITS = { off: Infinity, normal: 500, strict: 150 };
+  const limit = LIMITS[get("horizon-spike")] ?? LIMITS.normal;
+  if (get("horizon-raw-mouse") !== "0") {
+    const lock = Element.prototype.requestPointerLock;
+    Element.prototype.requestPointerLock = function (options) {
+      try {
+        const result = lock.call(this, { ...options, unadjustedMovement: true });
+        if (result && result.catch) return result.catch(() => lock.call(this, options));
+        return result;
+      } catch {
+        return lock.call(this, options);
+      }
+    };
+  }
+  if (limit < Infinity) {
+    const spike = (e) => document.pointerLockElement && (Math.abs(e.movementX) > limit || Math.abs(e.movementY) > limit);
+    for (const type of ["pointermove", "mousemove"]) {
+      addEventListener(type, (e) => { if (spike(e)) e.stopImmediatePropagation(); }, true);
+    }
   }
 })();
 </script>

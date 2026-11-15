@@ -198,6 +198,24 @@
             </div>
           </div>
           <div class="row">
+            <label id="raw-label">Raw mouse input</label>
+            <div class="field">
+              <div class="seg" id="raw-seg" role="group" aria-labelledby="raw-label">
+                <button type="button" data-value="on">On</button><button type="button" data-value="off">Off</button>
+              </div>
+              <p class="hint">Looks around with the mouse's own movement, without the system's acceleration or smoothing. Try it if the camera flicks while you move it. It can feel a little different (faster or slower) than before; if the browser can't do it, the game falls back by itself. Takes effect the next time the game starts.</p>
+            </div>
+          </div>
+          <div class="row">
+            <label id="spike-label">Camera flick filter</label>
+            <div class="field">
+              <div class="seg" id="spike-seg" role="group" aria-labelledby="spike-label">
+                <button type="button" data-value="off">Off</button><button type="button" data-value="normal">Normal</button><button type="button" data-value="strict">Strict</button>
+              </div>
+              <p class="hint">Ignores a single mouse movement too big to be real. Strict also ignores some fast flicks of your own, so use it only if Normal doesn't stop the camera jumping.</p>
+            </div>
+          </div>
+          <div class="row">
             <label id="debug-label">Show the game's log</label>
             <div class="field">
               <div class="seg" id="debug-seg" role="group" aria-labelledby="debug-label">

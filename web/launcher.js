@@ -8,7 +8,7 @@ import { CHAT_URL, GAME_URL, NEW_GAME_URL, REFRESH_MS, SERAPH_URL } from "./conf
 import { configured, publicRoomsOn, roomsFetch, setPublicRooms, startPresence } from "./presence.js";
 import {
     RAM_CHOICES, client, clearSettings, customRelays, debugOn, fullscreenOn, ramMb, setCustomRelays, setDebug, setFullscreen,
-    setClient, setRamMb, setTheme, theme,
+    setClient, setRamMb, rawMouse, setRawMouse, setSpikeFilter, spikeFilter, setTheme, theme,
 } from "./settings.js";
 import { RELAY_URLS } from "./config.js";
 import * as packs from "./packs.js";
@@ -536,6 +536,8 @@ segment("client-seg", client, (v) => {
     $("launch").href = launchTarget();
     renderServers();
 });
+segment("raw-seg", () => onOff(rawMouse()), (v) => setRawMouse(v === "on"));
+segment("spike-seg", spikeFilter, setSpikeFilter);
 segment("fs-seg", () => onOff(fullscreenOn()), (v) => setFullscreen(v === "on"));
 
 // Theme: "system" follows the device; the page always carries the one in use.
