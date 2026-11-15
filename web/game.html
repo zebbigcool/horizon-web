@@ -25,13 +25,12 @@
 <pre id="debug" hidden></pre>
 <script>
 // For devices where DevTools isn't available (school Chromebooks): keeps the
-// game's console output and shows it on screen if the game panics, errors or
-// shows no frame within 45 s. "?debug" in the address shows it always.
+// game's console output and shows it on screen only if the game panics. "?debug" in the address, or
+// Settings, Show the game's log, shows it always.
 (() => {
   const lines = [];
   const box = document.getElementById("debug");
   let shown = new URLSearchParams(location.search).has("debug") || (() => { try { return localStorage.getItem("horizon-debug") === "1"; } catch { return false; } })();
-  let drawn = false;
   const text = (a) => { try { return a instanceof Error ? (a.stack || a.message) : typeof a === "string" ? a : JSON.stringify(a); } catch { return String(a); } };
   const render = () => {
     box.hidden = !shown;
@@ -44,8 +43,7 @@
     const line = `${kind}: ${args.map(text).join(" ")}`.slice(0, 600);
     lines.push(line);
     if (lines.length > 200) lines.shift();
-    if (/first frame/i.test(line)) drawn = true;
-    if (kind === "error" || /panicked/i.test(line)) shown = true;
+    if (/panicked/i.test(line)) shown = true; // the game died: show why
     render();
   };
   for (const kind of ["log", "info", "warn", "error"]) {
@@ -63,7 +61,6 @@
     lines.unshift(...info);
     render();
   })();
-  setTimeout(() => { if (!drawn) { shown = true; add("warn", ["no frame after 45 s"]); } }, 45000);
 })();
 </script>
 <script type="module" src="main.js"></script>
