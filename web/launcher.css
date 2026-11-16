@@ -318,3 +318,8 @@ button, select, input { font: inherit; }
   * { transition: none !important; }
   .mark, .launch, .seg button.on, .relay-list .tag, .server .icon, .server .join { animation: none; }
 }
+
+#profile-name { min-width: 240px; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--soft); background: transparent; color: inherit; }
+#profile-face { width: 64px; height: 64px; image-rendering: pixelated; border-radius: 8px; margin: 10px 0 0; display: block; }
+#profile .actions { display: flex; gap: 10px; margin: 10px 0; flex-wrap: wrap; }
+#profile .file { cursor: pointer; }

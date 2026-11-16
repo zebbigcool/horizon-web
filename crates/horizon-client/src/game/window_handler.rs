@@ -546,6 +546,9 @@ impl ApplicationHandler for Game<'_> {
     /// window turns it into a window close, so Minecraft.stop saves the world.
     fn exiting(&mut self, _event_loop: &ActiveEventLoop) {
         self.shut_down();
+        // "Quit game" on the web returns to the launcher page it was started from.
+        #[cfg(target_arch = "wasm32")]
+        horizon_os::web::leave_page();
     }
 }
 

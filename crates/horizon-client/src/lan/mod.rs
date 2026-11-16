@@ -581,10 +581,10 @@ impl Shared {
             .any(|(u, _, _)| *u == uuid)
     }
     pub fn motd(&self) -> String {
-        self.motd.lock().unwrap().clone()
+        horizon_os::sync::lock(&self.motd).unwrap_or_else(|e| e.into_inner()).clone()
     }
     pub fn set_motd(&self, motd: String) {
-        *self.motd.lock().unwrap() = motd;
+        *horizon_os::sync::lock(&self.motd).unwrap_or_else(|e| e.into_inner()) = motd;
     }
     pub fn max_players(&self) -> usize {
         self.max_players.load(Ordering::Relaxed)

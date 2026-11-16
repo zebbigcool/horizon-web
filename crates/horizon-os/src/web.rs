@@ -111,6 +111,14 @@ export function horizon_console(level, message) {
 let wantLock = false;
 let lostLock = false;
 let hooked = null;
+export function horizon_leave_page() {
+    // Back to the launcher page the game was started from (kept by the launcher).
+    let back = "index.html";
+    try {
+        back = sessionStorage.getItem("horizon-return") || back;
+    } catch (e) {}
+    globalThis.location.replace(back);
+}
 export function horizon_pointer_lock_lost() {
     const lost = lostLock;
     lostLock = false;
@@ -225,6 +233,7 @@ extern "C" {
     fn horizon_console(level: u32, message: &str);
     fn horizon_pointer_lock(want: bool);
     fn horizon_pointer_lock_lost() -> bool;
+    fn horizon_leave_page();
     fn horizon_pointer_locked() -> bool;
 }
 
@@ -393,6 +402,11 @@ pub fn pointer_lock(want: bool) {
 /// does, the pointer moves freely and its motion must not turn the view.
 pub fn pointer_locked() -> bool {
     horizon_pointer_locked()
+}
+
+/// Leaves the game's page for the launcher page it was started from.
+pub fn leave_page() {
+    horizon_leave_page()
 }
 
 /// Whether the browser let the pointer go while the game held it (the

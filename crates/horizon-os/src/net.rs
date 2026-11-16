@@ -614,7 +614,7 @@ impl WebSocket {
         };
         ask("open", id, Some(target));
         let shared = &socket.handle.shared;
-        let state = shared.state.lock().unwrap_or_else(|e| e.into_inner());
+        let state = crate::sync::lock(&shared.state).unwrap_or_else(|e| e.into_inner());
         let (state, timed_out) =
             crate::sync::wait_timeout_while(&shared.state, &shared.ready, state, timeout, |s| {
                 !s.open && s.closed.is_none()

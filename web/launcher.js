@@ -12,10 +12,11 @@ import {
 } from "./settings.js";
 import { RELAY_URLS } from "./config.js";
 import * as packs from "./packs.js";
+import * as profile from "./profile.js";
 import * as servers from "./servers.js";
 
 const $ = (id) => document.getElementById(id);
-const pages = { play: $("play"), chat: $("chat"), browse: $("browse"), player: $("player"), settings: $("settings"), packs: $("packs"), servers: $("servers") };
+const pages = { play: $("play"), chat: $("chat"), browse: $("browse"), player: $("player"), settings: $("settings"), packs: $("packs"), servers: $("servers"), profile: $("profile") };
 const chatFrame = $("chat-frame");
 const body = $("rooms-body");
 const empty = $("rooms-empty");
@@ -48,11 +49,15 @@ function show() {
     const [name, id] = location.hash.slice(1).split("/");
     let page = "play";
     let nav = "play";
-    if (name === "chat" || name === "settings" || name === "packs" || name === "servers") page = nav = name;
+    if (name === "chat" || name === "settings" || name === "packs" || name === "servers" || name === "profile") page = nav = name;
     else if (name === "games" || name === "apps") {
         page = id ? "player" : "browse";
         nav = name;
     }
+    // "Quit game" returns here, to the page the game was started from.
+    try {
+        sessionStorage.setItem("horizon-return", location.pathname.split("/").pop() + location.search + location.hash);
+    } catch {}
     for (const [key, el] of Object.entries(pages)) el.hidden = key !== page;
     for (const link of document.querySelectorAll("[data-nav]")) link.classList.toggle("on", link.dataset.nav === nav);
     // The chat loads when first opened, and stays loaded when you come back.
@@ -660,3 +665,124 @@ $("code-input").addEventListener("input", () => $("code-input").setCustomValidit
 $("refresh").addEventListener("click", loadRooms);
 addEventListener("hashchange", show);
 show();
+
+// ---- Profile: name, skin and cape, written for the game to read at start ----
+{
+    const nameEl = $("profile-name");
+    const skinEl = $("profile-skin");
+    const status = $("profile-status");
+    const face = $("profile-face");
+    let state = null;
+    const say = (text) => (status.textContent = text);
+
+    async function drawFace() {
+        const file = state.skin === "custom" ? state.skinFile : null;
+        face.hidden = !file;
+        if (!file) return;
+        const bitmap = await createImageBitmap(file);
+        const ctx = face.getContext("2d");
+        ctx.imageSmoothingEnabled = false;
+        ctx.clearRect(0, 0, 64, 64);
+        ctx.drawImage(bitmap, 8, 8, 8, 8, 0, 0, 64, 64); // the face
+        ctx.drawImage(bitmap, 40, 8, 8, 8, 0, 0, 64, 64); // the hat layer
+        bitmap.close();
+    }
+
+    function paint() {
+        skinEl.value = state.skin;
+        $("profile-skin-remove").hidden = !state.skinFile;
+        $("profile-cape-remove").hidden = !state.capeFile;
+        for (const b of $("profile-arms").children) b.classList.toggle("on", (b.dataset.value === "slim") === state.slim);
+        for (const b of $("profile-cape").children) {
+            b.classList.toggle("on", (b.dataset.value === "on") === state.cape);
+            b.disabled = b.dataset.value === "on" && !state.capeFile;
+        }
+        drawFace().catch(() => {});
+    }
+
+    async function persist(message = "Saved. It applies the next time the game starts.") {
+        const name = nameEl.value.trim();
+        if (name && !profile.validName(name)) return say("A name is 1 to 16 characters, with no spaces.");
+        try {
+            // No name chosen: keep the one the game made, by not writing a profile yet.
+            if (name) await profile.save({ ...state, name });
+            else if (state.name) await profile.save({ ...state, name: state.name });
+            say(name || state.name ? message : "Pick a name to save your skin and cape.");
+            if (name) state.name = name;
+        } catch (e) {
+            say(String(e.message ?? e));
+        }
+    }
+
+    async function init() {
+        if (!profile.supported()) {
+            $("profile-unsupported").hidden = false;
+            for (const el of pages.profile.querySelectorAll("input, select, button")) el.disabled = true;
+            return;
+        }
+        skinEl.replaceChildren(
+            ...profile.CHARACTERS.map((c) => new Option(c[0].toUpperCase() + c.slice(1), c)),
+            new Option("Custom (uploaded)", "custom"),
+        );
+        state = await profile.load();
+        nameEl.value = state.name;
+        paint();
+    }
+
+    nameEl.addEventListener("change", () => persist());
+    skinEl.addEventListener("change", () => {
+        if (skinEl.value === "custom" && !state.skinFile) {
+            skinEl.value = state.skin;
+            return say("Upload a skin first.");
+        }
+        state.skin = skinEl.value;
+        paint();
+        persist();
+    });
+    $("profile-arms").addEventListener("click", (e) => {
+        const b = e.target.closest("button");
+        if (!b) return;
+        state.slim = b.dataset.value === "slim";
+        paint();
+        persist();
+    });
+    $("profile-cape").addEventListener("click", (e) => {
+        const b = e.target.closest("button");
+        if (!b || b.disabled) return;
+        state.cape = b.dataset.value === "on";
+        paint();
+        persist();
+    });
+    for (const [id, importer, key, use] of [
+        ["profile-skin-file", profile.importSkin, "skinFile", (s) => (s.skin = "custom")],
+        ["profile-cape-file", profile.importCape, "capeFile", (s) => (s.cape = true)],
+    ]) {
+        $(id).addEventListener("change", async (e) => {
+            const file = e.target.files[0];
+            e.target.value = "";
+            if (!file) return;
+            try {
+                await importer(file);
+                state = { ...state, ...(await profile.load()) , name: state.name };
+                use(state);
+                paint();
+                await persist();
+            } catch (err) {
+                say(String(err.message ?? err));
+            }
+        });
+    }
+    for (const [id, remove, key, reset] of [
+        ["profile-skin-remove", profile.removeSkin, "skinFile", (s) => (s.skin = "steve")],
+        ["profile-cape-remove", profile.removeCape, "capeFile", (s) => (s.cape = false)],
+    ]) {
+        $(id).addEventListener("click", async () => {
+            await remove();
+            state[key] = null;
+            reset(state);
+            paint();
+            persist("Removed.");
+        });
+    }
+    init().catch((e) => say(`Couldn't read your profile: ${e.message ?? e}`));
+}
