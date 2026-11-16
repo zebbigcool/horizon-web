@@ -73,7 +73,7 @@
     }
   };
   const add = (kind, args) => {
-    const line = `${kind}: ${args.map(text).join(" ")}`.slice(0, 600);
+    const line = `${kind}: ${args.map(text).join(" ")}`.slice(0, 2500);
     lines.push(line);
     if (lines.length > 200) lines.shift();
     if (/panicked/i.test(line)) shown = true; // the game died: show why
@@ -83,7 +83,7 @@
     const original = console[kind].bind(console);
     console[kind] = (...args) => { original(...args); add(kind, args); };
   }
-  addEventListener("error", (e) => add("error", [e.message || e.error]));
+  addEventListener("error", (e) => add("error", [e.error ?? e.message]));
   addEventListener("unhandledrejection", (e) => add("error", ["unhandled", e.reason]));
   (async () => {
     const info = [`isolated: ${self.crossOriginIsolated}`, `cores: ${navigator.hardwareConcurrency}`, `memory: ${navigator.deviceMemory ?? "?"} GB`];
