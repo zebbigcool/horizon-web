@@ -5,7 +5,7 @@
 #   web/build.sh            the release build: LTO, then wasm-opt (binaryen) when installed
 #   PROFILE=fast web/build.sh  optimized, no LTO or wasm-opt: quick to rebuild while working
 #   WASM_OPT=0 web/build.sh skip wasm-opt
-#   NAMES=1 web/build.sh    the release build, but keeping function names so a crash trace is readable
+#   web/build.sh names      (or NAMES=1 web/build.sh)    the release build, but keeping function names so a crash trace is readable
 #   DIST=<folder> web/build.sh  build into another folder
 #   BUNDLE=0 web/build.sh   only the game and the page, not the resources
 #
@@ -19,6 +19,8 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 profile="${PROFILE:-release}"
+# `web/build.sh names` is NAMES=1 for shells that cannot set a variable in front of a command.
+[ "${1:-}" = names ] && NAMES=1
 resources="${HORIZON_RESOURCES:-.local/horizon-client/26.3}"
 dist="${DIST:-web/dist}"
 
