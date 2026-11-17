@@ -5,6 +5,7 @@
 #   web/build.sh            the release build: LTO, then wasm-opt (binaryen) when installed
 #   PROFILE=fast web/build.sh  optimized, no LTO or wasm-opt: quick to rebuild while working
 #   WASM_OPT=0 web/build.sh skip wasm-opt
+#   NAMES=1 web/build.sh    the release build, but keeping function names so a crash trace is readable
 #   DIST=<folder> web/build.sh  build into another folder
 #   BUNDLE=0 web/build.sh   only the game and the page, not the resources
 #
@@ -46,7 +47,7 @@ target_dir="$(cargo metadata --format-version 1 --no-deps | python3 -c 'import j
 mkdir -p "$dist/pkg"
 bindgen=(wasm-bindgen --target web --no-typescript --out-dir "$dist/pkg")
 # Function names (5 MB) only make stack traces readable: the release build drops them.
-[ "$profile" = release ] && bindgen+=(--remove-name-section)
+[ "$profile" = release ] && [ "${NAMES:-0}" != 1 ] && bindgen+=(--remove-name-section)
 "${bindgen[@]}" "$target_dir/wasm32-unknown-unknown/$profile/horizon-client.wasm"
 # The glue imports its snippets (`inline_js`) from folders named per crate, not
 # per content: ask for each by its hash, so a cache can't hand the page an
@@ -66,7 +67,7 @@ wasm="$dist/pkg/horizon-client_bg.wasm"
 if [ "$profile" = release ] && [ "${WASM_OPT:-1}" != 0 ]; then
     if command -v wasm-opt > /dev/null; then
         # The features rustc's wasm32 target turns on, and the threaded build's atomics.
-        wasm-opt -O2 --enable-threads --enable-bulk-memory --enable-mutable-globals \
+        wasm-opt -O2 ${NAMES:+-g} --enable-threads --enable-bulk-memory --enable-mutable-globals \
             --enable-sign-ext --enable-nontrapping-float-to-int --enable-reference-types \
             --enable-multivalue "$wasm" -o "$wasm.opt"
         mv "$wasm.opt" "$wasm"
