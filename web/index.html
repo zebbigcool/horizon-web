@@ -247,6 +247,15 @@
             </div>
           </div>
           <div class="row">
+            <label id="lowmem-label">Low-memory mode</label>
+            <div class="field">
+              <div class="seg" id="lowmem-seg" role="group" aria-labelledby="lowmem-label">
+                <button type="button" data-value="on">On</button><button type="button" data-value="off">Off</button>
+              </div>
+              <p class="hint">For Chromebooks and other computers with little memory (4 GB or less). The game uses two threads at most, frees the page's copy of its files as soon as it can, and the first time it starts it sets short view distances, no clouds, minimal particles and no mipmaps or biome blending (change them in the game's Video Settings afterwards and they stay). Turn it off on a stronger computer. Takes effect the next time the game starts.</p>
+            </div>
+          </div>
+          <div class="row">
             <label id="raw-label">Raw mouse input</label>
             <div class="field">
               <div class="seg" id="raw-seg" role="group" aria-labelledby="raw-label">

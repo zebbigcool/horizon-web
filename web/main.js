@@ -4,7 +4,15 @@
 // keeps the large files for later visits.
 import "./audio.js"; // before the game's glue, which keeps the AudioContext it finds
 import { startPresence, watchSharedWorld } from "./presence.js";
-import { ramMb } from "./settings.js";
+import { applyLowMemoryOptions, cpuCap, lowMemory, ramMb } from "./settings.js";
+
+// Low-memory mode: the game sizes its thread pools from this count.
+{
+    const cap = cpuCap();
+    if (cap && (navigator.hardwareConcurrency || 0) > cap) {
+        Object.defineProperty(navigator, "hardwareConcurrency", { get: () => cap, configurable: true });
+    }
+}
 
 const ROOT = ".local/horizon-client/26.3";
 const status = document.getElementById("status");
@@ -321,15 +329,21 @@ async function served() {
 }
 
 async function main() {
+    console.log(`Horizon: low-memory mode ${lowMemory() ? "on" : "off"}; device memory ${navigator.deviceMemory ?? "?"} GB, ` +
+        `${navigator.hardwareConcurrency ?? "?"} threads counted`);
     startPresence();
     watchSharedWorld();
     if (!(await webgpu())) return;
-    const { glue, tar, manifest, base } = await served();
+    let { glue, tar, manifest, base } = await served();
     status.textContent = "Installing resources…";
     const t0 = performance.now();
     const installed = glue.horizon_install_tar(ROOT, tar);
     glue.horizon_install_manifest(ROOT, base, manifest);
     console.log(`Horizon: ${installed} files installed in ${Math.round(performance.now() - t0)} ms`);
+
+    // The page's copy of the archive isn't needed once the game holds the files.
+    tar = null;
+    if (await applyLowMemoryOptions()) console.log("Horizon: low-memory options written (render distance 6, no clouds, minimal particles)");
 
     const root = await savedRoot();
     if (root) {

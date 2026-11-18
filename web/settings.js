@@ -9,6 +9,8 @@ const CLIENT_KEY = "horizon-client";
 const FULLSCREEN_KEY = "horizon-fullscreen";
 const RELAYS_KEY = "horizon-relays";
 const PUBLIC_KEY = "horizon-public-room";
+const LOWMEM_KEY = "horizon-low-memory";
+const LOWMEM_APPLIED_KEY = "horizon-low-memory-applied";
 
 const read = (key) => {
     try {
@@ -44,6 +46,55 @@ export const setClient = (value) => write(CLIENT_KEY, value);
 
 // Mouse look (read by game.html): raw input on unless "0"; the spike filter is
 // "off", "normal" or "strict".
+// Low-memory mode (on by default): fewer game threads, a lighter first-run
+// options file, and the page's own copies of the resources dropped early.
+export const lowMemory = () => read(LOWMEM_KEY) !== "0";
+export const setLowMemory = (on) => {
+    write(LOWMEM_KEY, on ? "1" : "0");
+    // Turning it on again lights the options up once more.
+    try {
+        localStorage.removeItem(LOWMEM_APPLIED_KEY);
+    } catch {
+        // Nothing to clear.
+    }
+};
+
+// Options written once when low-memory mode starts (the player's own changes
+// in the game's menus stay after that): short distances, no clouds, minimal
+// particles, no mipmaps or biome blending, and the cheapest lighting.
+const LOW_OPTIONS = {
+    renderDistance: "6", simulationDistance: "5", renderClouds: "false", particles: "2", entityShadows: "false",
+    ao: "false", biomeBlendRadius: "0", mipmapLevels: "0", maxFps: "60", vignette: "false", weatherRadius: "3",
+    entityDistanceScaling: "0.5", improvedTransparency: "false",
+};
+
+// Merges LOW_OPTIONS into options.txt in the game's saved files, once.
+export async function applyLowMemoryOptions() {
+    if (!lowMemory() || read(LOWMEM_APPLIED_KEY) === "1") return false;
+    try {
+        const dir = await (await navigator.storage.getDirectory()).getDirectoryHandle("horizon", { create: true });
+        let lines = [];
+        try {
+            lines = (await (await (await dir.getFileHandle("options.txt")).getFile()).text()).split(/\r?\n/).filter(Boolean);
+        } catch (e) {
+            if (e.name !== "NotFoundError") throw e;
+        }
+        const keep = lines.filter((line) => !(line.split(":")[0] in LOW_OPTIONS));
+        const text = [...keep, ...Object.entries(LOW_OPTIONS).map(([k, v]) => `${k}:${v}`)].join("\n") + "\n";
+        const out = await (await dir.getFileHandle("options.txt", { create: true })).createWritable();
+        await out.write(text);
+        await out.close();
+        write(LOWMEM_APPLIED_KEY, "1");
+        return true;
+    } catch (e) {
+        console.warn(`Horizon: could not apply the low-memory options: ${e}`);
+        return false;
+    }
+}
+
+// How many CPU threads the game may count on: two in low-memory mode.
+export const cpuCap = () => (lowMemory() ? 2 : 0);
+
 export const rawMouse = () => read(RAW_KEY) !== "0";
 export const setRawMouse = (on) => write(RAW_KEY, on ? "1" : "0");
 export const spikeFilter = () => {
@@ -79,7 +130,7 @@ export const setCustomRelays = (list) => write(RELAYS_KEY, JSON.stringify(list))
 // Forgets every setting above and the public-worlds choice; the game's saves
 // are not touched.
 export const clearSettings = () => {
-    for (const key of [RAM_KEY, DEBUG_KEY, THEME_KEY, CLIENT_KEY, RAW_KEY, SPIKE_KEY, FULLSCREEN_KEY, RELAYS_KEY, PUBLIC_KEY]) {
+    for (const key of [RAM_KEY, DEBUG_KEY, THEME_KEY, CLIENT_KEY, RAW_KEY, SPIKE_KEY, FULLSCREEN_KEY, RELAYS_KEY, PUBLIC_KEY, LOWMEM_KEY, LOWMEM_APPLIED_KEY]) {
         try {
             localStorage.removeItem(key);
         } catch {
