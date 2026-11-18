@@ -19,7 +19,7 @@ WEB = Path(__file__).resolve().parent
 # Everything else (the WebAssembly, the resources) comes from dist.
 LIVE = {
     "index.html", "game.html", "launcher.js", "launcher.css", "config.js", "presence.js", "settings.js", "instances.js", "wisp.js", "packs.js", "profile.js", "servers.js",
-    "catalog.json", "NEWgame.html", "main.js", "audio.js", "worker.js", "sw.js",
+    "catalog.json", "mods-library.json", "NEWgame.html", "main.js", "audio.js", "worker.js", "sw.js",
 }
 
 

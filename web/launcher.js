@@ -18,7 +18,7 @@ import * as instances from "./instances.js";
 import { Wisp } from "./wisp.js";
 
 const $ = (id) => document.getElementById(id);
-const pages = { play: $("play"), chat: $("chat"), browse: $("browse"), player: $("player"), settings: $("settings"), packs: $("packs"), servers: $("servers"), profile: $("profile"), instances: $("instances") };
+const pages = { play: $("play"), chat: $("chat"), browse: $("browse"), player: $("player"), settings: $("settings"), packs: $("packs"), servers: $("servers"), profile: $("profile"), instances: $("instances"), mods: $("mods") };
 const chatFrame = $("chat-frame");
 const body = $("rooms-body");
 const empty = $("rooms-empty");
@@ -51,7 +51,7 @@ function show() {
     const [name, id] = location.hash.slice(1).split("/");
     let page = "play";
     let nav = "play";
-    if (name === "chat" || name === "settings" || name === "packs" || name === "servers" || name === "profile" || name === "instances") page = nav = name;
+    if (name === "chat" || name === "settings" || name === "packs" || name === "servers" || name === "profile" || name === "instances" || name === "mods") page = nav = name;
     else if (name === "games" || name === "apps") {
         page = id ? "player" : "browse";
         nav = name;
@@ -894,4 +894,103 @@ show();
         }
     });
     render();
+}
+
+// ---- Mods: the community library's native mods, with a list kept per instance
+{
+    const MODS_URL = "./mods-library.json";
+    const listEl = $("mod-list");
+    const note = $("mod-note");
+    const wantedKey = () => `horizon-mods-wanted-${instances.activeId()}`;
+    const wanted = () => {
+        try {
+            return new Set(JSON.parse(localStorage.getItem(wantedKey()) ?? "[]"));
+        } catch {
+            return new Set();
+        }
+    };
+    const saveWanted = (set) => {
+        try {
+            localStorage.setItem(wantedKey(), JSON.stringify([...set]));
+        } catch {
+            // Not remembered.
+        }
+    };
+    let library = null;
+
+    function render() {
+        if (!library) return;
+        const text = $("mod-search").value.trim().toLowerCase();
+        const group = $("mod-group").value;
+        const mine = wanted();
+        const shown = library.mods.filter((m) =>
+            (!group || m.group === group) && (!text || `${m.name} ${m.about} ${m.from} ${m.slug}`.toLowerCase().includes(text)));
+        $("mod-count").textContent = `${shown.length} of ${library.mods.length} · ${mine.size} in your list`;
+        listEl.replaceChildren(
+            ...shown.map((m) => {
+                const li = document.createElement("li");
+                li.className = "server";
+                const check = document.createElement("input");
+                check.type = "checkbox";
+                check.checked = mine.has(m.slug);
+                check.setAttribute("aria-label", `keep ${m.name} in my list`);
+                check.addEventListener("change", () => {
+                    const set = wanted();
+                    if (check.checked) set.add(m.slug);
+                    else set.delete(m.slug);
+                    saveWanted(set);
+                    $("mod-count").textContent = `${shown.length} of ${library.mods.length} · ${set.size} in your list`;
+                });
+                const meta = document.createElement("div");
+                meta.className = "meta";
+                const name = document.createElement("strong");
+                name.textContent = `${m.name}  ·  ${m.group}`;
+                const about = document.createElement("span");
+                about.textContent = m.about;
+                const from = document.createElement("span");
+                from.className = "hint";
+                from.textContent = `Ported from ${m.from}`;
+                meta.append(name, about, from);
+                const link = (label, href) => {
+                    const a = document.createElement("a");
+                    a.className = "join";
+                    a.textContent = label;
+                    a.href = href;
+                    a.target = "_blank";
+                    a.rel = "noopener noreferrer";
+                    return a;
+                };
+                li.append(check, meta,
+                    link("Source", `${library.repo}/tree/main/mods/${encodeURIComponent(m.slug)}`),
+                    link("Releases", `${library.repo}/releases?q=${encodeURIComponent(m.slug)}`));
+                return li;
+            }),
+        );
+    }
+
+    async function init() {
+        try {
+            library = await (await fetch(MODS_URL)).json();
+        } catch {
+            note.textContent = "Couldn't load the mod list.";
+            return;
+        }
+        $("mod-zip").href = library.zip;
+        const groups = [...new Set(library.mods.map((m) => m.group))].sort();
+        $("mod-group").replaceChildren(new Option("All categories", ""), ...groups.map((g) => new Option(g, g)));
+        render();
+    }
+    $("mod-search").addEventListener("input", render);
+    $("mod-group").addEventListener("change", render);
+    $("mod-copy").addEventListener("click", async () => {
+        const slugs = [...wanted()];
+        if (!slugs.length) return (note.textContent = "Tick some mods first.");
+        try {
+            await navigator.clipboard.writeText(slugs.join("\n"));
+            note.textContent = `Copied ${slugs.length} mod name${slugs.length === 1 ? "" : "s"}.`;
+        } catch {
+            note.textContent = slugs.join(", ");
+        }
+    });
+    init();
 }

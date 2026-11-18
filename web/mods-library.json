@@ -1,0 +1,378 @@
+{
+ "repo": "https://github.com/pxdns/horizon-mods-lib",
+ "zip": "https://github.com/pxdns/horizon-mods-lib/releases/download/all-mods/horizon-mods-all.zip",
+ "note": "Listed from the library's README. Community project, not made or endorsed by Horizon, Mojang or Microsoft.",
+ "mods": [
+  {
+   "slug": "fps-display",
+   "name": "FPS Display",
+   "about": "Shows FPS in a screen corner, coloured by smoothness",
+   "from": "FPS - Display",
+   "group": "HUD"
+  },
+  {
+   "slug": "sprint-indicator",
+   "name": "Sprint Indicator",
+   "about": "Shows whether you are sprinting, walking or sneaking",
+   "from": "Sprint Indicator",
+   "group": "HUD"
+  },
+  {
+   "slug": "key-overlay",
+   "name": "Key Overlay",
+   "about": "On-screen WASD, jump and mouse buttons that light up while held",
+   "from": "Key Overlay",
+   "group": "HUD"
+  },
+  {
+   "slug": "cps-counter",
+   "name": "CPS Counter",
+   "about": "Clicks per second",
+   "from": "Tempest CPS module",
+   "group": "HUD"
+  },
+  {
+   "slug": "info-hud",
+   "name": "Info HUD",
+   "about": "Speed, facing and dimension lines",
+   "from": "MiniHUD (info lines)",
+   "group": "HUD"
+  },
+  {
+   "slug": "custom-hud",
+   "name": "Custom HUD",
+   "about": "One box showing the lines you choose",
+   "from": "CustomHUD",
+   "group": "HUD"
+  },
+  {
+   "slug": "zoomify",
+   "name": "Zoomify",
+   "about": "Hold to zoom, scroll to zoom further, smoothly",
+   "from": "Zoomify",
+   "group": "Camera"
+  },
+  {
+   "slug": "simple-zoom",
+   "name": "Simple Zoom",
+   "about": "Press to zoom, press again to stop",
+   "from": "Simple Zoom",
+   "group": "Camera"
+  },
+  {
+   "slug": "waypoints",
+   "name": "Waypoints",
+   "about": "/wp named places and a tracked readout",
+   "from": "Xaero's Minimap and World Map (waypoints idea)",
+   "group": "Map"
+  },
+  {
+   "slug": "armor-hud",
+   "name": "Armor HUD",
+   "about": "Worn armour, durability and armour value",
+   "from": "uku's Armor HUD, Detail Armor Bar",
+   "group": "HUD"
+  },
+  {
+   "slug": "potion-counter",
+   "name": "Potion Counter",
+   "about": "Potions carried, including splash and lingering",
+   "from": "PotionCounter",
+   "group": "HUD"
+  },
+  {
+   "slug": "totem-counter",
+   "name": "Totem Counter",
+   "about": "Totems carried, shown red at zero",
+   "from": "TotemCounter",
+   "group": "HUD"
+  },
+  {
+   "slug": "effect-timer",
+   "name": "Effect Timer",
+   "about": "Active effects with time left and duration bars",
+   "from": "Status Effect Timer",
+   "group": "HUD"
+  },
+  {
+   "slug": "apple-skin",
+   "name": "AppleSkin",
+   "about": "Hunger and saturation, with a held-food preview",
+   "from": "AppleSkin",
+   "group": "HUD"
+  },
+  {
+   "slug": "pick-up-notifier",
+   "name": "Pick Up Notifier",
+   "about": "Pickup messages such as \"+3 Cobblestone\"",
+   "from": "Pick Up Notifier",
+   "group": "HUD"
+  },
+  {
+   "slug": "freelook",
+   "name": "Freelook",
+   "about": "Look around with Left Alt without turning the body",
+   "from": "Freelook",
+   "group": "Camera"
+  },
+  {
+   "slug": "freecam",
+   "name": "Freecam",
+   "about": "Detached, flyable camera",
+   "from": "Freecam",
+   "group": "Camera"
+  },
+  {
+   "slug": "snappy-tappy",
+   "name": "Snappy Tappy",
+   "about": "The most recently pressed of two opposite keys wins",
+   "from": "SnappyTappy",
+   "group": "Controls"
+  },
+  {
+   "slug": "better-hurt-cam",
+   "name": "Better Hurt Cam",
+   "about": "Weaker hit shake and no death tilt",
+   "from": "BetterHurtCam",
+   "group": "Camera"
+  },
+  {
+   "slug": "more-chat-history",
+   "name": "More Chat History",
+   "about": "Chat keeps 100 to 2000 lines",
+   "from": "More Chat History",
+   "group": "Chat"
+  },
+  {
+   "slug": "chat-notify",
+   "name": "Chat Notify",
+   "about": "Plays a sound when a message contains your name",
+   "from": "Chat Notify",
+   "group": "Chat"
+  },
+  {
+   "slug": "chat-animation",
+   "name": "Chat Animation",
+   "about": "New chat lines slide into place",
+   "from": "Chat Animation",
+   "group": "Chat"
+  },
+  {
+   "slug": "durability-tooltip",
+   "name": "Durability Tooltip",
+   "about": "Durability line on tool, weapon and armour tooltips",
+   "from": "Durability Tooltip",
+   "group": "Items"
+  },
+  {
+   "slug": "crosshair-indicator",
+   "name": "Crosshair Indicator",
+   "about": "Red mark on the crosshair over living entities",
+   "from": "Crosshair Indicator",
+   "group": "Combat"
+  },
+  {
+   "slug": "entity-crosshair",
+   "name": "Entity Crosshair",
+   "about": "Choose crosshair style and colour, red over living entities",
+   "from": "Entity Crosshair",
+   "group": "Combat"
+  },
+  {
+   "slug": "shulker-box-tooltip",
+   "name": "Shulker Box Tooltip",
+   "about": "Shulker contents: totals and a 9 by 3 item grid",
+   "from": "Shulker Box Tooltip",
+   "group": "Items"
+  },
+  {
+   "slug": "combat-hitboxes",
+   "name": "Combat Hitboxes",
+   "about": "Makes entities a little easier to hit",
+   "from": "Combat Hitboxes",
+   "group": "Combat"
+  },
+  {
+   "slug": "ping-view",
+   "name": "Ping View",
+   "about": "Connection ping with average and range",
+   "from": "Ping View",
+   "group": "HUD"
+  },
+  {
+   "slug": "invmove",
+   "name": "InvMove",
+   "about": "Keep walking with the inventory open",
+   "from": "InvMove",
+   "group": "Controls"
+  },
+  {
+   "slug": "better-mount-hud",
+   "name": "Better Mount HUD",
+   "about": "Health, speed and jump of your mount",
+   "from": "Better Mount HUD",
+   "group": "HUD"
+  },
+  {
+   "slug": "password-hider",
+   "name": "Password Hider",
+   "about": "Masks passwords in login-style commands and keeps them out of history",
+   "from": "Written for this library",
+   "group": "Chat"
+  },
+  {
+   "slug": "enchantment-descriptions",
+   "name": "Enchantment Descriptions",
+   "about": "Explains each enchantment under the item tooltip",
+   "from": "Enchantment Descriptions",
+   "group": "Items"
+  },
+  {
+   "slug": "f5-split",
+   "name": "F5 Split",
+   "about": "Separate keys for back and front third-person views",
+   "from": "F5 Split",
+   "group": "Camera"
+  },
+  {
+   "slug": "shield-statuses",
+   "name": "Shield Statuses",
+   "about": "Shield as ready, blocking or disabled, with seconds left",
+   "from": "Shield Statuses",
+   "group": "Combat"
+  },
+  {
+   "slug": "chat-patches",
+   "name": "Chat Patches",
+   "about": "Timestamps on chat lines, optional repeat dropping",
+   "from": "Chat Patches",
+   "group": "Chat"
+  },
+  {
+   "slug": "clumps",
+   "name": "Clumps",
+   "about": "Experience orbs merge into one orb",
+   "from": "Clumps",
+   "group": "Misc"
+  },
+  {
+   "slug": "search-stats",
+   "name": "Search Stats",
+   "about": "Search box on the statistics screen",
+   "from": "SearchStats",
+   "group": "Misc"
+  },
+  {
+   "slug": "better-stats",
+   "name": "Better Stats",
+   "about": "/statistics top, find and export commands",
+   "from": "Better Statistics Screen",
+   "group": "Misc"
+  },
+  {
+   "slug": "item-highlighter",
+   "name": "Item Highlighter",
+   "about": "Star on slots holding newly picked-up items",
+   "from": "Item Highlighter",
+   "group": "Items"
+  },
+  {
+   "slug": "crafting-tweaks",
+   "name": "Crafting Tweaks",
+   "about": "Keys to rotate, balance and clear the crafting grid",
+   "from": "Crafting Tweaks",
+   "group": "Items"
+  },
+  {
+   "slug": "visual-keys",
+   "name": "Visual Keys",
+   "about": "On-screen keyboard coloured by key bindings",
+   "from": "VisualKeys",
+   "group": "Controls"
+  },
+  {
+   "slug": "crystal-optimizer",
+   "name": "Crystal Optimizer",
+   "about": "Hit End crystal vanishes at once on a server",
+   "from": "Marlow's Crystal Optimizer",
+   "group": "Combat"
+  },
+  {
+   "slug": "chat-heads",
+   "name": "Chat Heads",
+   "about": "Sender's face beside each chat line",
+   "from": "Chat Heads",
+   "group": "Chat"
+  },
+  {
+   "slug": "controlling",
+   "name": "Controlling",
+   "about": "/keybinds find, conflicts and unbound searches",
+   "from": "Controlling",
+   "group": "Controls"
+  },
+  {
+   "slug": "multi-key-bindings",
+   "name": "Multi Key Bindings",
+   "about": "More than one key per action, with /multikey",
+   "from": "Multi Key Bindings",
+   "group": "Controls"
+  },
+  {
+   "slug": "pearl-optimizer",
+   "name": "Pearl Optimizer",
+   "about": "Thrown pearl shows at once on a server",
+   "from": "Pearl Optimizer",
+   "group": "Combat"
+  },
+  {
+   "slug": "bettergrassify",
+   "name": "BetterGrassify",
+   "about": "Grass block sides show grass top beside a step down",
+   "from": "BetterGrassify",
+   "group": "Visual"
+  },
+  {
+   "slug": "entity-texture-features",
+   "name": "Entity Texture Features",
+   "about": "Numbered mob texture variants and emissive layers",
+   "from": "Entity Texture Features",
+   "group": "Visual"
+  },
+  {
+   "slug": "litematica",
+   "name": "Litematica",
+   "about": "/schematic reads .litematic files for info and materials",
+   "from": "Litematica",
+   "group": "Misc"
+  },
+  {
+   "slug": "tiers",
+   "name": "Tiers",
+   "about": "/tier <name> looks up a player on a tier site (interface is a guess, off by default)",
+   "from": "Tiers",
+   "group": "Misc"
+  },
+  {
+   "slug": "totem-tweaks",
+   "name": "Totem Tweaks",
+   "about": "Totem pop animation options",
+   "from": "Totem Tweaks",
+   "group": "Visual"
+  },
+  {
+   "slug": "tweakeroo",
+   "name": "Tweakeroo",
+   "about": "Hand restock, hotbar cycle, fast right click, tool break warning",
+   "from": "Tweakeroo",
+   "group": "Items"
+  },
+  {
+   "slug": "minimap-plus",
+   "name": "Minimap Plus",
+   "about": "Corner, size, zoom keys and a large map for Horizon's minimap",
+   "from": "Xaero's Minimap and World Map (the map display)",
+   "group": "Map"
+  }
+ ]
+}

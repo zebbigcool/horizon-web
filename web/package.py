@@ -23,7 +23,7 @@ from pathlib import Path
 
 WEB = Path(__file__).resolve().parent
 DIST = WEB / "dist"
-PAGE_FILES = ("index.html", "game.html", "launcher.js", "launcher.css", "config.js", "presence.js", "settings.js", "instances.js", "wisp.js", "packs.js", "profile.js", "servers.js", "catalog.json",
+PAGE_FILES = ("index.html", "game.html", "launcher.js", "launcher.css", "config.js", "presence.js", "settings.js", "instances.js", "wisp.js", "packs.js", "profile.js", "servers.js", "catalog.json", "mods-library.json",
               "main.js", "audio.js", "worker.js", "sw.js")
 
 

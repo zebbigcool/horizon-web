@@ -328,3 +328,7 @@ button, select, input { font: inherit; }
 .instance-name { font-weight: 600; }
 #instance-list .server { display: flex; align-items: center; gap: 10px; }
 #instance-list .meta { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+#mod-list .server { display: flex; align-items: center; gap: 12px; }
+#mod-list .meta { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+#mod-list input[type=checkbox] { flex: 0 0 auto; width: 18px; height: 18px; }
+.link-btn { text-decoration: none; display: inline-flex; align-items: center; }
