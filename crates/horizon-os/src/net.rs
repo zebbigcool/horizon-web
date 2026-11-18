@@ -34,6 +34,7 @@ const sockets = new Map();
 let onEvent = null, take = null, onListen = null;
 function open(id, url, host, port, code, relays) {
     if (code) return joinShared(id, code, relays);
+    const url0 = url;
     if (!url) {
         const scheme = location.protocol === "https:" ? "wss" : "ws";
         const name = host.includes(":") ? `[${host}]` : host;
@@ -41,7 +42,8 @@ function open(id, url, host, port, code, relays) {
     }
     let ws;
     try {
-        ws = new WebSocket(url);
+        // A Java server (launcher: ?wisp=) is reached through a Wisp server instead.
+        ws = globalThis.horizonWisp && !url0 ? globalThis.horizonWisp.connect(host, port) : new WebSocket(url);
     } catch (e) {
         onEvent(id, 2, null, String(e.message ?? e));
         return;

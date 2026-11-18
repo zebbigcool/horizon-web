@@ -16,7 +16,7 @@ export function load() {
     try {
         const list = JSON.parse(localStorage.getItem(KEY) ?? "[]");
         return Array.isArray(list)
-            ? list.filter((s) => s && typeof s.address === "string").map((s) => ({ name: String(s.name || s.address), address: s.address }))
+            ? list.filter((s) => s && typeof s.address === "string").map((s) => ({ name: String(s.name || s.address), address: s.address, java: s.java === true }))
             : [];
     } catch {
         return [];
@@ -51,8 +51,15 @@ export function socketUrl(address, protocol = globalThis.location?.protocol) {
 }
 
 // The start page's address for joining: the game reads ?args= as its command line.
-export function joinUrl(gameUrl, address) {
-    return `${gameUrl}?args=${encodeURIComponent(`--server ${address}`)}`;
+// A Java server (java: true) is reached through the Wisp server at `wisp`.
+export function joinUrl(gameUrl, address, wisp = "") {
+    return `${gameUrl}?args=${encodeURIComponent(`--server ${address}`)}${wisp ? `&wisp=${encodeURIComponent(wisp)}` : ""}`;
+}
+
+// "host" or "host:port" -> { host, port } (25565 by default), for a Wisp stream.
+export function hostPort(address) {
+    const at = address.lastIndexOf(":");
+    return at > 0 ? { host: address.slice(0, at), port: Number(address.slice(at + 1)) } : { host: address, port: 25565 };
 }
 
 // ---- Minecraft's status packets
@@ -177,7 +184,7 @@ export function query(address, WebSocketImpl = globalThis.WebSocket) {
             }
         };
         socket.onerror = () => finish(reject, new Error("can't connect"));
-        socket.onclose = () => finish(reject, new Error("closed"));
+        socket.onclose = (e) => finish(reject, new Error(e?.reason || "closed"));
         socket.onmessage = ({ data }) => {
             try {
                 const ping = Math.round(performance.now() - started);

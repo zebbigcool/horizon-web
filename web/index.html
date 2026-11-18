@@ -32,6 +32,9 @@
       <a href="#packs" data-nav="packs">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 3 7v10l9 5 9-5V7l-9-5zm0 2.3L18.7 8 12 11.7 5.3 8 12 4.3zM5 9.7l6 3.3v6.6l-6-3.3V9.7zm14 0v6.6l-6 3.3V13l6-3.3z"/></svg><span>Packs</span>
       </a>
+      <a href="#instances" data-nav="instances">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h7v7H4zm9 0h7v7h-7zM4 13h7v7H4zm9 0h7v7h-7z"/></svg><span>Instances</span>
+      </a>
       <a href="#profile" data-nav="profile">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9zm0 2c-4.4 0-8 2.2-8 5v2h16v-2c0-2.8-3.6-5-8-5z"/></svg><span>Profile</span>
       </a>
@@ -95,10 +98,17 @@
         <form id="server-form" class="relay-form" autocomplete="off">
           <input id="server-name" type="text" placeholder="Name" aria-label="server name" maxlength="40">
           <input id="server-address" type="text" placeholder="host:port or wss://host" aria-label="server address" required>
+          <label class="check"><input id="server-java" type="checkbox"> Java server (through Wisp)</label>
           <button type="submit" class="ghost">Add server</button>
         </form>
         <p id="server-error" class="hint err" hidden></p>
-        <p class="hint wide-hint">Horizon servers are added as host:port (they take WebSockets beside Minecraft's port). Eaglercraft servers are added as a wss:// address. Servers you add are kept in this browser; joining uses your player name from the game's Edit Profile screen.</p>
+        <form id="wisp-form" class="relay-form" autocomplete="off">
+          <input id="wisp-url" type="text" placeholder="wss://your-wisp-server/" aria-label="Wisp server address" spellcheck="false">
+          <button type="submit" class="ghost">Save Wisp server</button>
+        </form>
+        <p id="wisp-note" class="hint" role="status"></p>
+        <p class="hint wide-hint">Horizon servers are added as host:port (they take WebSockets beside Minecraft's port). Eaglercraft servers are added as a wss:// address. Servers you add are kept in this browser; joining uses your player name from the Profile page.</p>
+        <p class="hint wide-hint">Ordinary Java servers don't take WebSockets, so they are reached through a <b>Wisp server</b>, which opens the real connection for you. Add the Wisp server's address above, then tick "Java server" when adding one. The Wisp server sees which servers you join, so use one you trust or run yourself. Servers that check your Microsoft account (online mode) refuse the join for now; servers that allow offline-mode names work.</p>
       </div>
     </section>
 
@@ -157,10 +167,25 @@
     </section>
 
     <!-- Settings -->
+    <section id="instances" class="page" hidden>
+      <div class="page-in">
+        <h2 class="title">Instances</h2>
+        <p class="sub">Each instance has its own worlds, options, packs and player profile (name, skin and cape). The active one is what the game starts with.</p>
+        <ul id="instance-list" class="servers"></ul>
+        <form id="instance-form" class="relay-form" autocomplete="off">
+          <input id="instance-name" type="text" placeholder="New instance name" aria-label="instance name" maxlength="32" required>
+          <label class="check"><input id="instance-copy" type="checkbox"> Copy the active instance's files</label>
+          <button type="submit" class="ghost">Create instance</button>
+        </form>
+        <p id="instance-note" class="hint" role="status"></p>
+        <p class="hint wide-hint">Instances are kept in this browser. Deleting one removes its worlds for good.</p>
+      </div>
+    </section>
+
     <section id="profile" class="page" hidden>
       <div class="page-in">
         <h2 class="title">Profile</h2>
-        <p class="sub">Your name, skin and cape. They apply the next time the game starts, so set them before you join a shared world or server.</p>
+        <p class="sub">Your name, skin and cape for <b class="instance-name">this instance</b>. They apply the next time the game starts, so set them before you join a shared world or server.</p>
         <div class="panel">
           <p class="hint" id="profile-unsupported" hidden>This browser can't keep files for the game, so the profile can't be saved here. Set it in the game's own menu instead.</p>
           <div class="row">

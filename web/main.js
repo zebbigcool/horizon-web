@@ -5,6 +5,14 @@
 import "./audio.js"; // before the game's glue, which keeps the AudioContext it finds
 import { startPresence, watchSharedWorld } from "./presence.js";
 import { applyLowMemoryOptions, cpuCap, lowMemory, ramMb } from "./settings.js";
+import * as instances from "./instances.js";
+import { Wisp } from "./wisp.js";
+
+// A Java server is reached through a Wisp server: the launcher passes its address as ?wisp=.
+{
+    const wisp = new URLSearchParams(location.search).get("wisp");
+    if (wisp) globalThis.horizonWisp = new Wisp(wisp);
+}
 
 // Low-memory mode: the game sizes its thread pools from this count.
 {
@@ -101,7 +109,7 @@ async function download(url, label) {
 // that is refused, in IndexedDB instead, one record per path.
 async function savedRoot() {
     try {
-        return await (await navigator.storage.getDirectory()).getDirectoryHandle("horizon", { create: true });
+        return await instances.dir();
     } catch (e) {
         try {
             return await idbOpen();
@@ -329,6 +337,7 @@ async function served() {
 }
 
 async function main() {
+    console.log(`Horizon: instance "${instances.active().name}"${globalThis.horizonWisp ? `; Java servers through Wisp (${globalThis.horizonWisp.url})` : ""}`);
     console.log(`Horizon: low-memory mode ${lowMemory() ? "on" : "off"}; device memory ${navigator.deviceMemory ?? "?"} GB, ` +
         `${navigator.hardwareConcurrency ?? "?"} threads counted`);
     startPresence();

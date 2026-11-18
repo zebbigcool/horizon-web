@@ -7,16 +7,18 @@
 import { CHAT_URL, GAME_URL, NEW_GAME_URL, REFRESH_MS, SERAPH_URL } from "./config.js";
 import { configured, publicRoomsOn, roomsFetch, setPublicRooms, startPresence } from "./presence.js";
 import {
-    RAM_CHOICES, client, lowMemory, setLowMemory, clearSettings, customRelays, debugOn, fullscreenOn, ramMb, setCustomRelays, setDebug, setFullscreen,
+    RAM_CHOICES, client, lowMemory, setLowMemory, setWispUrl, validWisp, wispUrl, clearSettings, customRelays, debugOn, fullscreenOn, ramMb, setCustomRelays, setDebug, setFullscreen,
     setClient, setRamMb, rawMouse, setRawMouse, setSpikeFilter, spikeFilter, setTheme, theme,
 } from "./settings.js";
 import { RELAY_URLS } from "./config.js";
 import * as packs from "./packs.js";
 import * as profile from "./profile.js";
 import * as servers from "./servers.js";
+import * as instances from "./instances.js";
+import { Wisp } from "./wisp.js";
 
 const $ = (id) => document.getElementById(id);
-const pages = { play: $("play"), chat: $("chat"), browse: $("browse"), player: $("player"), settings: $("settings"), packs: $("packs"), servers: $("servers"), profile: $("profile") };
+const pages = { play: $("play"), chat: $("chat"), browse: $("browse"), player: $("player"), settings: $("settings"), packs: $("packs"), servers: $("servers"), profile: $("profile"), instances: $("instances") };
 const chatFrame = $("chat-frame");
 const body = $("rooms-body");
 const empty = $("rooms-empty");
@@ -49,7 +51,7 @@ function show() {
     const [name, id] = location.hash.slice(1).split("/");
     let page = "play";
     let nav = "play";
-    if (name === "chat" || name === "settings" || name === "packs" || name === "servers" || name === "profile") page = nav = name;
+    if (name === "chat" || name === "settings" || name === "packs" || name === "servers" || name === "profile" || name === "instances") page = nav = name;
     else if (name === "games" || name === "apps") {
         page = id ? "player" : "browse";
         nav = name;
@@ -335,14 +337,18 @@ function serverRow(server, index) {
     stat.className = "stat";
     const dot = document.createElement("i");
     const detail = document.createElement("span");
-    detail.textContent = `${server.address} · checking…`;
+    detail.textContent = `${server.address}${server.java ? " (Java)" : ""} · checking…`;
     stat.append(dot, detail);
     meta.append(name, motd, motd2, stat);
     const join = document.createElement("a");
     join.className = "join";
     join.textContent = "Join";
     // The new client has no way to be told a server to join: it opens on its own menus.
-    join.href = newClient() ? NEW_GAME_URL : servers.joinUrl(GAME_URL, server.address);
+    join.href = newClient() ? NEW_GAME_URL : servers.joinUrl(GAME_URL, server.address, server.java ? wispUrl() : "");
+    if (server.java && !validWisp(wispUrl())) join.addEventListener("click", (e) => {
+        e.preventDefault();
+        $("wisp-note").textContent = "Add a Wisp server first: Java servers are reached through one.";
+    });
     const remove = document.createElement("button");
     remove.type = "button";
     remove.className = "x";
@@ -365,7 +371,14 @@ function renderServers() {
     list.forEach((server, index) => {
         const row = serverRow(server, index);
         serverList.append(row.li);
-        servers.query(server.address).then(
+        const wisp = server.java && validWisp(wispUrl()) ? new Wisp(wispUrl()) : null;
+        const impl = wisp ? function () { const { host, port } = servers.hostPort(server.address); return wisp.connect(host, port); } : undefined;
+        if (server.java && !wisp) {
+            row.dot.className = "down";
+            row.detail.textContent = `${server.address} (Java) · add a Wisp server to check it`;
+            return;
+        }
+        servers.query(server.address, impl).then(
             (status) => {
                 if (run !== serverRun) return;
                 row.dot.className = "up";
@@ -397,9 +410,10 @@ $("server-form").addEventListener("submit", (e) => {
         serverError.hidden = false;
         return;
     }
-    list.push({ name: $("server-name").value.trim() || address, address });
+    list.push({ name: $("server-name").value.trim() || address, address, java: $("server-java").checked });
     servers.save(list);
     $("server-name").value = $("server-address").value = "";
+    $("server-java").checked = false;
     renderServers();
 });
 // Status goes stale: ask again while the page is open.
@@ -786,4 +800,98 @@ show();
         });
     }
     init().catch((e) => say(`Couldn't read your profile: ${e.message ?? e}`));
+}
+
+// ---- Wisp server for Java servers
+{
+    const input = $("wisp-url");
+    const note = $("wisp-note");
+    input.value = wispUrl();
+    $("wisp-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const url = input.value.trim();
+        if (url && !validWisp(url)) {
+            note.textContent = "A Wisp server address starts with ws:// or wss://.";
+            return;
+        }
+        setWispUrl(url);
+        note.textContent = url ? "Saved." : "Removed.";
+        renderServers();
+    });
+}
+
+// ---- Instances
+{
+    const listEl = $("instance-list");
+    const note = $("instance-note");
+    const say = (text) => (note.textContent = text);
+    for (const el of document.querySelectorAll(".instance-name")) el.textContent = instances.active().name;
+
+    function render() {
+        listEl.replaceChildren(
+            ...instances.list().map((inst) => {
+                const li = document.createElement("li");
+                li.className = "server";
+                const meta = document.createElement("div");
+                meta.className = "meta";
+                const name = document.createElement("strong");
+                name.textContent = inst.name;
+                const sub = document.createElement("span");
+                sub.className = "hint";
+                sub.textContent = inst.id === instances.activeId() ? "Active" : inst.id === instances.DEFAULT ? "The folder the game always used" : "";
+                meta.append(name, sub);
+                li.append(meta);
+                const add = (label, handler, cls = "ghost") => {
+                    const b = document.createElement("button");
+                    b.type = "button";
+                    b.className = cls;
+                    b.textContent = label;
+                    b.addEventListener("click", handler);
+                    li.append(b);
+                };
+                if (inst.id !== instances.activeId()) {
+                    add("Use", () => {
+                        instances.setActive(inst.id);
+                        location.reload(); // Profile and Packs read the new folder.
+                    });
+                }
+                if (inst.id !== instances.DEFAULT) {
+                    add("Rename", () => {
+                        const next = prompt("Instance name", inst.name);
+                        if (next === null) return;
+                        try {
+                            instances.rename(inst.id, next);
+                            location.reload();
+                        } catch (e) {
+                            say(e.message);
+                        }
+                    });
+                    add("Delete", async () => {
+                        if (!confirm(`Delete "${inst.name}" and all its worlds? This can't be undone.`)) return;
+                        try {
+                            await instances.remove(inst.id);
+                            location.reload();
+                        } catch (e) {
+                            say(String(e.message ?? e));
+                        }
+                    }, "x");
+                }
+                return li;
+            }),
+        );
+    }
+
+    $("instance-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        if (!instances.supported()) return say("This browser can't keep files for the game, so instances can't be made here.");
+        try {
+            say("Creating…");
+            const made = await instances.create($("instance-name").value, $("instance-copy").checked ? instances.activeId() : null);
+            instances.setActive(made.id);
+            location.reload();
+        } catch (err) {
+            say(String(err.message ?? err));
+        }
+    });
+    render();
 }

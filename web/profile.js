@@ -3,6 +3,8 @@
 // horizon-player.txt, horizon-skin.png and horizon-cape.png. It takes effect
 // the next time the game starts, so set it before joining a world or server.
 
+import * as instances from "./instances.js";
+
 export const CHARACTERS = ["steve", "alex", "ari", "efe", "kai", "makena", "noor", "sunny", "zuri"];
 export const supported = () => Boolean(navigator.storage?.getDirectory);
 
@@ -15,10 +17,7 @@ const CAPE_SIZES = [[64, 32], [22, 17]];
 // One to sixteen printable ASCII characters, no spaces (what servers accept).
 export const validName = (name) => /^[\x21-\x7e]{1,16}$/.test(name);
 
-async function dir() {
-    const root = await navigator.storage.getDirectory();
-    return root.getDirectoryHandle("horizon", { create: true });
-}
+const dir = () => instances.dir();
 
 async function readFile(name) {
     try {

@@ -77,7 +77,7 @@ if [ "$profile" = release ] && [ "${WASM_OPT:-1}" != 0 ]; then
         echo "wasm-opt not found: the module is left as rustc made it (install binaryen)" >&2
     fi
 fi
-cp web/index.html web/game.html web/launcher.js web/launcher.css web/config.js web/presence.js web/settings.js web/packs.js web/profile.js web/servers.js web/catalog.json \
+cp web/index.html web/game.html web/launcher.js web/launcher.css web/config.js web/presence.js web/settings.js web/instances.js web/wisp.js web/packs.js web/profile.js web/servers.js web/catalog.json \
     web/main.js web/audio.js web/worker.js web/sw.js "$dist/"
 # The newer single-file client, when there is one.
 if [ -f web/NEWgame.html ]; then cp web/NEWgame.html "$dist/"; fi

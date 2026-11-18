@@ -11,11 +11,12 @@ export const KINDS = {
     mod: { folder: "horizon-mods", ext: ".hmod", max: 64 * 1024 * 1024 },
 };
 
+import * as instances from "./instances.js";
+
 export const supported = () => Boolean(navigator.storage?.getDirectory);
 
 async function dir(kind, create) {
-    const root = await navigator.storage.getDirectory();
-    const saved = await root.getDirectoryHandle("horizon", { create });
+    const saved = await instances.dir(instances.activeId(), create);
     return saved.getDirectoryHandle(KINDS[kind].folder, { create });
 }
 

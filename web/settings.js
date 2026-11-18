@@ -1,3 +1,4 @@
+import * as instances from "./instances.js";
 // The player's settings, kept in this browser (localStorage), read by the
 // launcher's settings page and by the game page (main.js, game.html).
 const RAM_KEY = "horizon-ram-mb";
@@ -9,6 +10,7 @@ const CLIENT_KEY = "horizon-client";
 const FULLSCREEN_KEY = "horizon-fullscreen";
 const RELAYS_KEY = "horizon-relays";
 const PUBLIC_KEY = "horizon-public-room";
+const WISP_KEY = "horizon-wisp";
 const LOWMEM_KEY = "horizon-low-memory";
 const LOWMEM_APPLIED_KEY = "horizon-low-memory-applied";
 
@@ -72,7 +74,7 @@ const LOW_OPTIONS = {
 export async function applyLowMemoryOptions() {
     if (!lowMemory() || read(LOWMEM_APPLIED_KEY) === "1") return false;
     try {
-        const dir = await (await navigator.storage.getDirectory()).getDirectoryHandle("horizon", { create: true });
+        const dir = await instances.dir();
         let lines = [];
         try {
             lines = (await (await (await dir.getFileHandle("options.txt")).getFile()).text()).split(/\r?\n/).filter(Boolean);
@@ -94,6 +96,17 @@ export async function applyLowMemoryOptions() {
 
 // How many CPU threads the game may count on: two in low-memory mode.
 export const cpuCap = () => (lowMemory() ? 2 : 0);
+
+// The Wisp server that carries Java-server connections (a ws:// or wss:// address).
+export const wispUrl = () => read(WISP_KEY) ?? "";
+export const setWispUrl = (url) => write(WISP_KEY, url);
+export const validWisp = (url) => {
+    try {
+        return ["ws:", "wss:"].includes(new URL(url).protocol);
+    } catch {
+        return false;
+    }
+};
 
 export const rawMouse = () => read(RAW_KEY) !== "0";
 export const setRawMouse = (on) => write(RAW_KEY, on ? "1" : "0");
@@ -130,7 +143,7 @@ export const setCustomRelays = (list) => write(RELAYS_KEY, JSON.stringify(list))
 // Forgets every setting above and the public-worlds choice; the game's saves
 // are not touched.
 export const clearSettings = () => {
-    for (const key of [RAM_KEY, DEBUG_KEY, THEME_KEY, CLIENT_KEY, RAW_KEY, SPIKE_KEY, FULLSCREEN_KEY, RELAYS_KEY, PUBLIC_KEY, LOWMEM_KEY, LOWMEM_APPLIED_KEY]) {
+    for (const key of [RAM_KEY, DEBUG_KEY, THEME_KEY, CLIENT_KEY, RAW_KEY, SPIKE_KEY, FULLSCREEN_KEY, RELAYS_KEY, PUBLIC_KEY, WISP_KEY, LOWMEM_KEY, LOWMEM_APPLIED_KEY]) {
         try {
             localStorage.removeItem(key);
         } catch {
