@@ -111,6 +111,14 @@ export function horizon_console(level, message) {
 let wantLock = false;
 let lostLock = false;
 let hooked = null;
+export function horizon_low_memory() {
+    // The launcher's Low-memory mode setting; on unless switched off.
+    try {
+        return globalThis.localStorage.getItem("horizon-low-memory") !== "0";
+    } catch (e) {
+        return true;
+    }
+}
 export function horizon_leave_page() {
     // Back to the launcher page the game was started from (kept by the launcher).
     let back = "index.html";
@@ -234,6 +242,7 @@ extern "C" {
     fn horizon_pointer_lock(want: bool);
     fn horizon_pointer_lock_lost() -> bool;
     fn horizon_leave_page();
+    fn horizon_low_memory() -> bool;
     fn horizon_pointer_locked() -> bool;
 }
 
@@ -402,6 +411,11 @@ pub fn pointer_lock(want: bool) {
 /// does, the pointer moves freely and its motion must not turn the view.
 pub fn pointer_locked() -> bool {
     horizon_pointer_locked()
+}
+
+/// Whether the launcher's Low-memory mode is on (it is unless switched off).
+pub fn low_memory() -> bool {
+    horizon_low_memory()
 }
 
 /// Leaves the game's page for the launcher page it was started from.

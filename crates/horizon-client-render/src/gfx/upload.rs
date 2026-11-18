@@ -11,6 +11,11 @@ const CHUNK: u64 = 1 << 20;
 pub struct Uploads {
     belt: wgpu::util::StagingBelt,
     chunk: u64,
+    /// The browser build's low-memory path: writes go through the queue, which
+    /// never asks the GPU for a buffer mapped at creation (some Chromebook GPUs
+    /// refuse a megabyte of those: "createBuffer ... mappedAtCreation").
+    #[cfg(target_arch = "wasm32")]
+    direct: Option<wgpu::Queue>,
 }
 
 impl Uploads {
@@ -23,7 +28,14 @@ impl Uploads {
         Self {
             belt: wgpu::util::StagingBelt::new(device.clone(), chunk),
             chunk,
+            #[cfg(target_arch = "wasm32")]
+            direct: None,
         }
+    }
+    /// Write through `queue` from now on instead of through mapped staging buffers.
+    #[cfg(target_arch = "wasm32")]
+    pub fn write_directly(&mut self, queue: &wgpu::Queue) {
+        self.direct = Some(queue.clone());
     }
     /// A mapped staging slice of at least `size` bytes. The belt gives a
     /// write larger than its chunk a buffer of exactly that size, keeps it for
@@ -56,6 +68,24 @@ impl Uploads {
         let Some(size) = NonZeroU64::new((padded * height as usize) as u64) else {
             return;
         };
+        #[cfg(target_arch = "wasm32")]
+        if let Some(queue) = &self.direct {
+            queue.write_texture(
+                destination,
+                pixels,
+                wgpu::TexelCopyBufferLayout {
+                    offset: 0,
+                    bytes_per_row: Some(row as u32),
+                    rows_per_image: Some(height),
+                },
+                wgpu::Extent3d {
+                    width,
+                    height,
+                    depth_or_array_layers: 1,
+                },
+            );
+            return;
+        }
         let alignment = NonZeroU64::new(u64::from(wgpu::COPY_BYTES_PER_ROW_ALIGNMENT))
             .expect("non-zero alignment");
         let slice = self.allocate(size, alignment);
@@ -104,6 +134,11 @@ impl Uploads {
                 && size.get().is_multiple_of(wgpu::COPY_BUFFER_ALIGNMENT),
             "buffer upload at {offset} of {size} bytes must be 4-byte aligned"
         );
+        #[cfg(target_arch = "wasm32")]
+        if let Some(queue) = &self.direct {
+            queue.write_buffer(target, offset, bytes);
+            return;
+        }
         let alignment = NonZeroU64::new(wgpu::COPY_BUFFER_ALIGNMENT).expect("non-zero alignment");
         let slice = self.allocate(size, alignment).slice(..size.get());
         encoder.copy_buffer_to_buffer(slice.buffer(), slice.offset(), target, offset, size.get());

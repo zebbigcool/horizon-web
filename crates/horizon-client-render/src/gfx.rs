@@ -4671,8 +4671,16 @@ impl Renderer {
             });
         let depth = Self::depth(&device, &config);
         let world_post = world_post::Post::new(&device, frame_format);
-        let uploads = upload::Uploads::new(&device);
-        let section_uploads = upload::Uploads::with_chunk(&device, SECTION_UPLOAD_CHUNK);
+        #[allow(unused_mut)]
+        let mut uploads = upload::Uploads::new(&device);
+        #[allow(unused_mut)]
+        let mut section_uploads = upload::Uploads::with_chunk(&device, SECTION_UPLOAD_CHUNK);
+        // Low-memory mode (the launcher's setting, on by default): no mapped staging buffers.
+        #[cfg(target_arch = "wasm32")]
+        if horizon_os::web::low_memory() {
+            uploads.write_directly(&queue);
+            section_uploads.write_directly(&queue);
+        }
         let stars = stars::Stars::new(&device, (frame_format, linear_light));
         let sky_layers = sky_layers::SkyLayers::new(&device, frame_format);
         let custom_sky = custom_sky::CustomSky::new(&device, (frame_format, linear_light));
