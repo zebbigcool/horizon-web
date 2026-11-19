@@ -5,6 +5,7 @@
 import { DurableObject } from "cloudflare:workers";
 import { Registry } from "./registry.js";
 import { DEFAULT_STUN, Relay } from "./relay.js";
+import { Accounts } from "./accounts.js";
 
 const CORS = {
     "Access-Control-Allow-Origin": "*",
@@ -70,6 +71,42 @@ export class RelayObject extends DurableObject {
     }
 }
 
+// Accounts, staff roles, moderation, the announcement and the shout (accounts.js).
+// The owner's password is the ADMIN_PASSWORD secret (`npx wrangler secret put
+// ADMIN_PASSWORD`); IP_SECRET (optional secret) keys the hashes of banned networks.
+export class AccountsObject extends DurableObject {
+    constructor(state, env) {
+        super(state, env);
+        const storage = state.storage;
+        this.accounts = new Accounts({
+            store: {
+                get: (k) => storage.get(k),
+                put: (k, v) => storage.put(k, v),
+                delete: (k) => storage.delete(k),
+                list: async (prefix) => [...(await storage.list({ prefix }))],
+            },
+            ownerPassword: env.ADMIN_PASSWORD ?? "",
+            ipSecret: env.IP_SECRET ?? "",
+        });
+        state.blockConcurrencyWhile(() => this.accounts.load());
+    }
+
+    // Called by the Worker with { method, path, body, ip }; answers [status, json].
+    async fetch(request) {
+        const { method, path, body, ip } = await request.json();
+        let result;
+        if (path === "/internal/ip-banned") result = [200, { banned: await this.accounts.ipBanned(ip) }];
+        else if (path === "/internal/ping") result = [200, await this.accounts.ping(body?.token, ip)];
+        else result = await this.accounts.handle(method, path, body, ip);
+        return Response.json(result);
+    }
+}
+
+const accountsStub = (env) => env.ACCOUNTS.get(env.ACCOUNTS.idFromName("accounts"));
+const askAccounts = async (env, payload) => (await accountsStub(env).fetch("https://accounts/", { method: "POST", body: JSON.stringify(payload) })).json();
+
+const ACCOUNT_PATH = /^\/api\/(account|staff|owner|data)\//;
+
 export default {
     // Any failure still answers with the CORS headers, so a page sees the real
     // error instead of a blocked request.
@@ -86,6 +123,42 @@ async function route(request, env) {
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS });
     const url = new URL(request.url);
     if (url.pathname === "/") return json(200, { service: "z's horizon rooms" });
-    if (url.pathname === "/relay") return env.RELAY.get(env.RELAY.idFromName("relay")).fetch(request);
+    const ip = request.headers.get("CF-Connecting-IP") ?? "";
+    if (url.pathname === "/relay") {
+        // A banned network can't join or host a shared world.
+        const [, answer] = await askAccounts(env, { method: "GET", path: "/internal/ip-banned", ip });
+        if (answer.banned) return new Response("banned", { status: 403, headers: CORS });
+        return env.RELAY.get(env.RELAY.idFromName("relay")).fetch(request);
+    }
+    if (request.method === "GET" && url.pathname === "/api/site") {
+        const [status, data] = await askAccounts(env, { method: "GET", path: "/api/site", ip });
+        return json(status, data);
+    }
+    if (request.method === "POST" && (ACCOUNT_PATH.test(url.pathname) || url.pathname === "/api/presence")) {
+        // Sent as text/plain by the pages (no CORS preflight); it is JSON. Cloud-save
+        // chunks are big, everything else is small.
+        const raw = await request.text();
+        const limit = url.pathname === "/api/data/put" ? 700_000 : 4096;
+        if (raw.length > limit) return json(413, { error: "too large" });
+        let body = null;
+        try {
+            body = raw ? JSON.parse(raw) : null;
+        } catch {
+            return json(400, { error: "bad json" });
+        }
+        if (url.pathname === "/api/presence") {
+            // The online count, plus what every page hears: the announcement, the
+            // shout, who you are and whether you were kicked or banned.
+            const registry = await env.REGISTRY.get(env.REGISTRY.idFromName("registry")).fetch(
+                new Request(request.url, { method: "POST", body: JSON.stringify({ id: body?.id }) }),
+            );
+            const counted = await registry.json();
+            if (!registry.ok) return json(registry.status, counted);
+            const [, site] = await askAccounts(env, { method: "POST", path: "/internal/ping", body: { token: body?.token }, ip });
+            return json(200, { ...counted, site });
+        }
+        const [status, data] = await askAccounts(env, { method: "POST", path: url.pathname, body, ip });
+        return json(status, data);
+    }
     return env.REGISTRY.get(env.REGISTRY.idFromName("registry")).fetch(request);
 }

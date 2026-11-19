@@ -18,6 +18,10 @@ class_name = "RegistryObject"
 name = "RELAY"
 class_name = "RelayObject"
 
+[[durable_objects.bindings]]
+name = "ACCOUNTS"
+class_name = "AccountsObject"
+
 # SQLite-backed Durable Objects are the ones the free plan includes.
 [[migrations]]
 tag = "v1"
@@ -26,6 +30,15 @@ new_sqlite_classes = ["RegistryObject"]
 [[migrations]]
 tag = "v2"
 new_sqlite_classes = ["RelayObject"]
+
+[[migrations]]
+tag = "v3"
+new_sqlite_classes = ["AccountsObject"]
+
+# The owner account ("Zeb") logs in with a password that is a secret, never in
+# this file or the repo: `npx wrangler secret put ADMIN_PASSWORD`. Optionally
+# `npx wrangler secret put IP_SECRET` (any long random text) keys the hashes of
+# banned networks; without it they are keyed from ADMIN_PASSWORD.
 
 # Optional TURN server for players behind strict NATs (the relay only does
 # STUN otherwise): set TURN_URL here, and TURN_USER / TURN_PASS with

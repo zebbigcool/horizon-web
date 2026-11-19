@@ -4,6 +4,7 @@
 //    unless the player switched it off (the launcher's minecraft page has the switch).
 import { RELAY_URLS, ROOMS_APIS } from "./config.js";
 import { customRelays } from "./settings.js";
+import { token } from "./session.js";
 
 // Relays the player added, then ours: tried before the game's own list, for hosting and joining.
 const relays = [...customRelays().map((r) => r.url), ...RELAY_URLS];
@@ -63,16 +64,31 @@ function post(path, body, keepalive = false) {
     });
 }
 
+// What the last ping heard: the announcement, the shout, who you are and
+// whether you were kicked or banned. Pages listen for "horizon:site".
+export let site = null;
+const hear = (data) => {
+    site = data;
+    document.dispatchEvent(new CustomEvent("horizon:site", { detail: data }));
+};
+export const refreshSite = () => pingNow?.();
+let pingNow = null;
+
 export async function startPresence(onOnline) {
     if (!configured()) return;
     const ping = async () => {
         try {
-            const response = await post("/api/presence", { id: sessionId });
-            if (response.ok) onOnline?.((await response.json()).online);
+            const response = await post("/api/presence", { id: sessionId, token: token() });
+            if (response.ok) {
+                const data = await response.json();
+                onOnline?.(data.online);
+                if (data.site) hear(data.site);
+            }
         } catch {
             // Offline or the service is down: the count just doesn't update.
         }
     };
+    pingNow = ping;
     ping();
     setInterval(ping, PRESENCE_MS);
     document.addEventListener("visibilitychange", () => {

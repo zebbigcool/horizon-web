@@ -293,6 +293,41 @@ button, select, input { font: inherit; }
 .danger { width: 100%; margin-top: 14px; padding: 9px; cursor: pointer; color: #ff7a59; background: var(--ctl); border: 1px solid var(--line); border-radius: 8px; }
 .danger:hover { border-color: #ff7a59; background: rgba(255, 90, 60, .12); }
 
+
+/* Accounts, staff and the shout */
+.pad { padding: 16px 18px; margin-bottom: 16px; }
+.pad h3 { margin: 0 0 8px; }
+.stack { display: flex; flex-direction: column; gap: 10px; max-width: 360px; }
+.actions { display: flex; gap: 10px; margin: 10px 0; flex-wrap: wrap; }
+.stack input, .pad > input, .field > input[type=text], .pad textarea, .shout-form textarea {
+  width: 100%; color: var(--text); background: var(--ctl); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; resize: vertical;
+}
+.stack input:focus, .pad > input:focus, .field > input:focus, .pad textarea:focus, .shout-form textarea:focus { outline: none; border-color: var(--orange); box-shadow: 0 0 12px rgba(255, 138, 31, .35); }
+.field > input[type=text] { max-width: 280px; }
+#tag-color { margin: 10px 0 0 10px; width: 44px; height: 32px; padding: 0; border: 1px solid var(--line); border-radius: 6px; background: none; vertical-align: middle; }
+.chip { font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 5px; color: #12081f; background: linear-gradient(var(--spin), var(--purple), var(--yellow), var(--purple)); animation: spin 4s linear infinite; text-transform: lowercase; }
+.chip.mute { color: var(--text); background: var(--ctl); border: 1px solid var(--line); animation: none; }
+.chip.bad { color: #ff7a59; background: rgba(255, 90, 60, .12); border: 1px solid #ff7a59; animation: none; }
+.who-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.who-name { font-size: 22px; }
+.shout { margin-bottom: 14px; padding: 12px 16px; border-radius: 10px; background: var(--panel); border: 1px solid transparent;
+  background-image: linear-gradient(var(--fill), var(--fill)), linear-gradient(var(--spin), var(--purple), var(--yellow), var(--purple));
+  background-origin: border-box; background-clip: padding-box, border-box; animation: spin 8s linear infinite; }
+.shout-head { display: flex; align-items: center; gap: 10px; }
+.shout-head small { color: var(--dim); flex: 1; }
+.shout p { margin: 6px 0 0; font-size: 17px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.shout-form { margin-bottom: 14px; }
+.shout-form textarea { display: block; }
+#shout-new { margin-bottom: 14px; }
+.person { flex-wrap: wrap; }
+.person .meta { min-width: 180px; }
+.person .meta small, .logrow .meta small { color: var(--dim); }
+.person .acts { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.person select, .logrow .undo { color: var(--text); background: var(--ctl); border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px; }
+.logrow .undone { color: var(--dim); text-decoration: line-through; }
+.person .ghost:disabled, .logrow .ghost:disabled { opacity: .4; cursor: default; }
+@media (prefers-reduced-motion: reduce) { .chip, .shout { animation: none; } }
+
 .noscript { position: fixed; inset: auto 0 20px; text-align: center; color: var(--dim); }
 
 /* Narrow screens: the sidebar becomes a bar along the bottom. */

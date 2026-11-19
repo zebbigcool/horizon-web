@@ -56,3 +56,36 @@ public relays the game knows, so worlds shared from one site or device can be jo
 After pulling, redeploy (`npx wrangler deploy` here; it applies the `v2` migration). Players behind strict
 NATs may need a TURN server: set `TURN_URL` in `wrangler.toml` and `TURN_USER` / `TURN_PASS` with
 `npx wrangler secret put`. Test the logic with `node relay.test.mjs`.
+
+## Accounts, staff, announcements and the shout
+
+`src/accounts.js` (one more Durable Object, `AccountsObject`, migration `v3`) holds the accounts and everything
+the owner controls. After pulling: set the owner's password, then redeploy.
+
+```sh
+npx wrangler secret put ADMIN_PASSWORD   # the password of the owner account "Zeb"; never in the repo
+npx wrangler secret put IP_SECRET        # optional: any long random text; keys the hashes of banned networks (keep it fixed)
+npx wrangler deploy
+```
+
+Until `ADMIN_PASSWORD` is set the owner can't log in (the "Zeb" name is reserved either way).
+
+- **Accounts**: sign up / log in with a username and password (PBKDF2-SHA256, 100k rounds; only the hash is
+  stored). A session token is kept in the browser; passwords can't be reset. **Cloud save** (Account page) keeps
+  the launcher settings and the default instance's files (about 12 MB) in the account.
+- **Roles** (the owner sets them, by searching profiles; the list shows each one's skin name):
+  mod kicks; janitor kicks and bans; admin kicks, bans and IP bans; the owner does all of it plus roles,
+  nametag, announcements and the shout. A rank can only act on a lower one.
+- **Kick** blocks play for 10 minutes; **ban** blocks it until lifted; **IP ban** blocks the whole network
+  from the site, sign-ups and the relay. "Blocks play" means the launcher refuses Launch/Join and an open game
+  page closes within about 20 seconds (the page checks on every presence ping). Players who are not logged
+  in can be stopped only by an IP ban.
+- **Undo**: every kick, ban, IP ban, unban and role change is in the Staff page's activity list, and each can be
+  undone by someone of the rank that could have done it (role changes by the owner only). The IP ban list shows
+  masked networks (`203.0.*.*`) with an Unban button; unbanning is itself undoable. IPs are stored only as keyed hashes.
+- **Announcements** pop up once for everyone, as a dialog from the owner; `$r$text$r$` makes rainbow text.
+  The **shout** stays on the Play page until the owner changes or deletes it there.
+- Nametag: the owner picks rainbow or a color on the Account page; it shows in dialogs, the shout and lists
+  (not above heads in the game).
+
+Test: `node --test web/rooms-service/accounts.test.mjs web/rooms-service/worker.test.mjs` (the second runs the real Worker's routing with in-memory Durable Objects).

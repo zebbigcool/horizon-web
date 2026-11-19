@@ -41,6 +41,12 @@
       <a href="#profile" data-nav="profile">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9zm0 2c-4.4 0-8 2.2-8 5v2h16v-2c0-2.8-3.6-5-8-5z"/></svg><span>Profile</span>
       </a>
+      <a href="#account" data-nav="account">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm-8 19a8 8 0 0 1 16 0v1H4v-1z"/></svg><span>Account</span>
+      </a>
+      <a href="#staff" data-nav="staff" id="nav-staff" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3zm-1 14-3.5-3.5 1.4-1.4L11 13.2l4.6-4.6L17 10l-6 6z"/></svg><span>Staff</span>
+      </a>
       <a href="#settings" data-nav="settings">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h9v2H4V6zm11 0h5v2h-5V6zm-2-2h2v6h-2V4zM4 16h5v2H4v-2zm7 0h9v2h-9v-2zm-2-2h2v6H9v-6z"/></svg><span>Settings</span>
       </a>
@@ -61,6 +67,20 @@
             <div class="chips"><span>26.3</span><span>WebGPU</span><span>Rust</span></div>
           </div>
         </div>
+
+        <div id="shout" class="shout" hidden>
+          <div class="shout-head"><span class="chip">shout</span><b id="shout-by" class="shout-by"></b><small id="shout-time"></small><button id="shout-edit" class="ghost" type="button" hidden>edit</button></div>
+          <p id="shout-text"></p>
+        </div>
+        <form id="shout-form" class="shout-form" hidden>
+          <textarea id="shout-input" maxlength="300" rows="2" placeholder="What should everyone see on the home page? $r$rainbow$r$ works too" aria-label="shout"></textarea>
+          <div class="actions">
+            <button type="submit" class="ghost">Set shout</button>
+            <button type="button" id="shout-clear" class="ghost">Delete shout</button>
+            <button type="button" id="shout-cancel" class="ghost">Cancel</button>
+          </div>
+        </form>
+        <button id="shout-new" class="ghost" type="button" hidden>Set a shout</button>
 
         <div class="panel">
           <div class="panel-head">
@@ -166,6 +186,96 @@
           </div>
           <p id="pack-msg" class="hint wide-hint" hidden></p>
         </div>
+      </div>
+    </section>
+
+    <!-- Account -->
+    <section id="account" class="page" hidden>
+      <div class="page-in">
+        <h2 class="title">Account</h2>
+        <p class="sub">Sign up to keep your launcher settings, profile and worlds in the cloud and use them on any device.</p>
+        <div id="acct-out" class="panel pad">
+          <form id="acct-form" class="stack" autocomplete="on">
+            <input id="acct-name" type="text" placeholder="Username" autocomplete="username" maxlength="16" spellcheck="false" autocapitalize="off" required>
+            <input id="acct-pass" type="password" placeholder="Password" autocomplete="current-password" maxlength="128" required>
+            <div class="actions">
+              <button id="acct-login" type="submit" class="ghost">Log in</button>
+              <button id="acct-signup" type="button" class="ghost">Sign up</button>
+            </div>
+          </form>
+          <p class="hint">A username is 3 to 16 letters, numbers or underscores; a password is at least 8 characters. Your password is never kept as text. There is no password reset, so remember it.</p>
+          <p id="acct-error" class="hint err" role="alert" hidden></p>
+        </div>
+        <div id="acct-in" class="panel pad" hidden>
+          <div class="who-row"><b id="acct-me" class="who-name"></b><span id="acct-role" class="chip"></span></div>
+          <div class="row">
+            <label for="acct-skin">Skin name</label>
+            <div class="field">
+              <input id="acct-skin" type="text" maxlength="32" placeholder="steve" spellcheck="false">
+              <p class="hint">Shown beside your name to staff. It follows your Profile skin unless you type something else.</p>
+              <div class="actions"><button id="acct-skin-save" type="button" class="ghost">Save</button></div>
+            </div>
+          </div>
+          <div id="acct-nametag" class="row" hidden>
+            <label id="tag-label">Nametag</label>
+            <div class="field">
+              <div class="seg" id="tag-seg" role="group" aria-labelledby="tag-label">
+                <button type="button" data-value="rainbow">Rainbow</button><button type="button" data-value="color">Color</button><button type="button" data-value="none">None</button>
+              </div>
+              <input id="tag-color" type="color" value="#ff8a1f" aria-label="nametag color">
+              <p class="hint">Your name, as everyone sees it: <b id="tag-preview"></b></p>
+            </div>
+          </div>
+          <div class="section">
+            <h3>Cloud save</h3>
+            <p class="hint wide-hint">Saves this browser's launcher settings and the default instance's files (options, profile and small worlds, up to about 12 MB together) to your account. Loading puts them back on this device and replaces what is here.</p>
+            <div class="actions">
+              <button id="cloud-save" type="button" class="ghost">Save to cloud</button>
+              <button id="cloud-load" type="button" class="ghost">Load from cloud</button>
+              <button id="cloud-delete" type="button" class="ghost">Delete cloud save</button>
+            </div>
+            <p id="cloud-note" class="hint" role="status"></p>
+          </div>
+          <button id="acct-logout" type="button" class="danger">Log out</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Staff -->
+    <section id="staff" class="page" hidden>
+      <div class="page-in wide">
+        <h2 class="title">Staff</h2>
+        <p class="sub" id="staff-sub"></p>
+        <div class="panel pad">
+          <h3>Players</h3>
+          <input id="staff-search" type="search" placeholder="Search by username or skin name" autocomplete="off" aria-label="search players">
+          <ul id="staff-list" class="servers"></ul>
+          <p id="staff-empty" class="hint"></p>
+        </div>
+        <div id="owner-tools" class="panel pad" hidden>
+          <h3>Announcement</h3>
+          <p class="hint wide-hint">Pops up once for everyone on the site, as a dialog from you. Use <b>$r$</b> around words for rainbow text.</p>
+          <textarea id="ann-input" maxlength="500" rows="3" placeholder="hi hi hi! $r$Rainbow text example$r$." aria-label="announcement"></textarea>
+          <div class="actions">
+            <button id="ann-send" type="button" class="ghost">Send announcement</button>
+            <button id="ann-preview" type="button" class="ghost">Preview</button>
+            <button id="ann-clear" type="button" class="ghost">Withdraw current</button>
+          </div>
+          <p id="ann-note" class="hint" role="status"></p>
+        </div>
+        <div id="ipban-panel" class="panel pad" hidden>
+          <h3>IP bans</h3>
+          <p class="hint wide-hint">Networks banned from the site. Addresses are kept only as a hash, and shown with the end hidden.</p>
+          <ul id="ipban-list" class="servers"></ul>
+          <p id="ipban-empty" class="hint"></p>
+        </div>
+        <div class="panel pad">
+          <h3>Activity</h3>
+          <p class="hint wide-hint">Everything staff did. Any action can be undone by someone of the rank that could have done it.</p>
+          <ul id="log-list" class="servers"></ul>
+          <p id="log-empty" class="hint"></p>
+        </div>
+        <p id="staff-error" class="hint err" role="alert" hidden></p>
       </div>
     </section>
 

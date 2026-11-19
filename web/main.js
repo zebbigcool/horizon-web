@@ -4,6 +4,7 @@
 // keeps the large files for later visits.
 import "./audio.js"; // before the game's glue, which keeps the AudioContext it finds
 import { startPresence, watchSharedWorld } from "./presence.js";
+import { watchSite } from "./site.js";
 import { applyLowMemoryOptions, cpuCap, lowMemory, ramMb } from "./settings.js";
 import * as instances from "./instances.js";
 import { Wisp } from "./wisp.js";
@@ -340,6 +341,7 @@ async function main() {
     console.log(`Horizon: instance "${instances.active().name}"${globalThis.horizonWisp ? `; Java servers through Wisp (${globalThis.horizonWisp.url})` : ""}`);
     console.log(`Horizon: low-memory mode ${lowMemory() ? "on" : "off"}; device memory ${navigator.deviceMemory ?? "?"} GB, ` +
         `${navigator.hardwareConcurrency ?? "?"} threads counted`);
+    watchSite({ game: true });
     startPresence();
     watchSharedWorld();
     if (!(await webgpu())) return;

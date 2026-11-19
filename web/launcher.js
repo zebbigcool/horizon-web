@@ -5,7 +5,10 @@
 // settings holds the memory limit and whether worlds are listed publicly.
 // Addresses live in config.js, the player's choices in settings.js.
 import { CHAT_URL, GAME_URL, NEW_GAME_URL, REFRESH_MS, SERAPH_URL } from "./config.js";
-import { configured, publicRoomsOn, roomsFetch, setPublicRooms, startPresence } from "./presence.js";
+import { configured, publicRoomsOn, refreshSite, roomsFetch, setPublicRooms, startPresence } from "./presence.js";
+import * as account from "./account.js";
+import { nametag, richText, showNotice } from "./notice.js";
+import { MESSAGES, blockedReason, markSeen, takeFlash, watchSite } from "./site.js";
 import {
     RAM_CHOICES, client, lowMemory, setLowMemory, setWispUrl, validWisp, wispUrl, clearSettings, customRelays, debugOn, fullscreenOn, ramMb, setCustomRelays, setDebug, setFullscreen,
     setClient, setRamMb, rawMouse, setRawMouse, setSpikeFilter, spikeFilter, setTheme, theme,
@@ -18,7 +21,7 @@ import * as instances from "./instances.js";
 import { Wisp } from "./wisp.js";
 
 const $ = (id) => document.getElementById(id);
-const pages = { play: $("play"), chat: $("chat"), browse: $("browse"), player: $("player"), settings: $("settings"), packs: $("packs"), servers: $("servers"), profile: $("profile"), instances: $("instances"), mods: $("mods") };
+const pages = { play: $("play"), chat: $("chat"), browse: $("browse"), player: $("player"), settings: $("settings"), packs: $("packs"), servers: $("servers"), profile: $("profile"), instances: $("instances"), mods: $("mods"), account: $("account"), staff: $("staff") };
 const chatFrame = $("chat-frame");
 const body = $("rooms-body");
 const empty = $("rooms-empty");
@@ -51,7 +54,7 @@ function show() {
     const [name, id] = location.hash.slice(1).split("/");
     let page = "play";
     let nav = "play";
-    if (name === "chat" || name === "settings" || name === "packs" || name === "servers" || name === "profile" || name === "instances" || name === "mods") page = nav = name;
+    if (name === "chat" || name === "settings" || name === "packs" || name === "servers" || name === "profile" || name === "instances" || name === "mods" || name === "account" || name === "staff") page = nav = name;
     else if (name === "games" || name === "apps") {
         page = id ? "player" : "browse";
         nav = name;
@@ -72,6 +75,7 @@ function show() {
     }
     // Leaving a game unloads it, so its sound stops.
     if (page !== "player" && playerFrame.getAttribute("src") !== "about:blank") playerFrame.src = "about:blank";
+    if (page === "staff") globalThis.renderStaff?.();
     if (page === "packs") renderPacks();
     if (page === "servers") renderServers();
     if (page === "browse") openBrowse(name);
@@ -993,4 +997,361 @@ show();
         }
     });
     init();
+}
+
+// ---- Accounts, staff, announcements and the shout ----
+{
+    const RANK = { user: 0, mod: 1, janitor: 2, admin: 3, owner: 4 };
+    const rank = () => RANK[acct?.me.role] ?? 0;
+    const isOwner = () => rank() === RANK.owner;
+    let acct = null; // { me, data } while logged in
+    let site = null; // what the last presence ping heard
+    let lastBlock = "";
+
+    const el = (tag, className, text) => {
+        const node = document.createElement(tag);
+        if (className) node.className = className;
+        if (text != null) node.textContent = text;
+        return node;
+    };
+    const say = (node, text, bad = false) => {
+        node.textContent = text ?? "";
+        node.hidden = !text;
+        node.classList.toggle("err", bad);
+    };
+    const when = (at) => new Date(at).toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
+
+    // ---- who is logged in
+    function paintAccount() {
+        const me = acct?.me;
+        $("acct-out").hidden = Boolean(me);
+        $("acct-in").hidden = !me;
+        $("nav-staff").hidden = rank() < RANK.mod;
+        $("acct-nametag").hidden = !isOwner();
+        paintShout();
+        if (!me) return;
+        nametag($("acct-me"), me.name, me.nametag);
+        $("acct-role").textContent = me.role;
+        $("acct-role").hidden = me.role === "user";
+        if (document.activeElement !== $("acct-skin")) $("acct-skin").value = me.skin;
+        if (isOwner()) {
+            const tag = me.nametag ?? { mode: "rainbow" };
+            for (const b of $("tag-seg").querySelectorAll("button")) b.classList.toggle("on", b.dataset.value === tag.mode);
+            if (tag.color) $("tag-color").value = tag.color;
+            nametag($("tag-preview"), me.name, tag);
+        }
+    }
+
+    async function refreshMe() {
+        try {
+            const data = await account.me();
+            acct = data ? { me: data.me, data: data.data } : null;
+        } catch {
+            // Offline: keep what is shown.
+        }
+        paintAccount();
+        if (!location.hash.startsWith("#staff")) return;
+        if (rank() >= RANK.mod) renderStaff();
+        else location.hash = "#play";
+    }
+
+    const fail = (box, e) => say(box, e.message || "Something went wrong.", true);
+
+    $("acct-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        say($("acct-error"), "");
+        try {
+            await account.login($("acct-name").value, $("acct-pass").value);
+            $("acct-pass").value = "";
+            await afterLogin();
+        } catch (err) {
+            fail($("acct-error"), err);
+        }
+    });
+    $("acct-signup").addEventListener("click", async () => {
+        if (!$("acct-form").reportValidity()) return;
+        say($("acct-error"), "");
+        try {
+            await account.signup($("acct-name").value, $("acct-pass").value);
+            $("acct-pass").value = "";
+            await afterLogin();
+        } catch (err) {
+            fail($("acct-error"), err);
+        }
+    });
+    async function afterLogin() {
+        await refreshMe();
+        refreshSite();
+        // A new account's skin name starts as the one picked on the Profile page.
+        if (acct && !acct.me.skin) {
+            try {
+                const skin = (await profile.load()).skin;
+                if (skin) await account.api("/api/account/skin", { skin });
+                await refreshMe();
+            } catch {}
+        }
+    }
+    $("acct-logout").addEventListener("click", async () => {
+        await account.logout().catch(() => {});
+        acct = null;
+        paintAccount();
+        refreshSite();
+    });
+    $("acct-skin-save").addEventListener("click", async () => {
+        try {
+            acct.me = (await account.api("/api/account/skin", { skin: $("acct-skin").value })).me;
+            paintAccount();
+        } catch (e) {
+            say($("cloud-note"), e.message, true);
+        }
+    });
+
+    // ---- the owner's nametag
+    async function setTag(mode) {
+        try {
+            acct.me = (await account.api("/api/account/nametag", { mode, color: $("tag-color").value })).me;
+            paintAccount();
+            refreshSite();
+        } catch (e) {
+            say($("cloud-note"), e.message, true);
+        }
+    }
+    $("tag-seg").addEventListener("click", (e) => {
+        const b = e.target.closest("button");
+        if (b) setTag(b.dataset.value);
+    });
+    $("tag-color").addEventListener("change", () => setTag("color"));
+
+    // ---- cloud save
+    const cloud = $("cloud-note");
+    const busy = (on) => {
+        for (const id of ["cloud-save", "cloud-load", "cloud-delete"]) $(id).disabled = on;
+    };
+    async function cloudDo(work, done) {
+        busy(true);
+        say(cloud, "Working…");
+        try {
+            say(cloud, await done(await work((i, n) => say(cloud, `Working… ${i + 1} of ${n}`))));
+        } catch (e) {
+            say(cloud, e.message, true);
+        } finally {
+            busy(false);
+        }
+    }
+    $("cloud-save").addEventListener("click", () =>
+        cloudDo(account.saveToCloud, ({ files, skipped }) => `Saved this browser's settings and ${files} file${files === 1 ? "" : "s"}${skipped ? `. ${skipped} were too big to fit and were left out` : ""}.`));
+    $("cloud-load").addEventListener("click", () => {
+        if (!confirm("Load your cloud save? It replaces your launcher settings and the default instance's files on this device.")) return;
+        cloudDo(account.loadFromCloud, ({ files }) => `Loaded settings and ${files} file${files === 1 ? "" : "s"}. Reload the page to apply them.`);
+    });
+    $("cloud-delete").addEventListener("click", () => {
+        if (!confirm("Delete your cloud save? Your files on this device stay.")) return;
+        cloudDo(() => account.api("/api/data/delete"), () => "Cloud save deleted.");
+    });
+
+    // ---- the shout (home page)
+    function paintShout() {
+        const shout = site?.shout;
+        const owner = isOwner();
+        $("shout").hidden = !shout;
+        if (shout) {
+            nametag($("shout-by"), shout.by, site.owner?.nametag);
+            $("shout-time").textContent = when(shout.at);
+            richText($("shout-text"), shout.text);
+        }
+        $("shout-edit").hidden = !(owner && shout);
+        $("shout-new").hidden = !(owner && !shout) || !$("shout-form").hidden;
+        if (!owner) $("shout-form").hidden = true;
+    }
+    const openShoutForm = (on) => {
+        $("shout-form").hidden = !on;
+        if (on) {
+            $("shout-input").value = site?.shout?.text ?? "";
+            $("shout-input").focus();
+        }
+        paintShout();
+    };
+    $("shout-edit").addEventListener("click", () => openShoutForm(true));
+    $("shout-new").addEventListener("click", () => openShoutForm(true));
+    $("shout-cancel").addEventListener("click", () => openShoutForm(false));
+    async function sendShout(text) {
+        try {
+            await account.api("/api/owner/shout", { text });
+            openShoutForm(false);
+            refreshSite();
+        } catch (e) {
+            alert(e.message);
+        }
+    }
+    $("shout-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        sendShout($("shout-input").value);
+    });
+    $("shout-clear").addEventListener("click", () => sendShout(""));
+
+    // ---- what the presence ping hears
+    watchSite();
+    document.addEventListener("horizon:site", (event) => {
+        site = event.detail;
+        // A role or ban changed on the server: bring this page up to date.
+        if ((site.me?.role ?? null) !== (acct?.me.role ?? null) || (site.me?.name ?? null) !== (acct?.me.name ?? null)) {
+            if (site.me || acct) refreshMe();
+        }
+        paintShout();
+        const reason = blockedReason();
+        if (reason && reason !== lastBlock) {
+            showNotice({ title: "Notice", text: reason === "kicked" ? MESSAGES.kicked(site.status.kickedUntil) : MESSAGES[reason] });
+        }
+        lastBlock = reason;
+    });
+    // Banned or kicked: Launch and Join don't open the game.
+    document.addEventListener("click", (e) => {
+        const reason = blockedReason();
+        if (!reason || !e.target.closest('a[href*="game.html"], a[href*="NEWgame.html"]')) return;
+        e.preventDefault();
+        e.stopPropagation();
+        showNotice({ title: "Can't play", text: reason === "kicked" ? MESSAGES.kicked(site?.status.kickedUntil) : MESSAGES[reason] });
+    }, true);
+    const flash = takeFlash();
+    if (flash) showNotice({ title: "Notice", text: flash });
+    refreshMe();
+
+    // ---- staff
+    const err = $("staff-error");
+    const call = async (path, body) => {
+        say(err, "");
+        try {
+            const data = await account.api(path, body);
+            await renderStaff();
+            return data;
+        } catch (e) {
+            fail(err, e);
+            return null;
+        }
+    };
+    const chip = (text, kind = "mute") => el("span", `chip ${kind}`, text);
+
+    function personRow(u) {
+        const li = el("li", "server person");
+        const meta = el("div", "meta");
+        const name = el("b");
+        nametag(name, u.name, u.nametag);
+        meta.append(name, el("small", "", u.skin ? `skin: ${u.skin}` : "no skin name"));
+        const chips = el("div", "acts");
+        if (u.role !== "user") chips.append(chip(u.role, ""));
+        if (u.banned) chips.append(chip("banned", "bad"));
+        if (u.kickedUntil) chips.append(chip(`kicked until ${new Date(u.kickedUntil).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`, "bad"));
+        if (u.ipBanned) chips.append(chip("IP banned", "bad"));
+        const acts = el("div", "acts");
+        const button = (label, need, path) => {
+            if (rank() < RANK[need]) return;
+            const b = el("button", "ghost", label);
+            b.type = "button";
+            b.disabled = !u.canAct;
+            b.addEventListener("click", () => {
+                if (confirm(`${label} ${u.name}? You can undo it from the activity list.`)) call(path, { name: u.name });
+            });
+            acts.append(b);
+        };
+        button("Kick", "mod", "/api/staff/kick");
+        button("Ban", "janitor", "/api/staff/ban");
+        button("IP ban", "admin", "/api/staff/ipban");
+        if (isOwner() && u.canAct) {
+            const select = el("select");
+            select.setAttribute("aria-label", `role of ${u.name}`);
+            for (const role of ["user", "mod", "janitor", "admin"]) select.append(new Option(role, role, false, role === u.role));
+            select.addEventListener("change", () => call("/api/staff/role", { name: u.name, role: select.value }));
+            acts.append(select);
+        }
+        li.append(meta, chips, acts);
+        return li;
+    }
+
+    const describe = (a) => {
+        switch (a.type) {
+            case "kick": return `${a.by} kicked ${a.target}`;
+            case "ban": return `${a.by} banned ${a.target}`;
+            case "ipban": return `${a.by} IP banned ${a.target} (${a.mask})`;
+            case "unipban": return `${a.by} lifted the IP ban on ${a.target ?? "a network"} (${a.mask})`;
+            case "role": return `${a.by} made ${a.target} ${a.to} (was ${a.from})`;
+            default: return `${a.by}: ${a.type}`;
+        }
+    };
+
+    function logRow(a) {
+        const li = el("li", "server logrow");
+        const meta = el("div", "meta");
+        meta.append(el("b", a.undone ? "undone" : "", describe(a)), el("small", "", a.undone ? `${when(a.at)} · undone by ${a.undone.by}` : when(a.at)));
+        li.append(meta);
+        if (!a.undone) {
+            const b = el("button", "ghost", "Undo");
+            b.type = "button";
+            b.disabled = !a.canUndo;
+            b.addEventListener("click", () => call("/api/staff/undo", { id: a.id }));
+            li.append(b);
+        }
+        return li;
+    }
+
+    function ipRow(b) {
+        const li = el("li", "server");
+        const meta = el("div", "meta");
+        meta.append(el("b", "", b.mask), el("small", "", `${b.target ? `${b.target} · ` : ""}banned by ${b.by} · ${when(b.at)}`));
+        const un = el("button", "ghost", "Unban");
+        un.type = "button";
+        un.addEventListener("click", () => call("/api/staff/unipban", { id: b.id }));
+        li.append(meta, un);
+        return li;
+    }
+
+    let searchTimer = 0;
+    $("staff-search").addEventListener("input", () => {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(renderStaff, 250);
+    });
+    $("ann-send").addEventListener("click", async () => {
+        const text = $("ann-input").value.trim();
+        if (!text) return say($("ann-note"), "Write something first.", true);
+        try {
+            const sent = await account.api("/api/owner/announce", { text });
+            if (sent.announcement) markSeen(sent.announcement.id);
+            say($("ann-note"), "Sent. Everyone online sees it within about 20 seconds, once.");
+            refreshSite();
+        } catch (e) {
+            say($("ann-note"), e.message, true);
+        }
+    });
+    $("ann-clear").addEventListener("click", async () => {
+        try {
+            await account.api("/api/owner/announce", { text: "" });
+            say($("ann-note"), "Withdrawn. People who haven't seen it yet won't.");
+        } catch (e) {
+            say($("ann-note"), e.message, true);
+        }
+    });
+    $("ann-preview").addEventListener("click", () => showNotice({ title: "Notice", text: $("ann-input").value || "(nothing yet)", by: acct?.me }));
+
+    async function renderStaff() {
+        if (rank() < RANK.mod) return;
+        $("staff-sub").textContent = `You are ${acct.me.role === "owner" ? "the owner" : `a ${acct.me.role}`}. ${
+            rank() >= RANK.admin ? "You can kick, ban and IP ban." : rank() >= RANK.janitor ? "You can kick and ban." : "You can kick."}${isOwner() ? " You also change roles, send announcements and set the shout." : ""}`;
+        $("owner-tools").hidden = !isOwner();
+        $("ipban-panel").hidden = rank() < RANK.admin;
+        try {
+            const [found, log, bans] = await Promise.all([
+                account.api("/api/staff/search", { q: $("staff-search").value }),
+                account.api("/api/staff/log"),
+                rank() >= RANK.admin ? account.api("/api/staff/ipbans") : { bans: [] },
+            ]);
+            $("staff-list").replaceChildren(...found.users.map(personRow));
+            $("staff-empty").textContent = found.users.length ? "" : "No players match.";
+            $("log-list").replaceChildren(...log.actions.map(logRow));
+            $("log-empty").textContent = log.actions.length ? "" : "Nothing yet.";
+            $("ipban-list").replaceChildren(...bans.bans.map(ipRow));
+            $("ipban-empty").textContent = bans.bans.length ? "" : "No networks are banned.";
+        } catch (e) {
+            fail(err, e);
+        }
+    }
+    globalThis.renderStaff = renderStaff;
 }
