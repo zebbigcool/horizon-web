@@ -923,10 +923,14 @@ fn run(
                 c.enable_encryption(&secret);
             }
             login::Clientbound::CustomQuery(q) => {
+                // A world that remembers its players asks who this is (lan::identity).
+                let payload = (q.channel == crate::lan::identity::CHANNEL)
+                    .then(|| crate::lan::identity::answer(&q.data))
+                    .flatten();
                 c.send(
                     &login::Serverbound::CustomQueryAnswer(login::CustomQueryAnswer {
                         transaction: q.transaction,
-                        payload: None,
+                        payload,
                     })
                     .encode(),
                 )

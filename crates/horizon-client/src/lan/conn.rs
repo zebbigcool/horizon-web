@@ -1174,7 +1174,24 @@ fn serve_login(
                     .unwrap_or_default();
                 (owner_uuid, properties)
             }
-            None => (offline_uuid(&hello.name), Vec::new()),
+            None => match identify(&mut c, &hello.name) {
+                Ok(Some(uuid)) => (uuid, Vec::new()),
+                Ok(None) => {
+                    let reason = horizon_world::nbt::Tag::compound([(
+                        "text",
+                        horizon_world::nbt::Tag::String(horizon_world::nbt::JavaString::from(
+                            "That name belongs to another player. Join with a different name.",
+                        )),
+                    )]);
+                    let text = refuse(&mut c, shared, "Server thread", &user, &reason);
+                    lost(shared, &user, &text);
+                    return Ok(());
+                }
+                Err(err) => {
+                    lost(shared, &user, "Disconnected");
+                    return Err(err);
+                }
+            },
         },
     };
     // The mods may hold the login for their answers, or refuse it, before the server's checks.
@@ -1269,6 +1286,40 @@ fn forward(
         }
         _ => Err("unexpected packet during login".into()),
     }
+}
+
+/// An offline guest of a world that remembers its players: asks the client who it is
+/// ([`super::identity`]). `None` when the name belongs to another player. Memory
+/// connections and worlds not opened to guests keep the name-based profile.
+fn identify(c: &mut Connection, name: &str) -> Result<Option<u128>, String> {
+    const TRANSACTION: i32 = 2;
+    let Some(world) = super::identity::world().filter(|_| !c.is_memory()) else {
+        return Ok(Some(offline_uuid(name)));
+    };
+    let Some(salt) = super::identity::request(&world) else {
+        return Ok(Some(offline_uuid(name)));
+    };
+    let e = |e: horizon_protocol::Error| e.to_string();
+    c.send(
+        &login::Clientbound::CustomQuery(login::CustomQuery {
+            transaction: TRANSACTION,
+            channel: super::identity::CHANNEL.into(),
+            data: salt,
+        })
+        .encode(),
+    )
+    .map_err(e)?;
+    let (id, payload) = c.recv().map_err(e)?;
+    let token = match login::Serverbound::decode(id, &payload).map_err(e)? {
+        login::Serverbound::CustomQueryAnswer(answer) if answer.transaction == TRANSACTION => {
+            answer.payload
+        }
+        _ => return Err("unexpected packet during login".into()),
+    };
+    Ok(match super::identity::admit(&world, name, token.as_deref()) {
+        super::identity::Admission::Player(uuid) => Some(uuid),
+        super::identity::Admission::NameTaken => None,
+    })
 }
 
 struct Parts {

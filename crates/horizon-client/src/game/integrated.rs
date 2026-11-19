@@ -1226,6 +1226,8 @@ impl Game<'_> {
             Lan::share(&self.level.name),
             horizon_client::lan::SHARED_PORT,
         );
+        // Guests of a world open to others are told apart by an identity, not just a name.
+        horizon_client::lan::identity::set_world(self.world_root.to_path_buf());
         s.flags.published.store(port, Ordering::Relaxed);
         s.pending = Some(Publish::Open(listener, LanSettings { port, ..settings }));
         self.apply_publish();
