@@ -13,12 +13,13 @@ addEventListener("beforeunload", (e) => {
 // Joining runs the game from a blob: address. The page fetches its own HTML, gives it a <base> (so every
 // relative file still comes from the site) and the address it was opened with (horizonPage: a blob page's
 // own location has no query), and replaces itself with it. A blob page made by this isolated page is
-// isolated too, so the game's threads work. `?noblob` (or horizon-blob=0 in the launcher's storage) skips it.
+// isolated too, so the game's threads work. It is off unless `?blob` (or horizon-blob=1 in the launcher's storage) asks for it.
 (() => {
   if (location.protocol === "blob:") return;
-  let off = new URLSearchParams(location.search).has("noblob");
-  try { off = off || localStorage.getItem("horizon-blob") === "0"; } catch {}
-  if (off || !globalThis.crossOriginIsolated) return;
+  // Off for now: only when asked for (`?blob`, or horizon-blob=1 in the launcher's storage).
+  let on = new URLSearchParams(location.search).has("blob");
+  try { on = on || localStorage.getItem("horizon-blob") === "1"; } catch {}
+  if (!on || new URLSearchParams(location.search).has("noblob") || !globalThis.crossOriginIsolated) return;
   globalThis.horizonBlobbing = true;
   fetch(location.href, { cache: "no-store" })
     .then((r) => (r.ok ? r.text() : Promise.reject(new Error(String(r.status)))))
