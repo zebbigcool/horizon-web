@@ -31,6 +31,7 @@ pub mod guest;
 pub mod handoff;
 pub mod hub;
 pub mod badge;
+pub mod bans;
 pub mod identity;
 pub mod import;
 mod io_pool;

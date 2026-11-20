@@ -465,6 +465,7 @@ mod studio;
 mod subtitle_hud;
 mod sulfur_cubes;
 mod tempban;
+mod world_mod;
 mod test_block_edit;
 mod test_blocks;
 mod test_entities;

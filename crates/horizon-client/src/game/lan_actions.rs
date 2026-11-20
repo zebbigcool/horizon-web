@@ -3424,6 +3424,12 @@ impl Game<'_> {
             );
             return;
         }
+        // `/kick`, `/ban` and `/unban` for a shared world's owner and the site's owner (game/world_mod.rs).
+        if super::world_mod::WORLD_MOD_COMMANDS.contains(&words[0])
+            && self.guest_world_mod_command(host, conn, &words)
+        {
+            return;
+        }
         // The chat filter's mute commands (game/chat_filter.rs), on servers that filter.
         if super::chat_filter::MUTE_COMMANDS.contains(&words[0]) && host.hub.chat_filter_on() {
             self.guest_mute_command(host, conn, &words);

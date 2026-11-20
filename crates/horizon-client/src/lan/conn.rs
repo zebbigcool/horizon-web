@@ -1196,6 +1196,22 @@ fn serve_login(
             },
         },
     };
+    // A player the world's owner banned (/ban in a shared world) is refused; the site's owner never is.
+    if !c.is_memory()
+        && let Some(world) = super::identity::world()
+        && super::bans::is_banned(&world, uuid)
+        && !super::badge::is_site_owner(uuid)
+    {
+        let reason = horizon_world::nbt::Tag::compound([(
+            "text",
+            horizon_world::nbt::Tag::String(horizon_world::nbt::JavaString::from(
+                "You are banned from this world.",
+            )),
+        )]);
+        let text = refuse(&mut c, shared, "Server thread", &user, &reason);
+        lost(shared, &user, &text);
+        return Ok(());
+    }
     // The mods may hold the login for their answers, or refuse it, before the server's checks.
     if !c.is_memory() {
         let mut defer = Vec::new();

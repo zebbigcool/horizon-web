@@ -107,3 +107,16 @@ Until `ADMIN_PASSWORD` is set the owner can't log in (the "Zeb" name is reserved
   (not above heads in the game).
 
 Test: `node --test web/rooms-service/accounts.test.mjs web/rooms-service/worker.test.mjs` (the second runs the real Worker's routing with in-memory Durable Objects).
+
+## Moderating a shared world in game
+
+In a shared world (one opened to guests), `/kick <player> [reason]`, `/ban <player> [reason]` and
+`/unban <player>` work for two kinds of player, with no operator level needed:
+
+- the world's owner (the host), in their own world only;
+- the site's owner (Zeb, proved by the signed badge, so copying the name does nothing), in every shared world.
+
+Nobody can kick or ban Zeb, and nobody but the host can touch the host. Bans are kept per world in
+`horizon-bans.txt` in the world's folder, by the player's identity (so a new name doesn't help), and are checked
+when a guest joins. A player who isn't here can be banned by name. The commands are typed by hand (they aren't in
+the tab-completion tree). Code: `crates/horizon-client/src/game/world_mod.rs`, `lan/bans.rs`, `lan/badge.rs`.

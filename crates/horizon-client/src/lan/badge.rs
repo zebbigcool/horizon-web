@@ -40,10 +40,15 @@ pub struct Verified {
     pub display: String,
     /// How the site's owner's name is drawn; none for everyone else.
     pub style: Option<Style>,
+    /// Whether the badge is the site owner's (the account called Zeb on the rooms service).
+    pub owner: bool,
 }
 
 /// The coloured players of the world being run: (UUID, name, style).
 static STYLES: Mutex<Vec<(u128, String, Style)>> = Mutex::new(Vec::new());
+
+/// The players of the world being run whose badge proved them the site's owner.
+static SITE_OWNERS: Mutex<Vec<u128>> = Mutex::new(Vec::new());
 
 fn locked<T>(m: &Mutex<T>) -> std::sync::MutexGuard<'_, T> {
     horizon_os::sync::lock(m).unwrap_or_else(|e| e.into_inner())
@@ -89,7 +94,8 @@ pub fn verify(badge: &str, key: &[u8; 32], now_ms: u64) -> Option<Verified> {
         return None;
     }
     let display = v["d"].as_str()?.to_owned();
-    let style = if v["r"].as_str()? == "owner" {
+    let owner = v["r"].as_str()? == "owner";
+    let style = if owner {
         match v["n"]["mode"].as_str() {
             Some("rainbow") => Some(Style::Rainbow),
             Some("color") => v["n"]["color"]
@@ -101,7 +107,11 @@ pub fn verify(badge: &str, key: &[u8; 32], now_ms: u64) -> Option<Verified> {
     } else {
         None
     };
-    Some(Verified { display, style })
+    Some(Verified {
+        display,
+        style,
+        owner,
+    })
 }
 
 /// `#rrggbb` for a fully saturated colour at `hue` degrees, a little lighter than pure so it
@@ -151,6 +161,20 @@ fn remember(uuid: u128, name: &str, style: Style) {
 /// A guest's colour is the one its last badge earned: forget it before asking again.
 pub fn forget(uuid: u128) {
     locked(&STYLES).retain(|(u, ..)| *u != uuid);
+    locked(&SITE_OWNERS).retain(|u| *u != uuid);
+}
+
+/// Whether a good badge proved this player the site's owner, who can't be kicked or banned from
+/// any shared world and can moderate every one.
+pub fn is_site_owner(uuid: u128) -> bool {
+    locked(&SITE_OWNERS).contains(&uuid)
+}
+
+fn remember_owner(uuid: u128) {
+    let mut owners = locked(&SITE_OWNERS);
+    if !owners.contains(&uuid) {
+        owners.push(uuid);
+    }
 }
 
 /// The key badges are checked with, from the page (none on native, or without one).
@@ -174,9 +198,13 @@ pub fn admit(uuid: u128, name: &str, data: &[u8], key: &[u8; 32]) {
     let Some(badge) = verify(text, key, now_ms()) else {
         return;
     };
-    if badge.display == name
-        && let Some(style) = badge.style
-    {
+    if badge.display != name {
+        return;
+    }
+    if badge.owner {
+        remember_owner(uuid);
+    }
+    if let Some(style) = badge.style {
         remember(uuid, name, style);
     }
 }
@@ -185,10 +213,11 @@ pub fn admit(uuid: u128, name: &str, data: &[u8], key: &[u8; 32]) {
 /// (when they are the site's owner) gives a colour of its own.
 pub fn note_host(uuid: u128, name: &str) {
     let own = key().and_then(|key| verify(&horizon_os::badge::get().0, &key, now_ms()));
-    let style = own
-        .filter(|badge| badge.display == name)
-        .and_then(|badge| badge.style)
-        .unwrap_or(Style::Red);
+    let own = own.filter(|badge| badge.display == name);
+    if own.as_ref().is_some_and(|badge| badge.owner) {
+        remember_owner(uuid);
+    }
+    let style = own.and_then(|badge| badge.style).unwrap_or(Style::Red);
     remember(uuid, name, style);
 }
 
@@ -221,6 +250,7 @@ mod tests {
         let badge = verify(OWNER, &key(), 1_000_000).unwrap();
         assert_eq!(badge.display, "Zeb");
         assert_eq!(badge.style, Some(Style::Rainbow));
+        assert!(badge.owner);
     }
 
     #[test]
@@ -228,6 +258,7 @@ mod tests {
         let badge = verify(COPIER, &key(), 1_000_000).unwrap();
         assert_eq!(badge.display, "Zeb");
         assert_eq!(badge.style, None);
+        assert!(!badge.owner, "a copied name is not the owner");
     }
 
     #[test]
