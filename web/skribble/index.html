@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>doodle dash</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Home: your face, your name, and a way in -->
+<main id="home" class="screen">
+  <h1 class="logo" aria-label="doodle dash"><span>d</span><span>o</span><span>o</span><span>d</span><span>l</span><span>e</span> <span>d</span><span>a</span><span>s</span><span>h</span></h1>
+  <section class="card home-card">
+    <div class="me">
+      <div id="av-preview" class="av-big"></div>
+      <div class="av-pick">
+        <div class="av-row"><button type="button" data-part="0" data-dir="-1" aria-label="previous colour">‹</button><span>colour</span><button type="button" data-part="0" data-dir="1" aria-label="next colour">›</button></div>
+        <div class="av-row"><button type="button" data-part="1" data-dir="-1" aria-label="previous eyes">‹</button><span>eyes</span><button type="button" data-part="1" data-dir="1" aria-label="next eyes">›</button></div>
+        <div class="av-row"><button type="button" data-part="2" data-dir="-1" aria-label="previous mouth">‹</button><span>mouth</span><button type="button" data-part="2" data-dir="1" aria-label="next mouth">›</button></div>
+        <div class="av-row"><button type="button" data-part="3" data-dir="-1" aria-label="previous accessory">‹</button><span>extra</span><button type="button" data-part="3" data-dir="1" aria-label="next accessory">›</button></div>
+        <button id="av-random" type="button" class="ghost">🎲 random</button>
+      </div>
+    </div>
+    <div class="form">
+      <input id="name" maxlength="20" placeholder="Enter your name" autocomplete="off" aria-label="your name">
+      <select id="lang" aria-label="language"></select>
+      <p id="invite" class="invite" hidden>Joining room <b id="invite-code"></b> · <a href="#" id="invite-cancel">cancel</a></p>
+      <button id="play" type="button" class="big green">Play!</button>
+      <button id="create" type="button" class="big blue">Create private room</button>
+      <div class="join-code">
+        <input id="code" maxlength="6" placeholder="room code" autocomplete="off" autocapitalize="characters" aria-label="room code">
+        <button id="join" type="button" class="ghost">Join</button>
+      </div>
+      <p id="home-err" class="err" role="alert" hidden></p>
+    </div>
+  </section>
+  <section class="card how">
+    <div><b>1 · Draw</b><span>When it's your turn, pick a word and draw it. Nobody gets the word but you.</span></div>
+    <div><b>2 · Guess</b><span>Type your guess in the chat. The faster you get it, the more points you earn.</span></div>
+    <div><b>3 · Win</b><span>After every round of turns, the player with the most points wins.</span></div>
+  </section>
+</main>
+
+<!-- Game -->
+<main id="game" class="screen" hidden>
+  <header class="top">
+    <div id="clock" class="clock" title="time left">--</div>
+    <div id="roundinfo" class="roundinfo"></div>
+    <div class="wordbox"><small id="wordlabel"></small><div id="word" class="word"></div></div>
+    <button id="sound" type="button" class="icon" title="sound" aria-label="sound">🔊</button>
+    <button id="leave" type="button" class="icon" title="leave the room" aria-label="leave the room">🚪</button>
+  </header>
+  <div class="main">
+    <aside class="players card" aria-label="players"><ul id="plist"></ul></aside>
+    <section class="stage">
+      <div class="canvaswrap" id="canvaswrap">
+        <canvas id="cv" width="800" height="600"></canvas>
+        <div id="votes" class="votes" hidden>
+          <button id="up" type="button" aria-label="like the drawing">👍 <span id="upn">0</span></button>
+          <button id="down" type="button" aria-label="dislike the drawing">👎 <span id="downn">0</span></button>
+        </div>
+        <div id="ov" class="ov" hidden>
+          <!-- lobby -->
+          <section id="ov-lobby" hidden>
+            <h2>Game settings</h2>
+            <p id="lobby-note" class="note"></p>
+            <div class="settings">
+              <label>Players <select id="s-maxPlayers"></select></label>
+              <label>Language <select id="s-lang"></select></label>
+              <label>Draw time <select id="s-drawTime"></select></label>
+              <label>Rounds <select id="s-rounds"></select></label>
+              <label>Word count <select id="s-wordCount"></select></label>
+              <label>Hints <select id="s-hints"></select></label>
+              <label>Word mode <select id="s-mode"><option value="normal">Normal</option><option value="hidden">Hidden (no letters shown)</option><option value="combination">Combination (two words)</option></select></label>
+              <label class="wide">Custom words <textarea id="s-custom" rows="3" maxlength="8000" placeholder="word one, word two, …"></textarea></label>
+              <label class="check wide"><input id="s-customOnly" type="checkbox"> Use only custom words</label>
+            </div>
+            <div class="actions">
+              <button id="start" type="button" class="big green" hidden>Start!</button>
+              <button id="invite-copy" type="button" class="big blue" hidden>Copy invite link</button>
+            </div>
+            <p id="invite-line" class="note" hidden></p>
+          </section>
+          <!-- word choice -->
+          <section id="ov-choose" hidden>
+            <h2 id="choose-title"></h2>
+            <div id="choose-av" class="av-big"></div>
+            <div id="choices" class="choices"></div>
+          </section>
+          <!-- a turn's result -->
+          <section id="ov-turn" hidden>
+            <p class="note" id="turn-reason"></p>
+            <h2>The word was <b id="turn-word"></b></h2>
+            <ul id="turn-list" class="scores"></ul>
+            <p id="turn-votes" class="note"></p>
+          </section>
+          <!-- the podium -->
+          <section id="ov-end" hidden>
+            <h2 id="end-title">Game over!</h2>
+            <div id="podium" class="podium"></div>
+            <ol id="end-list" class="scores"></ol>
+            <p class="note" id="end-note"></p>
+          </section>
+        </div>
+      </div>
+      <div id="tools" class="tools" hidden>
+        <div id="palette" class="palette" aria-label="colours"></div>
+        <label class="picker" title="any colour"><input id="custom-colour" type="color" value="#000000"></label>
+        <div id="sizes" class="sizes" aria-label="brush size"></div>
+        <div class="toolbtns">
+          <button type="button" data-tool="pen" title="pencil" aria-label="pencil">✏️</button>
+          <button type="button" data-tool="fill" title="fill" aria-label="fill">🪣</button>
+          <button type="button" data-tool="eraser" title="eraser" aria-label="eraser">🧽</button>
+          <button type="button" id="undo" title="undo (Ctrl+Z)" aria-label="undo">↶</button>
+          <button type="button" id="clear" title="clear" aria-label="clear">🗑️</button>
+        </div>
+      </div>
+    </section>
+    <aside class="chat card" aria-label="chat">
+      <div id="msgs" class="msgs" role="log" aria-live="polite"></div>
+      <form id="chat-form" autocomplete="off">
+        <input id="chat-input" maxlength="100" placeholder="Type your guess here…" aria-label="chat">
+      </form>
+    </aside>
+  </div>
+</main>
+
+<script type="module" src="game.js"></script>
+</body>
+</html>

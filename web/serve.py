@@ -34,12 +34,17 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         name = urllib.parse.unquote(urllib.parse.urlsplit(path).path).lstrip("/") or "index.html"
         if name in LIVE and (WEB / name).is_file():
             return str(WEB / name)
+        # The site's own games (skribble/): served live, and only from inside their folder.
+        game = (WEB / name).resolve()
+        if name.startswith("skribble/") and game.is_file() and game.is_relative_to(WEB / "skribble"):
+            return str(game)
         return super().translate_path(path)
 
     def end_headers(self):
         # The launcher (index.html) embeds other sites, which an isolated page
         # would block: only the game's page (game.html) and what it loads are isolated.
-        if self.path.split("?")[0] not in ("/", "/index.html", "/NEWgame.html"):
+        path = self.path.split("?")[0]
+        if path not in ("/", "/index.html", "/NEWgame.html") and not path.startswith("/skribble/"):
             self.send_header("Cross-Origin-Opener-Policy", "same-origin")
             self.send_header("Cross-Origin-Embedder-Policy", "require-corp")
         self.send_header("Cache-Control", "no-cache")

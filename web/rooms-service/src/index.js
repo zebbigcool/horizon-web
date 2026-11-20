@@ -6,6 +6,7 @@ import { DurableObject } from "cloudflare:workers";
 import { Registry } from "./registry.js";
 import { DEFAULT_STUN, Relay } from "./relay.js";
 import { Accounts } from "./accounts.js";
+import { Draw } from "./draw.js";
 
 const CORS = {
     "Access-Control-Allow-Origin": "*",
@@ -71,6 +72,39 @@ export class RelayObject extends DurableObject {
     }
 }
 
+// The draw-and-guess game (draw.js): one object holds every room, like the relay.
+// A one-second timer runs the turns while anyone is connected.
+export class DrawObject extends DurableObject {
+    constructor(state, env) {
+        super(state, env);
+        this.game = new Draw();
+        this.timer = null;
+    }
+
+    async fetch(request) {
+        if (request.headers.get("Upgrade") !== "websocket") return new Response("expected a WebSocket", { status: 426 });
+        const pair = new WebSocketPair();
+        const [client, server] = Object.values(pair);
+        server.accept();
+        const { onMessage, onClose } = this.game.connect(
+            { send: (text) => server.send(text), close: (code, reason) => server.close(code ?? 1000, reason) },
+            { ip: request.headers.get("CF-Connecting-IP") ?? "" },
+        );
+        const close = () => {
+            onClose();
+            if (this.game.connections <= 0 && this.timer) {
+                clearInterval(this.timer);
+                this.timer = null;
+            }
+        };
+        server.addEventListener("message", (e) => onMessage(e.data));
+        server.addEventListener("close", close);
+        server.addEventListener("error", close);
+        this.timer ??= setInterval(() => this.game.tick(), 1000);
+        return new Response(null, { status: 101, webSocket: client });
+    }
+}
+
 // Accounts, staff roles, moderation, the announcement and the shout (accounts.js).
 // The owner's password is the ADMIN_PASSWORD secret (`npx wrangler secret put
 // ADMIN_PASSWORD`); IP_SECRET (optional secret) keys the hashes of banned networks.
@@ -125,6 +159,11 @@ async function route(request, env) {
     const url = new URL(request.url);
     if (url.pathname === "/") return json(200, { service: "z's horizon rooms" });
     const ip = request.headers.get("CF-Connecting-IP") ?? "";
+    if (url.pathname === "/draw") {
+        const [, answer] = await askAccounts(env, { method: "GET", path: "/internal/ip-banned", ip });
+        if (answer.banned) return new Response("banned", { status: 403, headers: CORS });
+        return env.DRAW.get(env.DRAW.idFromName("draw")).fetch(request);
+    }
     if (url.pathname === "/relay") {
         // A banned network can't join or host a shared world.
         const [, answer] = await askAccounts(env, { method: "GET", path: "/internal/ip-banned", ip });

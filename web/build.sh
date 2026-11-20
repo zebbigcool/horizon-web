@@ -81,6 +81,8 @@ cp web/index.html web/game.html web/launcher.js web/launcher.css web/config.js w
     web/main.js web/audio.js web/worker.js web/sw.js "$dist/"
 # The newer single-file client, when there is one.
 if [ -f web/NEWgame.html ]; then cp web/NEWgame.html "$dist/"; fi
+# Games made for this site (the Games tab lists them ahead of seraph's).
+mkdir -p "$dist/skribble" && cp web/skribble/* "$dist/skribble/"
 
 [ "${BUNDLE:-1}" = 0 ] && { ls -l "$dist/pkg"/*.wasm; exit 0; }
 if [ ! -f "$dist/fs/boot.tar.gz" ] || [ "$resources/horizon-resources.json" -nt "$dist/fs/boot.tar.gz" ] \

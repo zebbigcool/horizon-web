@@ -321,3 +321,9 @@ then `bash web/build.sh` only if the update touched Rust, Cargo, or the build sc
 server; a failed build leaves the old server running and is retried. If the rooms Worker changed it says to run
 `npx wrangler deploy` in `web/rooms-service` (or does it itself with `--deploy-worker`, if wrangler is signed in).
 A pull blocked by your own edits is reported once and nothing is changed. Ctrl+C stops it and the server.
+
+## Doodle dash
+
+A draw-and-guess game in the Games tab (`skribble/`, listed ahead of seraph's games by `LOCAL_GAMES` in `launcher.js`).
+Its server is `rooms-service/src/draw.js`; the page reaches it through `ROOMS_APIS` in `config.js`. A private
+room's invite is the launcher's address with the room, `#games/doodle-dash/<code>`.

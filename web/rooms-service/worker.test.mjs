@@ -63,6 +63,7 @@ test("staff actions over HTTP; an IP ban stops sign-ups and the relay, and unban
     assert.equal((await post(w, "/api/account/signup", { name: "other", password: "password123" }, "5.6.7.8"))[0], 403);
     const relay = await call(w, "GET", "/relay", undefined, "5.6.7.8");
     assert.equal(relay.status, 403);
+    assert.equal((await call(w, "GET", "/draw", undefined, "5.6.7.8")).status, 403);
     [, ping] = await post(w, "/api/presence", { id: "t2" }, "5.6.7.8");
     assert.equal(ping.site.status.ipBanned, true);
 

@@ -31,7 +31,7 @@ export async function makeWorker(vars = {}) {
             get: () => (instance ??= new Class({ storage: storage(), blockConcurrencyWhile: (f) => f() }, env)),
         };
     };
-    for (const [name, Class] of [["REGISTRY", mod.RegistryObject], ["ACCOUNTS", mod.AccountsObject], ["RELAY", mod.RelayObject]]) {
+    for (const [name, Class] of [["REGISTRY", mod.RegistryObject], ["ACCOUNTS", mod.AccountsObject], ["RELAY", mod.RelayObject], ["DRAW", mod.DrawObject]]) {
         const b = binding(Class);
         env[name] = { idFromName: b.idFromName, get: () => {
             const o = b.get();

@@ -22,6 +22,10 @@ class_name = "RelayObject"
 name = "ACCOUNTS"
 class_name = "AccountsObject"
 
+[[durable_objects.bindings]]
+name = "DRAW"
+class_name = "DrawObject"
+
 # SQLite-backed Durable Objects are the ones the free plan includes.
 [[migrations]]
 tag = "v1"
@@ -34,6 +38,10 @@ new_sqlite_classes = ["RelayObject"]
 [[migrations]]
 tag = "v3"
 new_sqlite_classes = ["AccountsObject"]
+
+[[migrations]]
+tag = "v4"
+new_sqlite_classes = ["DrawObject"]
 
 # The owner account ("Zeb") logs in with a password that is a secret, never in
 # this file or the repo: `npx wrangler secret put ADMIN_PASSWORD`. Optionally

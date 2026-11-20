@@ -49,6 +49,7 @@ def folder(out: Path) -> None:
     # The newer single-file client, when there is one.
     if (WEB / "NEWgame.html").is_file():
         shutil.copy2(WEB / "NEWgame.html", site / "NEWgame.html")
+    shutil.copytree(WEB / "skribble", site / "skribble")
     shutil.copytree(DIST / "pkg", site / "pkg")
     fs = site / "fs"
     fs.mkdir()

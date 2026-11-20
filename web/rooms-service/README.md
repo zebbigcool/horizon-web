@@ -130,3 +130,14 @@ reloads once per refresh, and only if it was open before the time; a page opened
 game are left alone unless you tick "Also reload people who are in a game". `POST /api/owner/refresh` takes
 `{in: seconds}` or `{at: ms}`, plus `{text, game}`; `{cancel: true}` withdraws it. Pages hear about it with the
 usual 5-second ping, so "now" takes up to about 5 seconds.
+
+## Doodle dash (the draw-and-guess game)
+
+`src/draw.js` is the server of the Games tab's skribbl.io-style game (`web/skribble/`): public rooms by language,
+private rooms with a code, host settings (players, language, draw time, rounds, word count, hints, word mode, custom
+words, custom words only), word choice, hints, time-based scoring, "close" guesses, kick / ban / vote kick, likes and
+dislikes, and the shared canvas (late joiners get it replayed). `src/draw-words.js` has the word lists (the server
+picks the words, so players never have the list). `DrawObject` in `index.js` holds every room and runs a one-second
+timer; the page connects to `/draw` on the same addresses as the rest. After pulling, deploy once so the new
+`DRAW` Durable Object exists (`wrangler.toml` has its binding and migration `v4`).
+Test the rules with `node --test draw.test.mjs` (fake sockets and a fake clock).

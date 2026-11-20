@@ -200,13 +200,32 @@ const seraph = (() => {
     }
 })();
 
+// Games made for this site, listed ahead of seraph's. They live next to the page
+// (their paths are relative to it), not on seraph.
+const LOCAL_GAMES = [
+    {
+        id: "doodle-dash",
+        name: "doodle dash",
+        desc: "Draw and guess with friends online, like skribbl.io: public and private rooms, custom words, hints, and a podium.",
+        path: "skribble/index.html",
+        thumb: "skribble/thumb.svg",
+        genre: "multiplayer",
+        local: true,
+    },
+];
+
 function loadCatalog() {
-    catalogLoading ??= fetch("catalog.json")
+    catalogLoading ??= (seraph ? fetch("catalog.json") : Promise.reject(new Error("seraph isn't set up")))
         .then((r) => {
             if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
             return r.json();
         })
-        .then((data) => (catalog = data));
+        .catch((e) => {
+            // Our own games still show without seraph; its apps and games just aren't there.
+            console.warn(`launcher: could not load catalog.json: ${e}`);
+            return { games: [], apps: [], failed: true };
+        })
+        .then((data) => (catalog = { ...data, games: [...LOCAL_GAMES, ...data.games] }));
     return catalogLoading;
 }
 
@@ -235,7 +254,7 @@ function card(item) {
     const image = document.createElement("img");
     image.loading = "lazy";
     image.alt = "";
-    image.src = new URL(item.thumb, seraph).href;
+    image.src = new URL(item.thumb, item.local ? location.href : seraph).href;
     const name = document.createElement("b");
     name.textContent = item.name;
     link.append(image, name);
@@ -259,7 +278,7 @@ function renderGrid() {
     grid.replaceChildren(...items.map(card));
     browseEmpty.textContent = "nothing matches that";
     browseEmpty.hidden = items.length > 0;
-    browseNote.textContent = `${items.length} ${kind === "apps" ? "app" : "game"}${items.length === 1 ? "" : "s"}`;
+    browseNote.textContent = `${items.length} ${kind === "apps" ? "app" : "game"}${items.length === 1 ? "" : "s"}${catalog.failed ? " (seraph's list couldn't load)" : ""}`;
 }
 
 async function openBrowse(which) {
@@ -271,15 +290,14 @@ async function openBrowse(which) {
     $("browse-title").textContent = kind;
     search.placeholder = `search ${kind}`;
     genre.hidden = kind !== "games";
-    if (!seraph) {
-        message("seraph isn't set up yet: set SERAPH_URL in config.js to where it is hosted.");
-        return;
-    }
     try {
         await loadCatalog();
     } catch (e) {
-        console.warn(`launcher: could not load catalog.json: ${e}`);
         message(`couldn't load the ${kind} list.`, true);
+        return;
+    }
+    if (catalog.failed && kind === "apps") {
+        message(seraph ? "couldn't load the apps list." : "seraph isn't set up yet: set SERAPH_URL in config.js to where it is hosted.", Boolean(seraph));
         return;
     }
     if (kind !== which) return; // moved on while it loaded
@@ -292,10 +310,6 @@ async function openBrowse(which) {
 
 async function openPlayer(which, id) {
     $("player-back").href = `#${which}`;
-    if (!seraph) {
-        location.hash = `#${which}`;
-        return;
-    }
     try {
         await loadCatalog();
     } catch {
@@ -305,11 +319,14 @@ async function openPlayer(which, id) {
     const item = catalog[which].find((i) => i.id === id);
     // Only if still on this game.
     if (location.hash.slice(1).split("/")[0] !== which || decodeURIComponent(location.hash.split("/")[1] ?? "") !== id) return;
-    if (!item) {
+    if (!item || (!item.local && !seraph)) {
         location.hash = `#${which}`;
         return;
     }
-    const url = new URL(item.path, seraph).href;
+    let url = new URL(item.path, item.local ? location.href : seraph).href;
+    // A local game may be given a room to join: #games/<id>/<room>.
+    const room = decodeURIComponent(location.hash.split("/")[2] ?? "");
+    if (item.local && room) url += `?room=${encodeURIComponent(room)}`;
     $("player-title").textContent = item.name;
     $("player-tab").href = url;
     if (playerFrame.src !== url) playerFrame.src = url;
