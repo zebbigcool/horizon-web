@@ -1,6 +1,15 @@
 <!doctype html>
 <html lang="en">
 <head>
+<script>
+// Every page asks before it is closed or left: the browser's own "Leave site?" box.
+addEventListener("beforeunload", (e) => {
+  if (globalThis.horizonNoLeavePrompt) return;
+  e.preventDefault();
+  e.returnValue = "";
+});
+</script>
+
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>z's horizon</title>

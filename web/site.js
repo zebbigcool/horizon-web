@@ -127,6 +127,7 @@ export function watchSite({ game = false } = {}) {
             const text = reason === "kicked" ? MESSAGES.kicked(status.kickedUntil) : MESSAGES[reason];
             safe(() => sessionStorage.setItem(FLASH, text));
             const back = safe(() => sessionStorage.getItem("horizon-return"), "") || "index.html";
+            globalThis.horizonNoLeavePrompt = true;
             location.replace(back);
             return;
         }

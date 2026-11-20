@@ -125,6 +125,7 @@ export function horizon_leave_page() {
     try {
         back = sessionStorage.getItem("horizon-return") || back;
     } catch (e) {}
+    globalThis.horizonNoLeavePrompt = true;
     globalThis.location.replace(back);
 }
 export function horizon_pointer_lock_lost() {
@@ -199,7 +200,7 @@ export function horizon_pick_file(kind, accept) {
 export function horizon_function_key_chords() {
     let asked = null;
     try {
-        asked = new URLSearchParams(globalThis.location.search).get("fchord");
+        asked = new URLSearchParams(globalThis.horizonPage?.search ?? globalThis.location.search).get("fchord");
     } catch (e) {}
     if (asked === "on") return true;
     if (asked === "off") return false;

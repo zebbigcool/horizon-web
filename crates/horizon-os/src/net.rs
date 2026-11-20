@@ -36,7 +36,7 @@ function open(id, url, host, port, code, relays) {
     if (code) return joinShared(id, code, relays);
     const url0 = url;
     if (!url) {
-        const scheme = location.protocol === "https:" ? "wss" : "ws";
+        const scheme = (globalThis.horizonPage?.protocol ?? location.protocol) === "https:" ? "wss" : "ws";
         const name = host.includes(":") ? `[${host}]` : host;
         url = `${scheme}://${name}:${port}/`;
     }
@@ -368,7 +368,7 @@ export function horizon_socket_install(events, taker, listening) {
 // A worker's blocking GET (workers may make synchronous requests): the body
 // of a 2xx answer, or null. An https page asks for https.
 export function horizon_http_get(url) {
-    if (location.protocol === "https:") url = url.replace(/^http:/, "https:");
+    if ((globalThis.horizonPage?.protocol ?? location.protocol) === "https:") url = url.replace(/^http:/, "https:");
     try {
         const xhr = new XMLHttpRequest();
         xhr.open("GET", url, false);

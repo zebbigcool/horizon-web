@@ -1,6 +1,44 @@
 <!doctype html>
 <html lang="en">
 <head>
+<script>
+// Every page asks before it is closed or left: the browser's own "Leave site?" box.
+addEventListener("beforeunload", (e) => {
+  if (globalThis.horizonNoLeavePrompt) return;
+  e.preventDefault();
+  e.returnValue = "";
+});
+</script>
+<script>
+// Joining runs the game from a blob: address. The page fetches its own HTML, gives it a <base> (so every
+// relative file still comes from the site) and the address it was opened with (horizonPage: a blob page's
+// own location has no query), and replaces itself with it. A blob page made by this isolated page is
+// isolated too, so the game's threads work. `?noblob` (or horizon-blob=0 in the launcher's storage) skips it.
+(() => {
+  if (location.protocol === "blob:") return;
+  let off = new URLSearchParams(location.search).has("noblob");
+  try { off = off || localStorage.getItem("horizon-blob") === "0"; } catch {}
+  if (off || !globalThis.crossOriginIsolated) return;
+  globalThis.horizonBlobbing = true;
+  fetch(location.href, { cache: "no-store" })
+    .then((r) => (r.ok ? r.text() : Promise.reject(new Error(String(r.status)))))
+    .then((html) => {
+      const page = { href: location.href, origin: location.origin, protocol: location.protocol, search: location.search };
+      const base = new URL(".", location.href).href;
+      const head = `<base href="${base}"><script>globalThis.horizonPage=${JSON.stringify(page).replace(/</g, "\\u003c")};<\/script>`;
+      const url = URL.createObjectURL(new Blob([html.replace(/<head>/i, "<head>" + head)], { type: "text/html" }));
+      globalThis.horizonNoLeavePrompt = true;
+      location.replace(url);
+    })
+    .catch(() => {
+      globalThis.horizonNoLeavePrompt = true;
+      const u = new URL(location.href);
+      u.searchParams.set("noblob", "");
+      location.replace(u.href);
+    });
+})();
+</script>
+
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>z's horizon</title>
@@ -63,7 +101,7 @@
 (() => {
   const lines = [];
   const box = document.getElementById("debug");
-  let shown = new URLSearchParams(location.search).has("debug") || (() => { try { return localStorage.getItem("horizon-debug") === "1"; } catch { return false; } })();
+  let shown = new URLSearchParams(globalThis.horizonPage?.search ?? location.search).has("debug") || (() => { try { return localStorage.getItem("horizon-debug") === "1"; } catch { return false; } })();
   const text = (a) => { try { return a instanceof Error ? (a.stack || a.message) : typeof a === "string" ? a : JSON.stringify(a); } catch { return String(a); } };
   const render = () => {
     box.hidden = !shown;
@@ -100,7 +138,7 @@
 // main.js by its content hash (build.json): a cache that kept an older one
 // would pair it with this build's game.
 const files = await fetch("build.json", { cache: "no-store" }).then((r) => r.json()).catch(() => ({}));
-await import(files["main.js"] ? `./main.js?v=${files["main.js"]}` : "./main.js");
+if (!globalThis.horizonBlobbing) await import(files["main.js"] ? `./main.js?v=${files["main.js"]}` : "./main.js");
 </script>
 </body>
 </html>

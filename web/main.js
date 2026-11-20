@@ -12,7 +12,7 @@ import { Wisp } from "./wisp.js";
 
 // A Java server is reached through a Wisp server: the launcher passes its address as ?wisp=.
 {
-    const wisp = new URLSearchParams(location.search).get("wisp");
+    const wisp = new URLSearchParams(globalThis.horizonPage?.search ?? location.search).get("wisp");
     if (wisp) globalThis.horizonWisp = new Wisp(wisp);
 }
 
@@ -375,7 +375,7 @@ async function main() {
     await new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve, 0)));
     status.textContent = "";
     // The game's command-line arguments, from the address: ?args=--world%20T
-    const args = (new URLSearchParams(location.search).get("args") ?? "").split(" ").filter(Boolean);
+    const args = (new URLSearchParams(globalThis.horizonPage?.search ?? location.search).get("args") ?? "").split(" ").filter(Boolean);
     try {
         glue.horizon_start(args);
     } catch (e) {
