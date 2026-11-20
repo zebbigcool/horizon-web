@@ -312,3 +312,12 @@ chat session (only the session token is saved in this browser), connects to the 
 client, and works out what is unread from the chat's own data: each channel's last message, what you have read
 (including what the open Chat tab reads), and the messages that mention you. Muted servers and channels are
 respected. The dot is off while the Chat tab is open. Two-factor chat accounts aren't supported yet.
+
+## Keeping the host up to date
+
+`python web/autoupdate.py` runs the server (instead of `python web/serve.py`) and checks GitHub every 60 seconds
+(`--every N` to change it, a port number first to change 8080). On a new commit it runs `git pull --ff-only`,
+then `bash web/build.sh` only if the update touched Rust, Cargo, or the build scripts, and then restarts the
+server; a failed build leaves the old server running and is retried. If the rooms Worker changed it says to run
+`npx wrangler deploy` in `web/rooms-service` (or does it itself with `--deploy-worker`, if wrangler is signed in).
+A pull blocked by your own edits is reported once and nothing is changed. Ctrl+C stops it and the server.
