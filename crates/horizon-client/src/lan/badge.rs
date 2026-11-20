@@ -117,6 +117,7 @@ pub fn verify(badge: &str, key: &[u8; 32], now_ms: u64) -> Option<Verified> {
 /// `#rrggbb` for a fully saturated colour at `hue` degrees, a little lighter than pure so it
 /// reads on the chat's dark background.
 fn hue_color(hue: f32) -> String {
+    let hue = hue.rem_euclid(360.0);
     let (saturation, lightness) = (1.0f32, 0.62f32);
     let chroma = (1.0 - (2.0 * lightness - 1.0).abs()) * saturation;
     let sector = hue / 60.0;
@@ -134,22 +135,46 @@ fn hue_color(hue: f32) -> String {
     format!("#{:02x}{:02x}{:02x}", byte(r), byte(g), byte(b))
 }
 
-/// The name as a text component in `style`.
+/// How far the rainbow has turned, in degrees of hue: a full turn takes about nine seconds, so a
+/// name that is sent again every few ticks (`rainbow_players`) seems to flow.
+fn phase() -> f32 {
+    (now_ms() / 25 % 360) as f32
+}
+
+/// The name as a text component in `style` (a rainbow at its colours of this moment).
 pub fn component(name: &str, style: &Style) -> Value {
+    component_at(name, style, phase())
+}
+
+/// The name as a text component in `style`; a rainbow's first letter is at `turn` degrees of hue and
+/// each next letter a step further on (smaller for a long name, so the whole name is one sweep).
+pub fn component_at(name: &str, style: &Style, turn: f32) -> Value {
     match style {
         Style::Rainbow => {
             let letters: Vec<char> = name.chars().collect();
-            let count = letters.len().max(1) as f32;
+            let step = (300.0 / letters.len().max(1) as f32).clamp(18.0, 60.0);
             let extra: Vec<Value> = letters
                 .iter()
                 .enumerate()
-                .map(|(i, c)| json!({ "text": c.to_string(), "color": hue_color(360.0 * i as f32 / count) }))
+                .map(|(i, c)| json!({ "text": c.to_string(), "color": hue_color(turn + step * i as f32) }))
                 .collect();
             json!({ "text": "", "extra": extra })
         }
         Style::Color(color) => json!({ "text": name, "color": color }),
         Style::Red => json!({ "text": name, "color": "red" }),
     }
+}
+
+/// The players whose names are a rainbow, for the host to send their Tab list name again as it turns.
+pub fn rainbow_players() -> Vec<u128> {
+    if super::identity::world().is_none() {
+        return Vec::new();
+    }
+    locked(&STYLES)
+        .iter()
+        .filter(|(.., style)| matches!(style, Style::Rainbow))
+        .map(|(u, ..)| *u)
+        .collect()
 }
 
 fn remember(uuid: u128, name: &str, style: Style) {
@@ -276,13 +301,31 @@ mod tests {
 
     #[test]
     fn a_rainbow_name_has_a_colour_per_letter_from_red_on() {
-        let c = component("Zeb", &Style::Rainbow);
+        let c = component_at("Zeb", &Style::Rainbow, 0.0);
         let extra = c["extra"].as_array().unwrap();
         let letters: Vec<&str> = extra.iter().map(|e| e["text"].as_str().unwrap()).collect();
         assert_eq!(letters, ["Z", "e", "b"]);
         assert_eq!(extra[0]["color"], "#ff3d3d");
         assert_ne!(extra[0]["color"], extra[1]["color"]);
         assert_ne!(extra[1]["color"], extra[2]["color"]);
+    }
+
+    #[test]
+    fn the_rainbow_turns_and_comes_back_round() {
+        let colours = |turn: f32| -> Vec<String> {
+            let c = component_at("Zeb", &Style::Rainbow, turn);
+            c["extra"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|e| e["color"].as_str().unwrap().to_owned())
+                .collect()
+        };
+        assert_ne!(colours(0.0), colours(90.0), "it moves");
+        assert_eq!(colours(0.0), colours(360.0), "a turn is 360 degrees");
+        assert_eq!(colours(-120.0), colours(240.0), "and a negative turn wraps");
+        // The first letter takes the colour its neighbour had one step earlier.
+        assert_eq!(colours(60.0)[0], colours(0.0)[1]);
     }
 
     #[test]

@@ -2333,6 +2333,7 @@ impl Hub {
     /// A whole tick with one level: the network, the level, then the
     /// players' latencies.
     pub fn tick(&mut self, ctx: &mut TickCtx) -> Vec<HostEvent> {
+        self.turn_rainbows();
         let mut events = self.poll(ctx);
         events.extend(self.drain_packets(ctx));
         events.extend(self.tick_level(ctx));
@@ -4658,6 +4659,28 @@ impl Hub {
                 ..Default::default()
             }],
         }));
+    }
+
+    /// A rainbow name (the site owner's, in a world open to guests) turns a little in the Tab list:
+    /// its entry is sent again every fourth tick with the colours of the moment. Chat shows the
+    /// colours of the moment the line was sent.
+    fn turn_rainbows(&mut self) {
+        if self.ticks % 4 != 0 || self.guests.is_empty() {
+            return;
+        }
+        for uuid in super::badge::rainbow_players() {
+            if self.list_names.contains_key(&uuid) {
+                continue; // a mod's list name takes its place
+            }
+            self.broadcast(&C::PlayerInfoUpdate(play::PlayerInfoUpdate {
+                actions: 0x20,
+                entries: vec![play::PlayerInfo {
+                    uuid,
+                    display_name: Some(self.list_name(uuid)),
+                    ..Default::default()
+                }],
+            }));
+        }
     }
 
     /// A player's nickname changed (None: their name again): kept for chat,
