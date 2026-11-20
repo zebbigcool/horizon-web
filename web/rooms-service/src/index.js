@@ -105,7 +105,7 @@ export class AccountsObject extends DurableObject {
 const accountsStub = (env) => env.ACCOUNTS.get(env.ACCOUNTS.idFromName("accounts"));
 const askAccounts = async (env, payload) => (await accountsStub(env).fetch("https://accounts/", { method: "POST", body: JSON.stringify(payload) })).json();
 
-const ACCOUNT_PATH = /^\/api\/(account|staff|owner|data)\//;
+const ACCOUNT_PATH = /^\/api\/(account|staff|owner|data|poll)\//;
 
 export default {
     // Any failure still answers with the CORS headers, so a page sees the real

@@ -9,7 +9,9 @@
 // Every moderation action is logged and can be undone by someone of the rank
 // that could have done it (and not lower than whoever did it).
 //
-// The owner is the account named OWNER_NAME. Its password is never stored in
+// An account has a username (unique, can't be taken twice, what staff act on: like a
+// Discord @handle) and a display name (free to copy; it is the player's name in the
+// game and on lists). The owner is the account named OWNER_NAME. Its password is never stored in
 // the code or the data: it is the ADMIN_PASSWORD secret of the Worker, and
 // while that is unset the owner can't log in.
 
@@ -19,6 +21,8 @@ export const ASSIGNABLE = ["user", "mod", "janitor", "admin"];
 export const KICK_MS = 10 * 60 * 1000;
 export const SESSION_MS = 30 * 24 * 3600 * 1000;
 export const MAX_USERS = 5000;
+export const POLL_MIN = 2;
+export const POLL_MAX = 8;
 export const MAX_CHUNKS = 24;
 export const MAX_CHUNK_CHARS = 600_000;
 const LOG_KEEP = 300;
@@ -32,6 +36,7 @@ const fail = (error, status = 400) => ({ error, status });
 const rankOf = (user) => RANKS[user?.role] ?? 0;
 const clean = (value, max) => (typeof value === "string" ? value.trim().slice(0, max) : "");
 const validName = (n) => /^[A-Za-z0-9_]{3,16}$/.test(n);
+const validDisplay = (n) => /^[\x21-\x7e]{1,16}$/.test(n); // also valid as a Minecraft name
 const validColor = (c) => /^#[0-9a-fA-F]{6}$/.test(c);
 
 async function sha256(text) {
@@ -75,7 +80,7 @@ export class Accounts {
         this.now = now;
         this.iterations = iterations;
         this.users = new Map(); // lowercase name -> user
-        this.meta = { seq: 0, log: [], announcement: null, shout: null };
+        this.meta = { seq: 0, log: [], announcement: null, shout: null, votes: {} };
         this.bans = {}; // ip hash -> { mask, by, at, actionId }
         this.sessions = new Map(); // token hash -> { user, at }
         this.fails = new Map(); // "ip:name" -> [times]
@@ -99,7 +104,8 @@ export class Accounts {
     /** The public face of an account: what lists and nametags show. */
     view(u) {
         return {
-            name: u.name,
+            name: u.name, // the username: unique
+            display: u.display || u.name, // the display name: shown, copyable
             role: u.role,
             skin: u.skin || "",
             nametag: u.role === "owner" ? u.nametag ?? { mode: "rainbow" } : null,
@@ -147,7 +153,7 @@ export class Accounts {
         if (this.users.size >= MAX_USERS) return fail("No more accounts can be made right now.", 503);
         const salt = randomHex(16);
         const user = {
-            name, salt, iterations: this.iterations, hash: await pbkdf2(password, salt, this.iterations),
+            name, display: name, salt, iterations: this.iterations, hash: await pbkdf2(password, salt, this.iterations),
             role: "user", skin: "", created: this.now(), banned: false, kickedUntil: 0, ip: "", ipMask: "", data: null,
         };
         this.users.set(lower(name), user);
@@ -176,7 +182,7 @@ export class Accounts {
             if (!(await sameSecret(password, this.ownerPassword))) return wrong();
             let owner = this.users.get(lower(OWNER_NAME));
             if (!owner) {
-                owner = { name: OWNER_NAME, role: "owner", skin: "", created: this.now(), banned: false, kickedUntil: 0, ip: "", ipMask: "", data: null, nametag: { mode: "rainbow" } };
+                owner = { name: OWNER_NAME, display: OWNER_NAME, role: "owner", skin: "", created: this.now(), banned: false, kickedUntil: 0, ip: "", ipMask: "", data: null, nametag: { mode: "rainbow" } };
                 this.users.set(lower(OWNER_NAME), owner);
                 await this.saveUser(owner);
             }
@@ -221,6 +227,16 @@ export class Accounts {
         return { me: this.view(user) };
     }
 
+    async setDisplay(token, display) {
+        const user = await this.session(token);
+        if (!user) return fail("Log in first.", 401);
+        display = typeof display === "string" ? display.trim() : "";
+        if (!validDisplay(display)) return fail("A display name is 1 to 16 characters, with no spaces.");
+        user.display = display;
+        await this.saveUser(user);
+        return { me: this.view(user) };
+    }
+
     async setNametag(token, mode, color) {
         const user = await this.session(token);
         if (rankOf(user) < RANKS.owner) return fail("Only the owner has a nametag.", 403);
@@ -246,7 +262,7 @@ export class Accounts {
         const q = lower(clean(query, 16));
         const out = [];
         for (const u of this.users.values()) {
-            if (q && !lower(u.name).includes(q) && !lower(u.skin).includes(q)) continue;
+            if (q && !lower(u.name).includes(q) && !lower(u.display).includes(q) && !lower(u.skin).includes(q)) continue;
             out.push({
                 ...this.view(u), banned: u.banned, kickedUntil: u.kickedUntil > this.now() ? u.kickedUntil : 0,
                 ipBanned: Boolean(u.ip && this.bans[u.ip]), canAct: rankOf(u) < rankOf(actor),
@@ -376,15 +392,54 @@ export class Accounts {
 
     // ---- the owner's announcements and shout
 
-    async setNotice(token, field, text) {
+    async setNotice(token, field, text, options) {
         const [owner, err] = await this.staff(token, "owner");
         if (err) return err;
         const max = field === "announcement" ? 500 : 300;
         text = clean(text, max);
-        if (text) this.meta[field] = { id: ++this.meta.seq, text, by: owner.name, at: this.now() };
+        let poll;
+        if (field === "shout" && text && Array.isArray(options)) {
+            const list = options.map((o) => clean(o, 60)).filter(Boolean);
+            if (list.length === 1) return fail(`A poll needs at least ${POLL_MIN} options.`);
+            if (list.length > POLL_MAX) return fail(`A poll has at most ${POLL_MAX} options.`);
+            if (new Set(list.map(lower)).size !== list.length) return fail("Two options are the same.");
+            if (list.length) poll = { options: list };
+        }
+        if (text) this.meta[field] = { id: ++this.meta.seq, text, by: owner.name, at: this.now(), ...(poll ? { poll } : {}) };
         else this.meta[field] = null;
+        // A new shout starts with no votes; deleting it clears them.
+        if (field === "shout") this.meta.votes = {};
         await this.saveMeta();
-        return { [field]: this.meta[field] };
+        return { [field]: field === "shout" ? this.shoutFor(owner) : this.meta[field] };
+    }
+
+    /** The shout as one player sees it: poll results, and which option they picked. */
+    shoutFor(user) {
+        const shout = this.meta.shout;
+        if (!shout?.poll) return shout;
+        const counts = shout.poll.options.map(() => 0);
+        for (const v of Object.values(this.meta.votes ?? {})) if (counts[v] !== undefined) counts[v]++;
+        const mine = user ? this.meta.votes?.[lower(user.name)] : undefined;
+        return {
+            ...shout,
+            poll: {
+                options: shout.poll.options.map((text, i) => ({ text, votes: counts[i] })),
+                total: counts.reduce((a, b) => a + b, 0),
+                mine: mine ?? null,
+            },
+        };
+    }
+
+    async vote(token, option) {
+        const user = await this.session(token);
+        if (!user) return fail("Log in to vote.", 401);
+        const poll = this.meta.shout?.poll;
+        if (!poll) return fail("There is no poll right now.", 404);
+        if (!Number.isInteger(option) || option < 0 || option >= poll.options.length) return fail("Pick one of the options.");
+        // One vote per account; voting again changes it.
+        this.meta.votes[lower(user.name)] = option;
+        await this.saveMeta();
+        return { shout: this.shoutFor(user) };
     }
 
     /** What every page hears on its presence ping. */
@@ -394,7 +449,7 @@ export class Accounts {
         if (user) await this.noteIp(user, ip);
         const now = this.now();
         return {
-            ...this.site(),
+            ...this.site(user),
             me: user ? { ...this.view(user), canStaff: rankOf(user) >= RANKS.mod } : null,
             status: {
                 banned: Boolean(user?.banned),
@@ -404,10 +459,10 @@ export class Accounts {
         };
     }
 
-    site() {
+    site(user = null) {
         const owner = this.users.get(lower(OWNER_NAME));
         // The owner's face, so a page can draw "from Zeb" in the nametag they picked.
-        return { announcement: this.meta.announcement, shout: this.meta.shout, owner: owner ? this.view(owner) : null };
+        return { announcement: this.meta.announcement, shout: this.shoutFor(user), owner: owner ? this.view(owner) : null };
     }
 
     // ---- cloud save: a bundle the page makes, kept in chunks
@@ -471,6 +526,8 @@ export class Accounts {
                 return u ? [200, { me: this.view(u), data: u.data }] : [401, { error: "Log in first." }];
             }
             case "/api/account/skin": return done(await this.setSkin(t, b.skin));
+            case "/api/account/display": return done(await this.setDisplay(t, b.display));
+            case "/api/poll/vote": return done(await this.vote(t, b.option));
             case "/api/account/nametag": return done(await this.setNametag(t, b.mode, b.color));
             case "/api/staff/search": return done(await this.search(t, b.q));
             case "/api/staff/role": return done(await this.setRole(t, b.name, b.role));
@@ -482,7 +539,7 @@ export class Accounts {
             case "/api/staff/log": return done(await this.log(t));
             case "/api/staff/undo": return done(await this.undo(t, b.id));
             case "/api/owner/announce": return done(await this.setNotice(t, "announcement", b.text));
-            case "/api/owner/shout": return done(await this.setNotice(t, "shout", b.text));
+            case "/api/owner/shout": return done(await this.setNotice(t, "shout", b.text, b.options));
             case "/api/data/put": return done(await this.putData(t, b.gen, b.index, b.total, b.chunk));
             case "/api/data/info": return done(await this.dataInfo(t));
             case "/api/data/get": return done(await this.getData(t, b.index));

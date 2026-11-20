@@ -71,9 +71,15 @@
         <div id="shout" class="shout" hidden>
           <div class="shout-head"><span class="chip">shout</span><b id="shout-by" class="shout-by"></b><small id="shout-time"></small><button id="shout-edit" class="ghost" type="button" hidden>edit</button></div>
           <p id="shout-text"></p>
+          <div id="shout-poll" hidden></div>
         </div>
         <form id="shout-form" class="shout-form" hidden>
           <textarea id="shout-input" maxlength="300" rows="2" placeholder="What should everyone see on the home page? $r$rainbow$r$ works too" aria-label="shout"></textarea>
+          <div class="poll-box">
+            <label class="check"><input id="poll-on" type="checkbox"> Add a poll (2 to 8 options; one vote per account)</label>
+            <div id="poll-options" hidden></div>
+            <button id="poll-add" type="button" class="ghost" hidden>+ Add option</button>
+          </div>
           <div class="actions">
             <button type="submit" class="ghost">Set shout</button>
             <button type="button" id="shout-clear" class="ghost">Delete shout</button>
@@ -209,11 +215,18 @@
         <div id="acct-in" class="panel pad" hidden>
           <div class="who-row"><b id="acct-me" class="who-name"></b><span id="acct-role" class="chip"></span></div>
           <div class="row">
-            <label for="acct-skin">Skin name</label>
+            <label for="acct-display">Display name</label>
             <div class="field">
-              <input id="acct-skin" type="text" maxlength="32" placeholder="steve" spellcheck="false">
-              <p class="hint">Shown beside your name to staff. It follows your Profile skin unless you type something else.</p>
-              <div class="actions"><button id="acct-skin-save" type="button" class="ghost">Save</button></div>
+              <input id="acct-display" type="text" maxlength="16" placeholder="Your name in the game" spellcheck="false" autocomplete="off">
+              <p class="hint">This is your Minecraft name in the game and on lists. Anyone can use the same display name, so don't rely on it to tell people apart: 1 to 16 characters, no spaces.</p>
+              <div class="actions"><button id="acct-display-save" type="button" class="ghost">Save</button></div>
+            </div>
+          </div>
+          <div class="row">
+            <label>Username</label>
+            <div class="field">
+              <b id="acct-username"></b> <button id="acct-username-copy" type="button" class="ghost">Copy</button>
+              <p class="hint">Your username is yours alone: nobody else can have it, and it never changes. Staff and bans go by it, so a copied display name gets nothing.</p>
             </div>
           </div>
           <div id="acct-nametag" class="row" hidden>
@@ -248,7 +261,7 @@
         <p class="sub" id="staff-sub"></p>
         <div class="panel pad">
           <h3>Players</h3>
-          <input id="staff-search" type="search" placeholder="Search by username or skin name" autocomplete="off" aria-label="search players">
+          <input id="staff-search" type="search" placeholder="Search by username, display name or skin" autocomplete="off" aria-label="search players">
           <ul id="staff-list" class="servers"></ul>
           <p id="staff-empty" class="hint"></p>
         </div>
@@ -319,6 +332,7 @@
         <h2 class="title">Profile</h2>
         <p class="sub">Your name, skin and cape for <b class="instance-name">this instance</b>. They apply the next time the game starts, so set them before you join a shared world or server.</p>
         <div class="panel">
+          <p class="hint lockmsg" id="profile-locked" hidden>You're signed in, so your profile is managed by your account and can't be edited here. Your name in the game is your display name (change it on the Account page). Log out to change the skin or cape.</p>
           <p class="hint" id="profile-unsupported" hidden>This browser can't keep files for the game, so the profile can't be saved here. Set it in the game's own menu instead.</p>
           <div class="row">
             <label for="profile-name">Name</label>

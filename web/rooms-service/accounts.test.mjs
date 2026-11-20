@@ -219,3 +219,58 @@ test("handle routes by path and never leaks the token logic to GET", async () =>
     assert.deepEqual((await acc.handle("GET", "/api/site", null, ""))[1], { announcement: null, shout: null, owner: null });
     assert.equal((await acc.handle("POST", "/api/nope", {}, ""))[0], 404);
 });
+
+test("a username is unique and fixed; a display name is free to copy and is what others see", async () => {
+    const { acc } = make();
+    const a = await player(acc, "alice", "1.1.1.1");
+    const b = await player(acc, "bobby", "1.1.1.2");
+    assert.equal(ok(await acc.setDisplay(a, "Cool_Name")).me.display, "Cool_Name");
+    // the same display name can be taken by someone else (like a Discord display name)...
+    assert.equal(ok(await acc.setDisplay(b, "Cool_Name")).me.display, "Cool_Name");
+    // ...but a username can't, however it is spelled
+    assert.equal((await acc.signup("ALICE", "password123", "1.1.1.3")).status, 409);
+    assert.equal((await acc.signup("zeb", "password123", "1.1.1.3")).status, 409);
+    // a display name can be used as a Minecraft name, so no spaces and at most 16 characters
+    assert.ok((await acc.setDisplay(a, "has space")).error);
+    assert.ok((await acc.setDisplay(a, "x".repeat(17))).error);
+    // copying a display name gives nothing: staff and actions go by username
+    const o = await asOwner(acc);
+    const { users } = ok(await acc.search(o, "cool_name"));
+    assert.deepEqual(users.map((u) => [u.name, u.display]), [["alice", "Cool_Name"], ["bobby", "Cool_Name"]]);
+    ok(await acc.kick(o, "bobby"));
+    assert.equal((await acc.ping(a, "1.1.1.1")).status.kickedUntil, 0);
+    assert.ok((await acc.ping(b, "1.1.1.2")).status.kickedUntil > 0);
+    assert.equal((await acc.ping(a, "1.1.1.1")).me.display, "Cool_Name");
+});
+
+test("shout poll: 2 to 8 options, one vote per account (changeable), results for all, reset by a new shout", async () => {
+    const { acc } = make();
+    const o = await asOwner(acc);
+    const a = await player(acc, "alice", "1.1.1.1");
+    const b = await player(acc, "bobby", "1.1.1.2");
+    assert.ok((await acc.setNotice(o, "shout", "Map?", ["only one"])).error);
+    assert.ok((await acc.setNotice(o, "shout", "Map?", ["a", "A"])).error);
+    assert.ok((await acc.setNotice(o, "shout", "Map?", Array.from({ length: 9 }, (_, i) => `o${i}`))).error);
+    const made = ok(await acc.setNotice(o, "shout", "Which map?", ["Desert", "Forest", " ", "Ocean"])).shout;
+    assert.deepEqual(made.poll.options.map((x) => x.text), ["Desert", "Forest", "Ocean"]);
+    assert.equal((await acc.vote("", 0)).status, 401);
+    ok(await acc.vote(a, 1));
+    ok(await acc.vote(b, 1));
+    assert.equal(ok(await acc.vote(a, 2)).shout.poll.mine, 2); // changed her mind
+    assert.ok((await acc.vote(a, 3)).error);
+    assert.ok((await acc.vote(a, "1")).error);
+    const seenA = (await acc.ping(a, "1.1.1.1")).shout.poll;
+    assert.deepEqual(seenA.options.map((x) => x.votes), [0, 1, 1]);
+    assert.equal(seenA.total, 2);
+    assert.equal(seenA.mine, 2);
+    const anon = (await acc.ping("", "8.8.8.8")).shout.poll;
+    assert.equal(anon.mine, null);
+    assert.equal(anon.total, 2);
+    // a shout without options is plain, and a new shout starts a fresh poll
+    ok(await acc.setNotice(o, "shout", "Plain"));
+    assert.equal((await acc.ping(a, "1.1.1.1")).shout.poll, undefined);
+    assert.equal((await acc.vote(a, 0)).status, 404);
+    ok(await acc.setNotice(o, "shout", "Again", ["x", "y"]));
+    assert.equal((await acc.ping(a, "1.1.1.1")).shout.poll.total, 0);
+    assert.equal((await acc.ping("", "8.8.8.8")).shout.poll.options.length, 2);
+});

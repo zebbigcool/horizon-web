@@ -319,6 +319,15 @@ button, select, input { font: inherit; }
 .shout-form { margin-bottom: 14px; }
 .shout-form textarea { display: block; }
 #shout-new { margin-bottom: 14px; }
+.poll-box { margin: 10px 0; }
+.check { display: flex; gap: 8px; align-items: center; cursor: pointer; }
+.poll-row { display: flex; gap: 8px; margin-top: 8px; }
+.poll-row input { flex: 1; color: var(--text); background: var(--ctl); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; }
+.poll-row input:focus { outline: none; border-color: var(--orange); }
+#poll-add { margin-top: 8px; }
+#profile.locked .panel { opacity: .6; }
+.lockmsg { padding: 10px 14px; border: 1px solid var(--orange); border-radius: 8px; }
+.shout .zh-poll { max-width: 560px; }
 .person { flex-wrap: wrap; }
 .person .meta { min-width: 180px; }
 .person .meta small, .logrow .meta small { color: var(--dim); }

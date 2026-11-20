@@ -7,7 +7,7 @@
 import { CHAT_URL, GAME_URL, NEW_GAME_URL, REFRESH_MS, SERAPH_URL } from "./config.js";
 import { configured, publicRoomsOn, refreshSite, roomsFetch, setPublicRooms, startPresence } from "./presence.js";
 import * as account from "./account.js";
-import { nametag, richText, showNotice } from "./notice.js";
+import { nametag, renderPoll, richText, showNotice } from "./notice.js";
 import { MESSAGES, blockedReason, markSeen, takeFlash, watchSite } from "./site.js";
 import {
     RAM_CHOICES, client, lowMemory, setLowMemory, setWispUrl, validWisp, wispUrl, clearSettings, customRelays, debugOn, fullscreenOn, ramMb, setCustomRelays, setDebug, setFullscreen,
@@ -692,7 +692,11 @@ show();
     const status = $("profile-status");
     const face = $("profile-face");
     let state = null;
+    let locked = false; // signed in: the account owns the profile
     const say = (text) => (status.textContent = text);
+    const setAll = (disabled) => {
+        for (const el of pages.profile.querySelectorAll("input, select, button")) el.disabled = disabled;
+    };
 
     async function drawFace() {
         const file = state.skin === "custom" ? state.skinFile : null;
@@ -717,9 +721,31 @@ show();
             b.disabled = b.dataset.value === "on" && !state.capeFile;
         }
         drawFace().catch(() => {});
+        if (locked) setAll(true);
     }
 
+    // The account block (below) locks the profile while someone is signed in, and
+    // reloads it after writing the display name into it.
+    globalThis.horizonProfileLock = (on) => {
+        if (locked === on) return;
+        locked = on;
+        pages.profile.classList.toggle("locked", on);
+        $("profile-locked").hidden = !on;
+        if (on) setAll(true);
+        else {
+            setAll(false);
+            if (state) paint();
+        }
+    };
+    globalThis.horizonProfileReload = async () => {
+        if (!profile.supported()) return;
+        state = await profile.load();
+        nameEl.value = state.name;
+        paint();
+    };
+
     async function persist(message = "Saved. It applies the next time the game starts.") {
+        if (locked) return say("Your profile is managed by your account while you're signed in.");
         const name = nameEl.value.trim();
         if (name && !profile.validName(name)) return say("A name is 1 to 16 characters, with no spaces.");
         try {
@@ -1029,16 +1055,18 @@ show();
         $("nav-staff").hidden = rank() < RANK.mod;
         $("acct-nametag").hidden = !isOwner();
         paintShout();
+        globalThis.horizonProfileLock?.(Boolean(me));
         if (!me) return;
-        nametag($("acct-me"), me.name, me.nametag);
+        nametag($("acct-me"), me.display, me.nametag);
+        $("acct-username").textContent = `@${me.name}`;
+        if (document.activeElement !== $("acct-display")) $("acct-display").value = me.display;
         $("acct-role").textContent = me.role;
         $("acct-role").hidden = me.role === "user";
-        if (document.activeElement !== $("acct-skin")) $("acct-skin").value = me.skin;
         if (isOwner()) {
             const tag = me.nametag ?? { mode: "rainbow" };
             for (const b of $("tag-seg").querySelectorAll("button")) b.classList.toggle("on", b.dataset.value === tag.mode);
             if (tag.color) $("tag-color").value = tag.color;
-            nametag($("tag-preview"), me.name, tag);
+            nametag($("tag-preview"), me.display, tag);
         }
     }
 
@@ -1050,6 +1078,7 @@ show();
             // Offline: keep what is shown.
         }
         paintAccount();
+        await syncProfile();
         if (!location.hash.startsWith("#staff")) return;
         if (rank() >= RANK.mod) renderStaff();
         else location.hash = "#play";
@@ -1082,29 +1111,43 @@ show();
     async function afterLogin() {
         await refreshMe();
         refreshSite();
-        // A new account's skin name starts as the one picked on the Profile page.
-        if (acct && !acct.me.skin) {
-            try {
-                const skin = (await profile.load()).skin;
-                if (skin) await account.api("/api/account/skin", { skin });
-                await refreshMe();
-            } catch {}
+    }
+
+    // While signed in, the game's profile follows the account: the display name is the
+    // Minecraft name, and the skin's name is what staff see. (The profile page is locked.)
+    async function syncProfile() {
+        const me = acct?.me;
+        if (!me || !profile.supported()) return;
+        try {
+            const p = await profile.load();
+            if (p.name !== me.display) await profile.save({ name: me.display, skin: p.skin, slim: p.slim, cape: p.cape });
+            if (p.skin && p.skin !== me.skin) acct.me = (await account.api("/api/account/skin", { skin: p.skin })).me;
+            await globalThis.horizonProfileReload?.();
+        } catch {
+            // No game folder yet or storage blocked: it syncs next time.
         }
     }
+    globalThis.horizonSyncProfile = syncProfile;
+    addEventListener("hashchange", syncProfile); // e.g. after switching instance
+
     $("acct-logout").addEventListener("click", async () => {
         await account.logout().catch(() => {});
         acct = null;
         paintAccount();
         refreshSite();
     });
-    $("acct-skin-save").addEventListener("click", async () => {
+    $("acct-display-save").addEventListener("click", async () => {
         try {
-            acct.me = (await account.api("/api/account/skin", { skin: $("acct-skin").value })).me;
+            acct.me = (await account.api("/api/account/display", { display: $("acct-display").value })).me;
+            say($("cloud-note"), "");
             paintAccount();
+            await syncProfile();
+            refreshSite();
         } catch (e) {
-            say($("cloud-note"), e.message, true);
+            alert(e.message);
         }
     });
+    $("acct-username-copy").addEventListener("click", () => navigator.clipboard?.writeText(acct.me.name).catch(() => {}));
 
     // ---- the owner's nametag
     async function setTag(mode) {
@@ -1155,18 +1198,75 @@ show();
         const owner = isOwner();
         $("shout").hidden = !shout;
         if (shout) {
-            nametag($("shout-by"), shout.by, site.owner?.nametag);
+            nametag($("shout-by"), site.owner?.display ?? shout.by, site.owner?.nametag);
             $("shout-time").textContent = when(shout.at);
             richText($("shout-text"), shout.text);
-        }
+            renderPoll($("shout-poll"), shout, {
+                loggedIn: Boolean(acct),
+                loginHref: "#account",
+                vote: async (option) => {
+                    try {
+                        await account.api("/api/poll/vote", { option });
+                    } catch (e) {
+                        alert(e.message);
+                    }
+                    refreshSite();
+                },
+            });
+        } else $("shout-poll").hidden = true;
         $("shout-edit").hidden = !(owner && shout);
         $("shout-new").hidden = !(owner && !shout) || !$("shout-form").hidden;
         if (!owner) $("shout-form").hidden = true;
     }
+    // The poll builder: a checkbox, then 2 to 8 option boxes.
+    const optionBox = () => $("poll-options");
+    function pollRow(value = "") {
+        const row = el("div", "poll-row");
+        const input = el("input");
+        input.type = "text";
+        input.maxLength = 60;
+        input.placeholder = `Option ${optionBox().children.length + 1}`;
+        input.value = value;
+        input.setAttribute("aria-label", "poll option");
+        const remove = el("button", "ghost", "×");
+        remove.type = "button";
+        remove.setAttribute("aria-label", "remove option");
+        remove.addEventListener("click", () => {
+            row.remove();
+            paintPollForm();
+        });
+        row.append(input, remove);
+        optionBox().append(row);
+    }
+    function paintPollForm() {
+        const on = $("poll-on").checked;
+        optionBox().hidden = !on;
+        const rows = [...optionBox().children];
+        while (on && rows.length < 2) {
+            pollRow();
+            rows.push(null);
+        }
+        $("poll-add").hidden = !on || optionBox().children.length >= 8;
+        for (const [i, row] of [...optionBox().children].entries()) {
+            row.lastChild.hidden = optionBox().children.length <= 2;
+            row.firstChild.placeholder = `Option ${i + 1}`;
+        }
+    }
+    $("poll-on").addEventListener("change", paintPollForm);
+    $("poll-add").addEventListener("click", () => {
+        pollRow();
+        paintPollForm();
+        optionBox().lastChild.firstChild.focus();
+    });
     const openShoutForm = (on) => {
         $("shout-form").hidden = !on;
         if (on) {
             $("shout-input").value = site?.shout?.text ?? "";
+            optionBox().replaceChildren();
+            const old = site?.shout?.poll?.options ?? [];
+            $("poll-on").checked = old.length > 0;
+            for (const o of old) pollRow(o.text);
+            paintPollForm();
             $("shout-input").focus();
         }
         paintShout();
@@ -1174,9 +1274,9 @@ show();
     $("shout-edit").addEventListener("click", () => openShoutForm(true));
     $("shout-new").addEventListener("click", () => openShoutForm(true));
     $("shout-cancel").addEventListener("click", () => openShoutForm(false));
-    async function sendShout(text) {
+    async function sendShout(text, options) {
         try {
-            await account.api("/api/owner/shout", { text });
+            await account.api("/api/owner/shout", { text, options });
             openShoutForm(false);
             refreshSite();
         } catch (e) {
@@ -1185,7 +1285,8 @@ show();
     }
     $("shout-form").addEventListener("submit", (e) => {
         e.preventDefault();
-        sendShout($("shout-input").value);
+        const options = $("poll-on").checked ? [...optionBox().querySelectorAll("input")].map((i) => i.value.trim()).filter(Boolean) : undefined;
+        sendShout($("shout-input").value, options);
     });
     $("shout-clear").addEventListener("click", () => sendShout(""));
 
@@ -1194,7 +1295,7 @@ show();
     document.addEventListener("horizon:site", (event) => {
         site = event.detail;
         // A role or ban changed on the server: bring this page up to date.
-        if ((site.me?.role ?? null) !== (acct?.me.role ?? null) || (site.me?.name ?? null) !== (acct?.me.name ?? null)) {
+        if ((site.me?.role ?? null) !== (acct?.me.role ?? null) || (site.me?.name ?? null) !== (acct?.me.name ?? null) || (site.me?.display ?? null) !== (acct?.me.display ?? null)) {
             if (site.me || acct) refreshMe();
         }
         paintShout();
@@ -1235,8 +1336,8 @@ show();
         const li = el("li", "server person");
         const meta = el("div", "meta");
         const name = el("b");
-        nametag(name, u.name, u.nametag);
-        meta.append(name, el("small", "", u.skin ? `skin: ${u.skin}` : "no skin name"));
+        nametag(name, u.display, u.nametag);
+        meta.append(name, el("small", "", `@${u.name} · ${u.skin ? `skin: ${u.skin}` : "no skin name"}`));
         const chips = el("div", "acts");
         if (u.role !== "user") chips.append(chip(u.role, ""));
         if (u.banned) chips.append(chip("banned", "bad"));
@@ -1249,7 +1350,7 @@ show();
             b.type = "button";
             b.disabled = !u.canAct;
             b.addEventListener("click", () => {
-                if (confirm(`${label} ${u.name}? You can undo it from the activity list.`)) call(path, { name: u.name });
+                if (confirm(`${label} ${u.display} (@${u.name})? You can undo it from the activity list.`)) call(path, { name: u.name });
             });
             acts.append(b);
         };

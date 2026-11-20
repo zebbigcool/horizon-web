@@ -19,7 +19,15 @@ const CSS = `
 .zh-card button { min-width: 92px; padding: 8px 22px; cursor: pointer; color: #f4ecff; font: inherit; font-weight: 700; border-radius: 9px; border: 1px solid transparent;
   background-image: linear-gradient(#1a1030, #1a1030), linear-gradient(90deg, #b44cff, #ffd23f, #b44cff); background-origin: border-box; background-clip: padding-box, border-box; }
 .zh-card button:hover, .zh-card button:focus-visible { outline: none; color: #ffd23f; }
-@media (prefers-reduced-motion: reduce) { .zh-rb { animation: none; } }
+.zh-poll { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+.zh-opt { position: relative; overflow: hidden; display: flex; justify-content: space-between; gap: 12px; text-align: left; padding: 7px 11px; cursor: pointer;
+  font: inherit; color: var(--text, #f4ecff); background: var(--ctl, rgba(10, 6, 18, .5)); border: 1px solid var(--line, rgba(180, 76, 255, .45)); border-radius: 8px; }
+.zh-opt i { position: absolute; inset: 0 auto 0 0; width: var(--pct, 0%); background: linear-gradient(90deg, rgba(180, 76, 255, .5), rgba(255, 138, 31, .5)); transition: width .4s; }
+.zh-opt span { position: relative; overflow-wrap: anywhere; }
+.zh-opt:hover { border-color: #ff8a1f; }
+.zh-opt.mine { border-color: #ffd23f; box-shadow: inset 0 0 0 1px #ffd23f; font-weight: 700; }
+.zh-poll small { color: var(--dim, #a99bc4); }
+.zh-poll small a { color: #ff8a1f; }
 `;
 
 let styled = false;
@@ -77,7 +85,7 @@ function next() {
     if (by) {
         head.append(document.createTextNode(" from "));
         const who = document.createElement("span");
-        nametag(who, by.name, by.nametag);
+        nametag(who, by.display ?? by.name, by.nametag);
         head.append(who);
     }
     const body = document.createElement("p");
@@ -111,4 +119,44 @@ export function showNotice(options) {
         queue.push({ ...options, done: resolve });
         next();
     });
+}
+
+/**
+ * Draws a shout's poll into `el`: each option with its votes, the player's own
+ * pick marked. `vote(index)` is called on a click; `loginHref` is where "log in
+ * to vote" leads (the player isn't logged in when `shout.poll.mine` can't be set).
+ */
+export function renderPoll(el, shout, { vote, loggedIn, loginHref = "index.html#account" }) {
+    style();
+    el.replaceChildren();
+    const poll = shout?.poll;
+    el.hidden = !poll;
+    if (!poll) return;
+    el.classList.add("zh-poll");
+    poll.options.forEach((option, i) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `zh-opt${poll.mine === i ? " mine" : ""}`;
+        const pct = poll.total ? Math.round((option.votes / poll.total) * 100) : 0;
+        button.style.setProperty("--pct", `${pct}%`);
+        const bar = document.createElement("i");
+        const label = document.createElement("span");
+        label.textContent = option.text;
+        const count = document.createElement("span");
+        count.textContent = `${option.votes} · ${pct}%`;
+        button.append(bar, label, count);
+        button.addEventListener("click", () => vote(i));
+        if (!loggedIn) button.disabled = true;
+        el.append(button);
+    });
+    const foot = document.createElement("small");
+    foot.append(document.createTextNode(`${poll.total} vote${poll.total === 1 ? "" : "s"}`));
+    if (!loggedIn) {
+        foot.append(document.createTextNode(" · "));
+        const link = document.createElement("a");
+        link.href = loginHref;
+        link.textContent = "log in to vote";
+        foot.append(link);
+    }
+    el.append(foot);
 }

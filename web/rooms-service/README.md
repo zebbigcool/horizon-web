@@ -85,6 +85,14 @@ Until `ADMIN_PASSWORD` is set the owner can't log in (the "Zeb" name is reserved
   masked networks (`203.0.*.*`) with an Unban button; unbanning is itself undoable. IPs are stored only as keyed hashes.
 - **Announcements** pop up once for everyone, as a dialog from the owner; `$r$text$r$` makes rainbow text.
   The **shout** stays on the Play page until the owner changes or deletes it there.
+- **Username and display name** (like Discord): the username is unique, can't be taken twice and never
+  changes; staff actions and bans go by it. The display name is free to copy (1 to 16 characters, no spaces,
+  so it works as a Minecraft name) and is the player's name in the game: while signed in, the launcher writes it
+  into the game's profile and the Profile page is read-only (log out to change the skin or cape). Staff
+  lists show the display name with the `@username` under it, and the skin's name.
+- **Shout polls**: the owner can add 2 to 8 options to the shout. One vote per account (changeable); results are
+  public, voting needs a login. The shout and its poll also show in a small box at the top of the game page
+  (press Esc to free the mouse, then click). A new shout starts a new poll.
 - Nametag: the owner picks rainbow or a color on the Account page; it shows in dialogs, the shout and lists
   (not above heads in the game).
 
