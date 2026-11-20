@@ -187,7 +187,16 @@ export function createChatWatcher(onChange) {
             const data = await response.json().catch(() => ({}));
             if (data.result === "MFA") throw new Error("This account uses two-factor sign-in, which isn't supported here yet.");
             if (data.result === "Disabled") throw new Error("That account is disabled.");
-            if (!response.ok || !data.token) throw new Error(data.type === "InvalidCredentials" ? "Wrong email or password." : "The chat refused that sign-in.");
+            if (!response.ok || !data.token) {
+                const known = {
+                    InvalidCredentials: "Wrong email or password. (The chat signs in with the account's email address, not the username.)",
+                    LockedOut: "Too many tries. Wait a few minutes and try again.",
+                    UnverifiedAccount: "That account's email isn't verified yet.",
+                    DisabledAccount: "That account is disabled.",
+                    Banned: "That account is banned.",
+                };
+                throw new Error(known[data.type] ?? `The chat refused that sign-in (HTTP ${response.status}${data.type ? `, ${data.type}` : ""}${data.error ? `, ${data.error}` : ""}).`);
+            }
             stop();
             saveSession({ token: data.token, userId: data.user_id, sessionId: data._id });
             open();

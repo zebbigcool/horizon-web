@@ -510,7 +510,7 @@ addEventListener("beforeunload", (e) => {
           <p class="hint wide-hint">Sign in to the chat here to get a dot on the Chat tab: red when someone pings you, white for other unread messages. This page keeps its own chat session (only a session token is saved in this browser, not your password), and it respects muted servers and channels.</p>
           <p id="chat-notify-state" class="hint" role="status"></p>
           <form id="chat-notify-form" class="relay-form" autocomplete="on">
-            <input id="chat-notify-email" type="email" placeholder="Chat email" autocomplete="username" aria-label="chat email" required>
+            <input id="chat-notify-email" type="email" placeholder="Chat email (not username)" autocomplete="username" aria-label="chat email" required>
             <input id="chat-notify-pass" type="password" placeholder="Chat password" autocomplete="current-password" aria-label="chat password" required>
             <button type="submit" class="ghost">Sign in to chat</button>
           </form>
