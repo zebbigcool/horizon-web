@@ -305,10 +305,10 @@ as the chat doesn't have to.
 
 ## The Chat tab's dot
 
-A red dot at the top right of the Chat icon means you were pinged; a white one means other unread messages (red
-wins). The chat is a different site in an iframe, which the launcher can't read, so the chat site reports its
-own count: add [`chat-bridge.js`](chat-bridge.js) to it and call `horizonChat.message(text, { mine })` for each
-message that appears. The launcher tells the chat site who you are (your account username, for pings) and
-whether the Chat tab is open; nothing counts as unread while you look at it. The chat loads in the background
-a few seconds after the launcher opens so it can notice messages. Only messages from the chat site's own origin
-(`CHAT_URL` in `config.js`) are believed.
+A red dot at the top right of the Chat icon means someone pinged you; a white one means other unread messages
+(red wins). The chat is a self-hosted Stoat (Revolt) server, so the launcher listens to it itself
+([chat-notify.js](chat-notify.js)): sign in under Settings > Chat notifications and the launcher keeps its own
+chat session (only the session token is saved in this browser), connects to the chat's WebSocket like any
+client, and works out what is unread from the chat's own data: each channel's last message, what you have read
+(including what the open Chat tab reads), and the messages that mention you. Muted servers and channels are
+respected. The dot is off while the Chat tab is open. Two-factor chat accounts aren't supported yet.

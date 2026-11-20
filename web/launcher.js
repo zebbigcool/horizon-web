@@ -4,6 +4,7 @@
 // catalog (catalog.json) and open each one, loaded from where seraph is hosted;
 // settings holds the memory limit and whether worlds are listed publicly.
 // Addresses live in config.js, the player's choices in settings.js.
+import { createChatWatcher } from "./chat-notify.js";
 import { CHAT_URL, GAME_URL, NEW_GAME_URL, REFRESH_MS, SERAPH_URL } from "./config.js";
 import { configured, publicRoomsOn, refreshSite, roomsFetch, setPublicRooms, startPresence } from "./presence.js";
 import * as account from "./account.js";
@@ -556,56 +557,47 @@ segment("debug-seg", () => onOff(debugOn()), (v) => setDebug(v === "on"));
 if (!NEW_GAME_URL) $("client-row").hidden = true;
 
 // ---- the Chat tab's dot
-// The chat is another site in an iframe, so it has to tell us (chat-bridge.js, for that site): it posts
-// { type: "horizon-chat", unread, pinged } whenever its count changes, and we tell it when the tab is
-// being looked at and who you are (so it knows what a ping is). A red dot means you were pinged,
-// white means other unread messages; red wins. Looking at the chat clears both.
+// The launcher listens to the chat server itself (chat-notify.js; sign in under Settings > Chat
+// notifications). A red dot means someone pinged you, white means other unread messages; red wins.
+// While the Chat tab is open the dot stays off, and what the open chat reads is cleared as it goes.
 {
-    const origin = new URL(CHAT_URL).origin;
     const link = document.querySelector('.nav a[data-nav="chat"]');
     const dot = $("chat-dot");
-    let unread = 0;
-    let pinged = false;
-    let name = "";
+    let last = { unread: 0, pinged: false, status: "off", detail: "", signedIn: false };
     const looking = () => location.hash.replace(/^#/, "").split("/")[0] === "chat" && !document.hidden;
     const paint = () => {
-        const show = pinged || unread > 0;
+        const show = !looking() && (last.pinged || last.unread > 0);
+        const red = show && last.pinged;
         dot.hidden = !show;
-        dot.classList.toggle("red", pinged);
-        const label = pinged ? "Chat, you were pinged" : unread > 0 ? "Chat, unread messages" : "Chat";
+        dot.classList.toggle("red", red);
+        const label = red ? "Chat, you were pinged" : show ? "Chat, unread messages" : "Chat";
         link.setAttribute("aria-label", label);
         link.title = label;
+        const state = $("chat-notify-state");
+        state.textContent = !last.signedIn ? "Not signed in." : last.status === "on" ? "Connected. The Chat tab shows a dot for new messages." : last.status === "connecting" ? last.detail || "Connecting…" : last.detail || "Not connected.";
+        $("chat-notify-form").hidden = last.signedIn;
+        $("chat-notify-out").hidden = !last.signedIn;
     };
-    const tell = () => chatFrame.contentWindow?.postMessage({ type: "horizon-chat-host", visible: looking(), name }, origin);
-    const sync = () => {
-        if (looking()) {
-            unread = 0;
-            pinged = false;
-        }
-        paint();
-        tell();
-    };
-    addEventListener("message", (e) => {
-        if (e.origin !== origin || e.source !== chatFrame.contentWindow || e.data?.type !== "horizon-chat") return;
-        unread = looking() ? 0 : Math.max(0, Math.min(9999, Math.floor(Number(e.data.unread)) || 0));
-        pinged = looking() ? false : e.data.pinged === true;
+    const watcher = createChatWatcher((next) => {
+        last = next;
         paint();
     });
-    document.addEventListener("horizon:site", (e) => {
-        const next = e.detail?.me?.name ?? "";
-        if (next !== name) {
-            name = next;
-            tell();
+    addEventListener("hashchange", paint);
+    document.addEventListener("visibilitychange", paint);
+    $("chat-notify-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const note = $("chat-notify-note");
+        note.textContent = "";
+        try {
+            await watcher.signIn($("chat-notify-email").value.trim(), $("chat-notify-pass").value);
+            $("chat-notify-pass").value = "";
+        } catch (err) {
+            note.textContent = err.message;
         }
     });
-    chatFrame.addEventListener("load", tell);
-    addEventListener("hashchange", sync);
-    document.addEventListener("visibilitychange", sync);
-    // Load the chat in the background a moment after the launcher, so unread messages are noticed.
-    setTimeout(() => {
-        if (!chatFrame.src) chatFrame.src = CHAT_URL;
-    }, 3000);
-    sync();
+    $("chat-notify-out").addEventListener("click", () => watcher.signOut());
+    setTimeout(() => watcher.start(), 1500);
+    paint();
 }
 
 // The sidebar folds to icons (and back); the choice is kept in this browser.
