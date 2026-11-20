@@ -302,3 +302,13 @@ as the chat doesn't have to.
 - **Controller output**: rumble through gilrs' force feedback has no thread
   on the web, and the DualSense's own output needs HID.
 - **Mods** that run WebAssembly through wasmtime can't run inside the page.
+
+## The Chat tab's dot
+
+A red dot at the top right of the Chat icon means you were pinged; a white one means other unread messages (red
+wins). The chat is a different site in an iframe, which the launcher can't read, so the chat site reports its
+own count: add [`chat-bridge.js`](chat-bridge.js) to it and call `horizonChat.message(text, { mine })` for each
+message that appears. The launcher tells the chat site who you are (your account username, for pings) and
+whether the Chat tab is open; nothing counts as unread while you look at it. The chat loads in the background
+a few seconds after the launcher opens so it can notice messages. Only messages from the chat site's own origin
+(`CHAT_URL` in `config.js`) are believed.

@@ -407,3 +407,10 @@ button, select, input { font: inherit; }
 #owner-tools h3 + .hint + .row, #owner-tools textarea + .check { margin-top: 8px; }
 #owner-tools .check { margin: 8px 0; }
 #owner-tools h3:not(:first-child) { margin-top: 22px; }
+
+/* The Chat tab's dot: red when you were pinged, white for other unread messages. */
+.nav .ico { position: relative; display: flex; flex: none; }
+.nav .dot { position: absolute; top: -4px; right: -5px; width: 10px; height: 10px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 2px var(--side); }
+.nav .dot.red { background: #ff3b3b; }
+.nav .dot[hidden] { display: none; }
+.shell.collapsed .nav .ico { margin: 0; }

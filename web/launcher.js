@@ -555,6 +555,59 @@ segment("public-seg", () => onOff(publicRoomsOn()), (v) => setPublicRooms(v === 
 segment("debug-seg", () => onOff(debugOn()), (v) => setDebug(v === "on"));
 if (!NEW_GAME_URL) $("client-row").hidden = true;
 
+// ---- the Chat tab's dot
+// The chat is another site in an iframe, so it has to tell us (chat-bridge.js, for that site): it posts
+// { type: "horizon-chat", unread, pinged } whenever its count changes, and we tell it when the tab is
+// being looked at and who you are (so it knows what a ping is). A red dot means you were pinged,
+// white means other unread messages; red wins. Looking at the chat clears both.
+{
+    const origin = new URL(CHAT_URL).origin;
+    const link = document.querySelector('.nav a[data-nav="chat"]');
+    const dot = $("chat-dot");
+    let unread = 0;
+    let pinged = false;
+    let name = "";
+    const looking = () => location.hash.replace(/^#/, "").split("/")[0] === "chat" && !document.hidden;
+    const paint = () => {
+        const show = pinged || unread > 0;
+        dot.hidden = !show;
+        dot.classList.toggle("red", pinged);
+        const label = pinged ? "Chat, you were pinged" : unread > 0 ? "Chat, unread messages" : "Chat";
+        link.setAttribute("aria-label", label);
+        link.title = label;
+    };
+    const tell = () => chatFrame.contentWindow?.postMessage({ type: "horizon-chat-host", visible: looking(), name }, origin);
+    const sync = () => {
+        if (looking()) {
+            unread = 0;
+            pinged = false;
+        }
+        paint();
+        tell();
+    };
+    addEventListener("message", (e) => {
+        if (e.origin !== origin || e.source !== chatFrame.contentWindow || e.data?.type !== "horizon-chat") return;
+        unread = looking() ? 0 : Math.max(0, Math.min(9999, Math.floor(Number(e.data.unread)) || 0));
+        pinged = looking() ? false : e.data.pinged === true;
+        paint();
+    });
+    document.addEventListener("horizon:site", (e) => {
+        const next = e.detail?.me?.name ?? "";
+        if (next !== name) {
+            name = next;
+            tell();
+        }
+    });
+    chatFrame.addEventListener("load", tell);
+    addEventListener("hashchange", sync);
+    document.addEventListener("visibilitychange", sync);
+    // Load the chat in the background a moment after the launcher, so unread messages are noticed.
+    setTimeout(() => {
+        if (!chatFrame.src) chatFrame.src = CHAT_URL;
+    }, 3000);
+    sync();
+}
+
 // The sidebar folds to icons (and back); the choice is kept in this browser.
 {
     const shell = document.querySelector(".shell");
