@@ -167,6 +167,11 @@ function refreshWatcher({ game }) {
             }
         }
     };
+    // A player who reloads or leaves before the time has refreshed early: this refresh is done for them,
+    // so neither the countdown nor the reload comes back on the next page in this tab.
+    addEventListener("pagehide", () => {
+        if (shown && shown.at > Date.now() + offset) safe(() => sessionStorage.setItem(DONE, String(shown.id)));
+    });
     const build = () => {
         const css = document.createElement("style");
         css.textContent = REFRESH_CSS;
@@ -208,7 +213,7 @@ function refreshWatcher({ game }) {
         if (firstServerNow >= refresh.at && !safe(() => sessionStorage.getItem(DONE) === String(refresh.id), false)) {
             safe(() => sessionStorage.setItem(DONE, String(refresh.id)));
         }
-        if (safe(() => sessionStorage.getItem(DONE) === String(refresh.id), false) && refresh.at <= site.now) {
+        if (safe(() => sessionStorage.getItem(DONE) === String(refresh.id), false)) {
             shown = null;
             if (box) box.hidden = true;
             return;
