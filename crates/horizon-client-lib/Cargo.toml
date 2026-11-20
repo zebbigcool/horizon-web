@@ -58,6 +58,7 @@ bytemuck = { version = "1.24", features = ["derive"] }
 glam = "0.30"
 png = "0.18"
 sha2 = "0.10.9"
+ed25519-dalek = { version = "2", default-features = false }
 # Server resource packs are checked and cached by their SHA-1, as vanilla does.
 sha1 = "0.10"
 serde = { version = "1", features = ["derive"] }
