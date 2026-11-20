@@ -325,7 +325,6 @@ button, select, input { font: inherit; }
 .poll-row input { flex: 1; color: var(--text); background: var(--ctl); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; }
 .poll-row input:focus { outline: none; border-color: var(--orange); }
 #poll-add { margin-top: 8px; }
-#profile.locked .panel { opacity: .6; }
 .lockmsg { padding: 10px 14px; border: 1px solid var(--orange); border-radius: 8px; }
 .shout .zh-poll { max-width: 560px; }
 .person { flex-wrap: wrap; }
@@ -338,6 +337,30 @@ button, select, input { font: inherit; }
 @media (prefers-reduced-motion: reduce) { .chip, .shout { animation: none; } }
 
 .noscript { position: fixed; inset: auto 0 20px; text-align: center; color: var(--dim); }
+
+/* The sidebar scrolls when it is taller than the window, and folds to icons. */
+.side { min-height: 0; }
+.nav { flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+.side-toggle {
+  display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 8px; cursor: pointer;
+  color: var(--dim); background: none; border: 1px solid transparent; font: inherit; flex: none;
+}
+.side-toggle:hover, .side-toggle:focus-visible { color: var(--text); background: rgba(180, 76, 255, 0.12); outline: none; }
+.side-toggle svg { width: 20px; height: 20px; fill: currentColor; flex: none; transition: transform .2s; }
+.shell { transition: grid-template-columns .2s; }
+.shell.collapsed { grid-template-columns: 68px 1fr; }
+.shell.collapsed .side { padding: 18px 8px; align-items: stretch; }
+.shell.collapsed .brand { justify-content: center; padding: 0 0 10px; }
+.shell.collapsed .brand b, .shell.collapsed .brand small, .shell.collapsed .nav span,
+.shell.collapsed .side-toggle span { display: none; }
+.shell.collapsed .nav a, .shell.collapsed .side-toggle { justify-content: center; padding: 10px 0; gap: 0; }
+.shell.collapsed .nav a.on { box-shadow: inset 0 0 0 1px var(--orange), 0 0 16px rgba(180, 76, 255, 0.2); }
+.shell.collapsed .side-toggle svg { transform: rotate(180deg); }
+.shell.collapsed .side .online { padding: 0; text-align: center; font-size: 0; }
+.shell.collapsed .side .online b { font-size: 12px; }
+.shell.collapsed .side .online i { display: none; }
+@media (prefers-reduced-motion: reduce) { .shell, .side-toggle svg { transition: none; } }
+@media (max-width: 720px) { .side-toggle { display: none; } .nav { overflow-x: auto; overflow-y: hidden; } }
 
 /* Narrow screens: the sidebar becomes a bar along the bottom. */
 @media (max-width: 720px) {
@@ -376,3 +399,5 @@ button, select, input { font: inherit; }
 #mod-list .meta { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 #mod-list input[type=checkbox] { flex: 0 0 auto; width: 18px; height: 18px; }
 .link-btn { text-decoration: none; display: inline-flex; align-items: center; }
+
+.profile-signed #profile-name-row { display: none; }

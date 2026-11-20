@@ -554,6 +554,26 @@ const onOff = (on) => (on ? "on" : "off");
 segment("public-seg", () => onOff(publicRoomsOn()), (v) => setPublicRooms(v === "on"));
 segment("debug-seg", () => onOff(debugOn()), (v) => setDebug(v === "on"));
 if (!NEW_GAME_URL) $("client-row").hidden = true;
+
+// The sidebar folds to icons (and back); the choice is kept in this browser.
+{
+    const shell = document.querySelector(".shell");
+    const toggle = $("side-toggle");
+    for (const a of document.querySelectorAll(".nav a")) a.title = a.querySelector("span")?.textContent ?? "";
+    const set = (collapsed) => {
+        shell.classList.toggle("collapsed", collapsed);
+        toggle.setAttribute("aria-expanded", String(!collapsed));
+        const label = collapsed ? "Expand the sidebar" : "Collapse the sidebar";
+        toggle.setAttribute("aria-label", label);
+        toggle.title = label;
+        try { localStorage.setItem("horizon-side", collapsed ? "1" : "0"); } catch {}
+    };
+    let saved = false;
+    try { saved = localStorage.getItem("horizon-side") === "1"; } catch {}
+    set(saved);
+    toggle.addEventListener("click", () => set(!shell.classList.contains("collapsed")));
+}
+
 segment("client-seg", client, (v) => {
     setClient(v);
     $("launch").href = launchTarget();
@@ -692,7 +712,7 @@ show();
     const status = $("profile-status");
     const face = $("profile-face");
     let state = null;
-    let locked = false; // signed in: the account owns the profile
+    let signedName = null; // signed in: the account's username is the name, so the name field is hidden
     const say = (text) => (status.textContent = text);
     const setAll = (disabled) => {
         for (const el of pages.profile.querySelectorAll("input, select, button")) el.disabled = disabled;
@@ -721,21 +741,14 @@ show();
             b.disabled = b.dataset.value === "on" && !state.capeFile;
         }
         drawFace().catch(() => {});
-        if (locked) setAll(true);
     }
 
-    // The account block (below) locks the profile while someone is signed in, and
-    // reloads it after writing the display name into it.
-    globalThis.horizonProfileLock = (on) => {
-        if (locked === on) return;
-        locked = on;
-        pages.profile.classList.toggle("locked", on);
+    // The account block (below) says who is signed in: the name field is hidden and the
+    // account's name is what the game uses; skin and cape stay editable.
+    globalThis.horizonProfileLock = (on, name = null) => {
+        signedName = on ? name : null;
+        pages.profile.classList.toggle("profile-signed", on);
         $("profile-locked").hidden = !on;
-        if (on) setAll(true);
-        else {
-            setAll(false);
-            if (state) paint();
-        }
     };
     globalThis.horizonProfileReload = async () => {
         if (!profile.supported()) return;
@@ -745,8 +758,7 @@ show();
     };
 
     async function persist(message = "Saved. It applies the next time the game starts.") {
-        if (locked) return say("Your profile is managed by your account while you're signed in.");
-        const name = nameEl.value.trim();
+        const name = signedName ?? nameEl.value.trim();
         if (name && !profile.validName(name)) return say("A name is 1 to 16 characters, with no spaces.");
         try {
             // No name chosen: keep the one the game made, by not writing a profile yet.
@@ -754,6 +766,7 @@ show();
             else if (state.name) await profile.save({ ...state, name: state.name });
             say(name || state.name ? message : "Pick a name to save your skin and cape.");
             if (name) state.name = name;
+            if (signedName) globalThis.horizonSyncProfile?.(); // the skin's name goes to the account
         } catch (e) {
             say(String(e.message ?? e));
         }
@@ -1055,7 +1068,7 @@ show();
         $("nav-staff").hidden = rank() < RANK.mod;
         $("acct-nametag").hidden = !isOwner();
         paintShout();
-        globalThis.horizonProfileLock?.(Boolean(me));
+        globalThis.horizonProfileLock?.(Boolean(me), me ? (me.display ?? me.name) : null);
         if (!me) return;
         nametag($("acct-me"), (me.display ?? me.name), me.nametag);
         $("acct-username").textContent = `@${me.name}`;

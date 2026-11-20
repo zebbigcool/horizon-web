@@ -10,7 +10,7 @@ import { token } from "./session.js";
 const relays = [...customRelays().map((r) => r.url), ...RELAY_URLS];
 if (relays.length) globalThis.horizonRelays = relays;
 
-const PRESENCE_MS = 20_000;
+const PRESENCE_MS = 5_000; // also how soon an announcement or shout reaches an open page
 const HEARTBEAT_MS = 10_000;
 const PUBLIC_KEY = "horizon-public-room";
 
