@@ -1057,16 +1057,16 @@ show();
         paintShout();
         globalThis.horizonProfileLock?.(Boolean(me));
         if (!me) return;
-        nametag($("acct-me"), me.display, me.nametag);
+        nametag($("acct-me"), (me.display ?? me.name), me.nametag);
         $("acct-username").textContent = `@${me.name}`;
-        if (document.activeElement !== $("acct-display")) $("acct-display").value = me.display;
+        if (document.activeElement !== $("acct-display")) $("acct-display").value = (me.display ?? me.name);
         $("acct-role").textContent = me.role;
         $("acct-role").hidden = me.role === "user";
         if (isOwner()) {
             const tag = me.nametag ?? { mode: "rainbow" };
             for (const b of $("tag-seg").querySelectorAll("button")) b.classList.toggle("on", b.dataset.value === tag.mode);
             if (tag.color) $("tag-color").value = tag.color;
-            nametag($("tag-preview"), me.display, tag);
+            nametag($("tag-preview"), (me.display ?? me.name), tag);
         }
     }
 
@@ -1120,7 +1120,7 @@ show();
         if (!me || !profile.supported()) return;
         try {
             const p = await profile.load();
-            if (p.name !== me.display) await profile.save({ name: me.display, skin: p.skin, slim: p.slim, cape: p.cape });
+            if (p.name !== (me.display ?? me.name)) await profile.save({ name: (me.display ?? me.name), skin: p.skin, slim: p.slim, cape: p.cape });
             if (p.skin && p.skin !== me.skin) acct.me = (await account.api("/api/account/skin", { skin: p.skin })).me;
             await globalThis.horizonProfileReload?.();
         } catch {
@@ -1336,7 +1336,7 @@ show();
         const li = el("li", "server person");
         const meta = el("div", "meta");
         const name = el("b");
-        nametag(name, u.display, u.nametag);
+        nametag(name, (u.display ?? u.name), u.nametag);
         meta.append(name, el("small", "", `@${u.name} · ${u.skin ? `skin: ${u.skin}` : "no skin name"}`));
         const chips = el("div", "acts");
         if (u.role !== "user") chips.append(chip(u.role, ""));
@@ -1350,7 +1350,7 @@ show();
             b.type = "button";
             b.disabled = !u.canAct;
             b.addEventListener("click", () => {
-                if (confirm(`${label} ${u.display} (@${u.name})? You can undo it from the activity list.`)) call(path, { name: u.name });
+                if (confirm(`${label} ${(u.display ?? u.name)} (@${u.name})? You can undo it from the activity list.`)) call(path, { name: u.name });
             });
             acts.append(b);
         };

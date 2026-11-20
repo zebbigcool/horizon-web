@@ -6,7 +6,7 @@ import { Accounts, MemoryStore, maskIp } from "./src/accounts.js";
 const make = (opts = {}) => {
     const clock = { t: 1_000_000 };
     const store = new MemoryStore();
-    const mk = () => new Accounts({ store, ownerPassword: "owner-secret-1", ipSecret: "k", iterations: 1000, now: () => clock.t, ...opts });
+    const mk = () => new Accounts({ store, ownerPassword: "owner-secret-1", ipSecret: "k", iterations: 1000, now: () => clock.t, displayNames: true, ...opts });
     return { clock, store, acc: mk(), again: mk };
 };
 const ok = (r) => {
@@ -304,4 +304,13 @@ test("badges: signed proof of who a player is, short-lived, checkable with the p
     ok(await acc.ban(o, "alice"));
     assert.equal((await acc.badge(p)).status, 403);
     assert.equal((await make().acc.badgeKey()).status, 503);
+});
+
+test("display names are off by default: everyone, Zeb included, shows their username", async () => {
+    const { acc } = make({ displayNames: false });
+    const a = ok(await acc.signup("alice", "pw-alice-1", "1.1.1.1")).token;
+    assert.equal((await acc.ping(a, "1.1.1.1")).me.display, "alice");
+    assert.equal((await acc.setDisplay(a, "Other")).error !== undefined, true);
+    const z = ok(await acc.login("Zeb", "owner-secret-1", "1.1.1.1")).token;
+    assert.equal((await acc.ping(z, "1.1.1.1")).me.display, "Zeb");
 });

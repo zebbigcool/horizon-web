@@ -74,7 +74,9 @@ export function maskIp(ip) {
 }
 
 export class Accounts {
-    constructor({ store, ownerPassword = "", ipSecret = "", badgeKey = "", now = () => Date.now(), iterations = 100_000 }) {
+    constructor({ store, ownerPassword = "", ipSecret = "", badgeKey = "", now = () => Date.now(), iterations = 100_000, displayNames = false }) {
+        // Display names are off for now: everyone's name in the game is their username.
+        this.displayNames = displayNames;
         this.badgeJwk = badgeKey; // the badge signing key: a JWK (see make-badge-key.mjs)
         this.badgeSigner = null;
         this.store = store;
@@ -108,7 +110,7 @@ export class Accounts {
     view(u) {
         return {
             name: u.name, // the username: unique
-            display: u.display || u.name, // the display name: shown, copyable
+            display: (this.displayNames && u.display) || u.name, // the display name (off for now: the username)
             role: u.role,
             skin: u.skin || "",
             nametag: u.role === "owner" ? u.nametag ?? { mode: "rainbow" } : null,
@@ -233,6 +235,7 @@ export class Accounts {
     async setDisplay(token, display) {
         const user = await this.session(token);
         if (!user) return fail("Log in first.", 401);
+        if (!this.displayNames) return fail("Display names are off for now: your name is your username.");
         display = typeof display === "string" ? display.trim() : "";
         if (!validDisplay(display)) return fail("A display name is 1 to 16 characters, with no spaces.");
         user.display = display;
@@ -265,7 +268,7 @@ export class Accounts {
         const q = lower(clean(query, 16));
         const out = [];
         for (const u of this.users.values()) {
-            if (q && !lower(u.name).includes(q) && !lower(u.display).includes(q) && !lower(u.skin).includes(q)) continue;
+            if (q && !lower(u.name).includes(q) && !lower(this.view(u).display).includes(q) && !lower(u.skin).includes(q)) continue;
             out.push({
                 ...this.view(u), banned: u.banned, kickedUntil: u.kickedUntil > this.now() ? u.kickedUntil : 0,
                 ipBanned: Boolean(u.ip && this.bans[u.ip]), canAct: rankOf(u) < rankOf(actor),
