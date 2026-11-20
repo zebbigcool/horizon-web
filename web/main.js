@@ -5,6 +5,7 @@
 import "./audio.js"; // before the game's glue, which keeps the AudioContext it finds
 import { startPresence, watchSharedWorld } from "./presence.js";
 import { watchSite } from "./site.js";
+import { keepBadge } from "./account.js";
 import { applyLowMemoryOptions, cpuCap, lowMemory, ramMb } from "./settings.js";
 import * as instances from "./instances.js";
 import { Wisp } from "./wisp.js";
@@ -346,6 +347,7 @@ async function main() {
     watchSharedWorld();
     if (!(await webgpu())) return;
     let { glue, tar, manifest, base } = await served();
+    keepBadge((badge, key) => glue.horizon_set_badge?.(badge, key));
     status.textContent = "Installing resources…";
     const t0 = performance.now();
     const installed = glue.horizon_install_tar(ROOT, tar);

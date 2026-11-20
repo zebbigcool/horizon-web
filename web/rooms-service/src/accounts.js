@@ -18,6 +18,7 @@
 export const OWNER_NAME = "Zeb";
 export const RANKS = { user: 0, mod: 1, janitor: 2, admin: 3, owner: 4 };
 export const ASSIGNABLE = ["user", "mod", "janitor", "admin"];
+export const BADGE_MS = 10 * 60 * 1000;
 export const KICK_MS = 10 * 60 * 1000;
 export const SESSION_MS = 30 * 24 * 3600 * 1000;
 export const MAX_USERS = 5000;
@@ -73,7 +74,9 @@ export function maskIp(ip) {
 }
 
 export class Accounts {
-    constructor({ store, ownerPassword = "", ipSecret = "", now = () => Date.now(), iterations = 100_000 }) {
+    constructor({ store, ownerPassword = "", ipSecret = "", badgeKey = "", now = () => Date.now(), iterations = 100_000 }) {
+        this.badgeJwk = badgeKey; // the badge signing key: a JWK (see make-badge-key.mjs)
+        this.badgeSigner = null;
         this.store = store;
         this.ownerPassword = ownerPassword;
         this.ipSecret = ipSecret || ownerPassword || "horizon-ip";
@@ -465,6 +468,40 @@ export class Accounts {
         return { announcement: this.meta.announcement, shout: this.shoutFor(user), owner: owner ? this.view(owner) : null };
     }
 
+    // ---- badges: a short-lived signed proof of who a player is, for the game
+    //
+    // A shared world's host can't tell the real owner from someone who typed the same
+    // name, so a logged-in player's page fetches a badge and the game hands it to the
+    // host at login. The host checks the signature with the public key from /api/badge-key
+    // and that the badge's display name is the name being joined with.
+
+    async signer() {
+        if (this.badgeSigner) return this.badgeSigner;
+        const jwk = JSON.parse(this.badgeJwk);
+        this.badgeSigner = {
+            key: await crypto.subtle.importKey("jwk", jwk, { name: "Ed25519" }, false, ["sign"]),
+            pub: [...Uint8Array.from(atob(jwk.x.replace(/-/g, "+").replace(/_/g, "/")), (c) => c.charCodeAt(0))].map((b) => b.toString(16).padStart(2, "0")).join(""),
+        };
+        return this.badgeSigner;
+    }
+
+    async badgeKey() {
+        if (!this.badgeJwk) return fail("Badges aren't set up on this server.", 503);
+        return { key: (await this.signer()).pub };
+    }
+
+    async badge(token) {
+        const user = await this.session(token);
+        if (!user) return fail("Log in first.", 401);
+        if (!this.badgeJwk) return fail("Badges aren't set up on this server.", 503);
+        if (user.banned) return fail("Your account is banned.", 403);
+        const exp = this.now() + BADGE_MS;
+        const view = this.view(user);
+        const payload = new TextEncoder().encode(JSON.stringify({ v: 1, u: user.name, d: view.display, r: user.role, n: view.nametag, exp }));
+        const sig = new Uint8Array(await crypto.subtle.sign({ name: "Ed25519" }, (await this.signer()).key, payload));
+        return { badge: `v1.${hex(payload)}.${hex(sig)}`, exp };
+    }
+
     // ---- cloud save: a bundle the page makes, kept in chunks
 
     async putData(token, gen, index, total, chunk) {
@@ -514,6 +551,7 @@ export class Accounts {
         await this.load();
         const done = (r) => (r?.error ? [r.status ?? 400, { error: r.error }] : [200, r ?? {}]);
         if (method === "GET" && path === "/api/site") return [200, this.site()];
+        if (method === "GET" && path === "/api/badge-key") return done(await this.badgeKey());
         if (method !== "POST") return [404, { error: "not found" }];
         const b = body ?? {};
         const t = b.token;
@@ -527,6 +565,7 @@ export class Accounts {
             }
             case "/api/account/skin": return done(await this.setSkin(t, b.skin));
             case "/api/account/display": return done(await this.setDisplay(t, b.display));
+            case "/api/account/badge": return done(await this.badge(t));
             case "/api/poll/vote": return done(await this.vote(t, b.option));
             case "/api/account/nametag": return done(await this.setNametag(t, b.mode, b.color));
             case "/api/staff/search": return done(await this.search(t, b.q));

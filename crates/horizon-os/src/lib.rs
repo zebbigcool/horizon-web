@@ -11,6 +11,27 @@ compile_error!("the browser build needs threads: build it with web/build.sh");
 
 pub mod env;
 pub mod fs;
+
+/// The signed badge of the logged-in player and the key badges are checked with, which the
+/// web build's page keeps current (`web::horizon_set_badge`): threads can't read the page's
+/// globals, but they share this memory. Always empty on native.
+pub mod badge {
+    use std::sync::Mutex;
+
+    static PAGE: Mutex<(String, String)> = Mutex::new((String::new(), String::new()));
+
+    pub fn set(badge: &str, key: &str) {
+        *crate::sync::lock(&PAGE).unwrap_or_else(|e| e.into_inner()) =
+            (badge.to_owned(), key.to_owned());
+    }
+
+    /// `(badge, key)`, each empty when the page has none.
+    pub fn get() -> (String, String) {
+        let page = crate::sync::lock(&PAGE).unwrap_or_else(|e| e.into_inner());
+        (page.0.clone(), page.1.clone())
+    }
+}
+
 #[cfg(target_arch = "wasm32")]
 pub mod net;
 #[cfg(target_arch = "wasm32")]

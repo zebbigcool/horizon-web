@@ -30,6 +30,7 @@ pub mod forwarding;
 pub mod guest;
 pub mod handoff;
 pub mod hub;
+pub mod badge;
 pub mod identity;
 pub mod import;
 mod io_pool;

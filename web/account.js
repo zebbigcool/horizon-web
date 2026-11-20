@@ -49,6 +49,36 @@ export async function me() {
     }
 }
 
+/**
+ * Keeps the game told who this player is: fetches a short-lived signed badge (and the key
+ * badges are checked with) now and every few minutes, and hands both to `give(badge, key)`.
+ * A shared world's host uses them to know the real owner from someone with the same name.
+ * Nothing is fetched while logged out, and a server without badges set up is simply skipped.
+ */
+export function keepBadge(give) {
+    let key = "";
+    const refresh = async () => {
+        try {
+            if (!key) key = (await (await roomsFetch("/api/badge-key")).json()).key ?? "";
+        } catch {
+            key = "";
+        }
+        let badge = "";
+        try {
+            if (key && loggedIn()) badge = (await api("/api/account/badge")).badge;
+        } catch {
+            badge = "";
+        }
+        try {
+            give(badge, key);
+        } catch {
+            // An older game build without the hook.
+        }
+    };
+    refresh();
+    setInterval(refresh, 4 * 60 * 1000);
+}
+
 // ---- cloud save: this browser's launcher data and the default instance's small files
 
 const CHUNK = 450_000; // characters per request (the service takes 700 000)

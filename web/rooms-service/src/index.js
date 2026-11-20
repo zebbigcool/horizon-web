@@ -86,6 +86,7 @@ export class AccountsObject extends DurableObject {
                 list: async (prefix) => [...(await storage.list({ prefix }))],
             },
             ownerPassword: env.ADMIN_PASSWORD ?? "",
+            badgeKey: env.BADGE_KEY ?? "",
             ipSecret: env.IP_SECRET ?? "",
         });
         state.blockConcurrencyWhile(() => this.accounts.load());
@@ -130,8 +131,8 @@ async function route(request, env) {
         if (answer.banned) return new Response("banned", { status: 403, headers: CORS });
         return env.RELAY.get(env.RELAY.idFromName("relay")).fetch(request);
     }
-    if (request.method === "GET" && url.pathname === "/api/site") {
-        const [status, data] = await askAccounts(env, { method: "GET", path: "/api/site", ip });
+    if (request.method === "GET" && (url.pathname === "/api/site" || url.pathname === "/api/badge-key")) {
+        const [status, data] = await askAccounts(env, { method: "GET", path: url.pathname, ip });
         return json(status, data);
     }
     if (request.method === "POST" && (ACCOUNT_PATH.test(url.pathname) || url.pathname === "/api/presence")) {

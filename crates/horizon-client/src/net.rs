@@ -924,9 +924,14 @@ fn run(
             }
             login::Clientbound::CustomQuery(q) => {
                 // A world that remembers its players asks who this is (lan::identity).
-                let payload = (q.channel == crate::lan::identity::CHANNEL)
-                    .then(|| crate::lan::identity::answer(&q.data))
-                    .flatten();
+                let payload = if q.channel == crate::lan::identity::CHANNEL {
+                    crate::lan::identity::answer(&q.data)
+                } else if q.channel == crate::lan::badge::CHANNEL {
+                    // Who this player is on the site, if the page has a badge (lan::badge).
+                    crate::lan::badge::answer()
+                } else {
+                    None
+                };
                 c.send(
                     &login::Serverbound::CustomQueryAnswer(login::CustomQueryAnswer {
                         transaction: q.transaction,

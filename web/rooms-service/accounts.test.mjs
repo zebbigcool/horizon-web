@@ -274,3 +274,34 @@ test("shout poll: 2 to 8 options, one vote per account (changeable), results for
     assert.equal((await acc.ping(a, "1.1.1.1")).shout.poll.total, 0);
     assert.equal((await acc.ping("", "8.8.8.8")).shout.poll.options.length, 2);
 });
+
+test("badges: signed proof of who a player is, short-lived, checkable with the published key", async () => {
+    const pair = await crypto.subtle.generateKey("Ed25519", true, ["sign", "verify"]);
+    const jwk = JSON.stringify(await crypto.subtle.exportKey("jwk", pair.privateKey));
+    const { acc, clock } = make({ badgeKey: jwk });
+    const o = await asOwner(acc);
+    const p = await player(acc, "alice", "1.1.1.1");
+    assert.equal((await acc.badge("")).status, 401);
+
+    const { key } = ok(await acc.badgeKey());
+    const verify = async (badge) => {
+        const [v, payloadHex, sigHex] = badge.split(".");
+        const bytes = (h) => Uint8Array.from(h.match(/../g).map((x) => parseInt(x, 16)));
+        const pub = await crypto.subtle.importKey("raw", bytes(key), { name: "Ed25519" }, false, ["verify"]);
+        const good = v === "v1" && (await crypto.subtle.verify({ name: "Ed25519" }, pub, bytes(sigHex), bytes(payloadHex)));
+        return good ? JSON.parse(new TextDecoder().decode(bytes(payloadHex))) : null;
+    };
+    const zeb = await verify(ok(await acc.badge(o)).badge);
+    assert.deepEqual([zeb.u, zeb.d, zeb.r, zeb.n.mode], ["Zeb", "Zeb", "owner", "rainbow"]);
+    assert.equal(zeb.exp, clock.t + 10 * 60 * 1000);
+    ok(await acc.setDisplay(p, "Zeb")); // copying the display name...
+    const fake = await verify(ok(await acc.badge(p)).badge);
+    assert.deepEqual([fake.u, fake.d, fake.r, fake.n], ["alice", "Zeb", "user", null]); // ...doesn't copy the badge
+    // a changed payload doesn't verify
+    const [v, payload, sig] = ok(await acc.badge(p)).badge.split(".");
+    assert.equal(await verify(`${v}.${payload.replace(/^../, "ff")}.${sig}`), null);
+    // a banned account gets none, and without a key there are none
+    ok(await acc.ban(o, "alice"));
+    assert.equal((await acc.badge(p)).status, 403);
+    assert.equal((await make().acc.badgeKey()).status, 503);
+});

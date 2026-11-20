@@ -93,6 +93,16 @@ Until `ADMIN_PASSWORD` is set the owner can't log in (the "Zeb" name is reserved
 - **Shout polls**: the owner can add 2 to 8 options to the shout. One vote per account (changeable); results are
   public, voting needs a login. The shout and its poll also show in a small box at the top of the game page
   (press Esc to free the mouse, then click). A new shout starts a new poll.
+- **Coloured names in a shared world** (chat, Tab list, join line; not above heads): the site owner's name is a
+  rainbow (or the colour they picked), and the player whose world it is shows in red while it is shared.
+  A name proves nothing, so the owner's colour comes from a *badge*: a ten-minute Ed25519 signature the
+  rooms service gives a logged-in player (`/api/account/badge`) and the game hands to the host at login; the
+  host checks it with the public key from `/api/badge-key` and that the badge's display name is the name
+  being joined with. Someone who copies the display name "Zeb" gets no colour. One-time setup:
+  `node web/rooms-service/make-badge-key.mjs`, then `npx wrangler secret put BADGE_KEY` and paste the line it
+  printed (without a key, badges are off and only the red owner name shows). The game side is
+  `crates/horizon-client/src/lan/badge.rs`. A host who sees a badge could replay it elsewhere for its ten minutes;
+  all it buys is a colour.
 - Nametag: the owner picks rainbow or a color on the Account page; it shows in dialogs, the shout and lists
   (not above heads in the game).
 

@@ -257,6 +257,13 @@ pub fn on_start(start: fn()) {
 }
 
 /// Adds the files of a tar archive under `root` in the virtual filesystem.
+/// The page hands over the logged-in player's signed badge and the key to check others'
+/// with (web/account.js, every few minutes); empty strings when it has none.
+#[wasm_bindgen]
+pub fn horizon_set_badge(badge: &str, key: &str) {
+    crate::badge::set(badge, key);
+}
+
 #[wasm_bindgen]
 pub fn horizon_install_tar(root: &str, tar: &[u8]) -> Result<usize, JsValue> {
     crate::fs::install_tar(root, tar).map_err(|e| JsValue::from_str(&e.to_string()))

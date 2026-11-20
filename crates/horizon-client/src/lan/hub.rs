@@ -547,7 +547,9 @@ impl Hub {
     /// A mod's display name (`display_names`) takes the place of both.
     pub fn player_display_name(&self, uuid: u128, name: &str) -> Tag {
         let shown = self.nicknames.get(&uuid).map_or(name, String::as_str);
-        let custom = self.display_names.get(&uuid);
+        // A shared world's owner and the site owner's badge colour the name (lan/badge.rs).
+        let styled = super::badge::styled(uuid);
+        let custom = self.display_names.get(&uuid).or(styled.as_ref());
         let team = self.teams.iter().find(|t| t.players.contains(name));
         if team.is_none() && shown == name && custom.is_none() {
             return display_name(uuid, name);
@@ -1388,6 +1390,7 @@ impl Hub {
         self.list_names
             .get(&uuid)
             .cloned()
+            .or_else(|| super::badge::styled(uuid).map(|c| crate::scoreboard::component_tag(&c)))
             .or_else(|| self.nicknames.get(&uuid).map(|n| literal(n)))
     }
     /// ClientboundPlayerInfoUpdatePacket.createPlayerInitializing: every action.

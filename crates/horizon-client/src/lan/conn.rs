@@ -1165,6 +1165,8 @@ fn serve_login(
         },
         (None, None) => match singleplayer {
             Some((owner_name, owner_uuid)) => {
+                // The world's owner, who shows in red once it is shared (lan/badge.rs).
+                super::badge::note_host(owner_uuid, &owner_name);
                 name = owner_name;
                 let properties = shared
                     .config
@@ -1294,7 +1296,12 @@ fn forward(
 fn identify(c: &mut Connection, name: &str) -> Result<Option<u128>, String> {
     const TRANSACTION: i32 = 2;
     let Some(world) = super::identity::world().filter(|_| !c.is_memory()) else {
-        return Ok(Some(offline_uuid(name)));
+        let uuid = offline_uuid(name);
+        // The window's own player is the world's owner: red once the world is shared.
+        if c.is_memory() {
+            super::badge::note_host(uuid, name);
+        }
+        return Ok(Some(uuid));
     };
     let Some(salt) = super::identity::request(&world) else {
         return Ok(Some(offline_uuid(name)));
@@ -1316,10 +1323,45 @@ fn identify(c: &mut Connection, name: &str) -> Result<Option<u128>, String> {
         }
         _ => return Err("unexpected packet during login".into()),
     };
-    Ok(match super::identity::admit(&world, name, token.as_deref()) {
-        super::identity::Admission::Player(uuid) => Some(uuid),
+    let admission = super::identity::admit(&world, name, token.as_deref());
+    Ok(match admission {
+        super::identity::Admission::Player(uuid) => {
+            ask_badge(c, name, uuid)?;
+            Some(uuid)
+        }
         super::identity::Admission::NameTaken => None,
     })
+}
+
+/// Asks a guest for its badge, the signed proof of who it is on the site ([`super::badge`]),
+/// when this page has the key to check one with. A client that doesn't answer (any other
+/// build) just has no badge.
+fn ask_badge(c: &mut Connection, name: &str, uuid: u128) -> Result<(), String> {
+    const TRANSACTION: i32 = 3;
+    super::badge::forget(uuid);
+    let Some(key) = super::badge::key() else {
+        return Ok(());
+    };
+    let e = |e: horizon_protocol::Error| e.to_string();
+    c.send(
+        &login::Clientbound::CustomQuery(login::CustomQuery {
+            transaction: TRANSACTION,
+            channel: super::badge::CHANNEL.into(),
+            data: Vec::new(),
+        })
+        .encode(),
+    )
+    .map_err(e)?;
+    let (id, payload) = c.recv().map_err(e)?;
+    match login::Serverbound::decode(id, &payload).map_err(e)? {
+        login::Serverbound::CustomQueryAnswer(answer) if answer.transaction == TRANSACTION => {
+            if let Some(data) = answer.payload {
+                super::badge::admit(uuid, name, &data, &key);
+            }
+            Ok(())
+        }
+        _ => Err("unexpected packet during login".into()),
+    }
 }
 
 struct Parts {
