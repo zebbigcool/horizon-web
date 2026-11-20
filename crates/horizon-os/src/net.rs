@@ -261,7 +261,7 @@ const report = (event) => {
 };
 function listen(lid, name, owner, relays) {
     relays = withPageRelays(relays);
-    let next = 0, closed = false, ws = null, hosted = null, players = 1;
+    let next = 0, closed = false, ws = null, hosted = null, players = 1, reconnects = 0, since = 0;
     const peers = new Map();
     listeners.set(lid, {
         close() {
@@ -290,6 +290,7 @@ function listen(lid, name, owner, relays) {
                     code = readStr8(b, 3)[0];
                     console.info(`Horizon: shared world ${code} on ${ws.url}`);
                     hosted = code;
+                    since = Date.now();
                     report({ kind: "open", code, name, owner, players });
                     onListen(lid, 0, code);
                 } else if (b[0] === 0x01) {
@@ -342,7 +343,18 @@ function listen(lid, name, owner, relays) {
             else {
                 if (hosted) report({ kind: "closed", code: hosted });
                 hosted = null;
-                onListen(lid, 2, "The relay closed the shared world");
+                // A relay that restarts (a redeploy) or a network that drops the
+                // connection shouldn't end the share: ask again, with growing delays.
+                // The world gets a new code; players already in stay (their channels
+                // don't go through the relay).
+                if (Date.now() - since > 60000) reconnects = 0;
+                if (reconnects < 5) {
+                    reconnects += 1;
+                    next = 0;
+                    setTimeout(attempt, 1000 * reconnects);
+                } else {
+                    onListen(lid, 2, "The relay closed the shared world");
+                }
             }
         };
     };
