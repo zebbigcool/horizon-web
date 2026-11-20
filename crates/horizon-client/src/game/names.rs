@@ -395,7 +395,13 @@ impl Game<'_> {
             }
             // getDisplayName: the name in the team's prefix, suffix and colour.
             let member = if player {
-                Text::literal(&name)
+                let uuid = if own_model == Some(m as *const Mob) {
+                    self.own_profile_uuid()
+                } else {
+                    self.remote_player_uuid(m.id)
+                };
+                self.coloured_own_name(uuid, &name)
+                    .unwrap_or_else(|| Text::literal(&name))
             } else {
                 m.custom_name_text
                     .clone()

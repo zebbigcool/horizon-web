@@ -10584,6 +10584,18 @@ impl Game<'_> {
     pub(super) fn own_profile_uuid(&self) -> Option<u128> {
         self.remote.as_ref().map(|r| r.profile).filter(|u| *u != 0)
     }
+    /// A player's own name in the colours their Tab list entry gives it (the site owner's rainbow, a
+    /// shared world owner's red), for the tag over their head. Only when the entry is that name and
+    /// nothing else: a nickname or a rank in the list doesn't change the tag, as in vanilla.
+    pub(super) fn coloured_own_name(
+        &self,
+        uuid: Option<u128>,
+        name: &str,
+    ) -> Option<horizon_client::text::Text> {
+        let entry = self.remote.as_ref()?.tab_players.get(&uuid?)?;
+        let text = horizon_client::scoreboard::comp_text(entry.display_name.as_ref()?);
+        (text.plain() == name).then_some(text)
+    }
     /// The UUID of another player's entity in the level.
     pub(super) fn remote_player_uuid(&self, id: u32) -> Option<u128> {
         self.remote.as_ref()?.player_uuid(id)
