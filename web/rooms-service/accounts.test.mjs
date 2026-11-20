@@ -216,7 +216,7 @@ test("handle routes by path and never leaks the token logic to GET", async () =>
     assert.equal(s, 200);
     const [s2] = await acc.handle("POST", "/api/staff/kick", { token: r.token, name: "x" }, "1.1.1.1");
     assert.equal(s2, 403);
-    assert.deepEqual((await acc.handle("GET", "/api/site", null, ""))[1], { announcement: null, shout: null, owner: null });
+    assert.deepEqual((await acc.handle("GET", "/api/site", null, ""))[1], { announcement: null, shout: null, refresh: null, now: 1000000, owner: null });
     assert.equal((await acc.handle("POST", "/api/nope", {}, ""))[0], 404);
 });
 
@@ -313,4 +313,30 @@ test("display names are off by default: everyone, Zeb included, shows their user
     assert.equal((await acc.setDisplay(a, "Other")).error !== undefined, true);
     const z = ok(await acc.login("Zeb", "owner-secret-1", "1.1.1.1")).token;
     assert.equal((await acc.ping(z, "1.1.1.1")).me.display, "Zeb");
+});
+
+test("the owner's refresh: now or scheduled, with a message; only the owner; the server's clock goes with it", async () => {
+    const { acc, clock } = make();
+    const o = await asOwner(acc);
+    const a = await player(acc, "alice", "1.1.1.1");
+    assert.equal((await acc.setRefresh(a, { in: 0 })).status, 403);
+    assert.equal((await acc.setRefresh("", { in: 0 })).status, 401);
+    assert.equal((await acc.ping(a, "1.1.1.1")).refresh, null);
+    const soon = ok(await acc.setRefresh(o, { in: 90, text: " Update! $r$New stuff$r$ ", game: true })).refresh;
+    assert.equal(soon.at, clock.t + 90_000);
+    assert.equal(soon.text, "Update! $r$New stuff$r$");
+    assert.equal(soon.game, true);
+    const heard = await acc.ping(a, "1.1.1.1");
+    assert.equal(heard.refresh.id, soon.id);
+    assert.equal(heard.now, clock.t);
+    const now = ok(await acc.setRefresh(o, { in: 0 })).refresh; // replaces it
+    assert.ok(now.id > soon.id);
+    assert.equal(now.at, clock.t);
+    assert.equal(now.game, false);
+    assert.equal(ok(await acc.setRefresh(o, { at: clock.t - 5000 })).refresh.at, clock.t); // the past means now
+    assert.equal(ok(await acc.setRefresh(o, { at: clock.t + 3_600_000 })).refresh.at, clock.t + 3_600_000);
+    assert.ok((await acc.setRefresh(o, { in: 31 * 24 * 3600 })).error);
+    assert.ok((await acc.setRefresh(o, { in: "soon" })).error);
+    ok(await acc.setRefresh(o, { cancel: true }));
+    assert.equal((await acc.ping(a, "1.1.1.1")).refresh, null);
 });

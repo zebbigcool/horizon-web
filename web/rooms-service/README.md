@@ -120,3 +120,13 @@ Nobody can kick or ban Zeb, and nobody but the host can touch the host. Bans are
 `horizon-bans.txt` in the world's folder, by the player's identity (so a new name doesn't help), and are checked
 when a guest joins. A player who isn't here can be banned by name. The commands are typed by hand (they aren't in
 the tab-completion tree). Code: `crates/horizon-client/src/game/world_mod.rs`, `lan/bans.rs`, `lan/badge.rs`.
+
+## Refreshing everyone's page
+
+Staff page, owner tools, "Refresh everyone's page": reload every open page right now, in some minutes, or at a
+date and time, with an optional message (`$r$…$r$` for rainbow). Everyone gets a live countdown (by the server's
+clock, so a wrong PC clock doesn't matter) that they can make small with Hide and open again with Show. A page
+reloads once per refresh, and only if it was open before the time; a page opened later isn't bounced. Pages in a
+game are left alone unless you tick "Also reload people who are in a game". `POST /api/owner/refresh` takes
+`{in: seconds}` or `{at: ms}`, plus `{text, game}`; `{cancel: true}` withdraws it. Pages hear about it with the
+usual 5-second ping, so "now" takes up to about 5 seconds.

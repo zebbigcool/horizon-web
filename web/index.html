@@ -287,6 +287,27 @@ addEventListener("beforeunload", (e) => {
             <button id="ann-clear" type="button" class="ghost">Withdraw current</button>
           </div>
           <p id="ann-note" class="hint" role="status"></p>
+          <h3>Refresh everyone's page</h3>
+          <p class="hint wide-hint">Reloads every open page, now or at a time you pick. Everyone sees a live countdown they can make small. The message is optional.</p>
+          <div class="row">
+            <label for="rf-when">When</label>
+            <div class="field refresh-when">
+              <select id="rf-when" aria-label="when to refresh">
+                <option value="now">Right now</option>
+                <option value="in" selected>In a few minutes</option>
+                <option value="at">At a date and time</option>
+              </select>
+              <input id="rf-minutes" type="number" min="1" max="1440" value="5" aria-label="minutes from now"> <span id="rf-minutes-unit" class="hint">minutes</span>
+              <input id="rf-at" type="datetime-local" aria-label="date and time" hidden>
+            </div>
+          </div>
+          <textarea id="rf-text" maxlength="300" rows="2" placeholder="Optional message, e.g. Update coming! $r$Back in a sec$r$" aria-label="refresh message"></textarea>
+          <label class="check"><input id="rf-game" type="checkbox"> Also reload people who are in a game (they could lose unsaved progress)</label>
+          <div class="actions">
+            <button id="rf-send" type="button" class="ghost">Start refresh</button>
+            <button id="rf-cancel" type="button" class="ghost">Cancel current</button>
+          </div>
+          <p id="rf-note" class="hint" role="status"></p>
         </div>
         <div id="ipban-panel" class="panel pad" hidden>
           <h3>IP bans</h3>

@@ -22,6 +22,7 @@ export const BADGE_MS = 10 * 60 * 1000;
 export const KICK_MS = 10 * 60 * 1000;
 export const SESSION_MS = 30 * 24 * 3600 * 1000;
 export const MAX_USERS = 5000;
+export const REFRESH_MAX_MS = 30 * 24 * 3600 * 1000;
 export const POLL_MIN = 2;
 export const POLL_MAX = 8;
 export const MAX_CHUNKS = 24;
@@ -85,7 +86,7 @@ export class Accounts {
         this.now = now;
         this.iterations = iterations;
         this.users = new Map(); // lowercase name -> user
-        this.meta = { seq: 0, log: [], announcement: null, shout: null, votes: {} };
+        this.meta = { seq: 0, log: [], announcement: null, shout: null, refresh: null, votes: {} };
         this.bans = {}; // ip hash -> { mask, by, at, actionId }
         this.sessions = new Map(); // token hash -> { user, at }
         this.fails = new Map(); // "ip:name" -> [times]
@@ -449,6 +450,36 @@ export class Accounts {
     }
 
     /** What every page hears on its presence ping. */
+    // The owner's page refresh: for everyone now, or scheduled, with an optional message that
+    // goes with the countdown. `body` is { cancel } or { in: seconds } or { at: ms since the epoch },
+    // plus { text, game }: game also reloads players who are in a game (off: they only see no countdown).
+    async setRefresh(token, body) {
+        const [owner, err] = await this.staff(token, "owner");
+        if (err) return err;
+        if (body?.cancel) {
+            this.meta.refresh = null;
+            await this.saveMeta();
+            return { refresh: null };
+        }
+        const now = this.now();
+        let at = now;
+        if (body?.at !== undefined && body?.at !== null) at = Number(body.at);
+        else if (body?.in !== undefined && body?.in !== null) at = now + Number(body.in) * 1000;
+        if (!Number.isFinite(at)) return fail("Pick when to refresh.");
+        if (at > now + REFRESH_MAX_MS) return fail("That is too far away (30 days at most).");
+        at = Math.max(at, now);
+        this.meta.refresh = {
+            id: ++this.meta.seq,
+            at: Math.round(at),
+            text: clean(body?.text, 300),
+            game: Boolean(body?.game),
+            by: owner.name,
+            setAt: now,
+        };
+        await this.saveMeta();
+        return { refresh: this.meta.refresh };
+    }
+
     async ping(token, ip) {
         await this.load();
         const user = await this.session(token);
@@ -468,7 +499,14 @@ export class Accounts {
     site(user = null) {
         const owner = this.users.get(lower(OWNER_NAME));
         // The owner's face, so a page can draw "from Zeb" in the nametag they picked.
-        return { announcement: this.meta.announcement, shout: this.shoutFor(user), owner: owner ? this.view(owner) : null };
+        // `now` is the server's clock: pages count down to `refresh.at` by it, not by their own.
+        return {
+            announcement: this.meta.announcement,
+            shout: this.shoutFor(user),
+            refresh: this.meta.refresh ?? null,
+            now: this.now(),
+            owner: owner ? this.view(owner) : null,
+        };
     }
 
     // ---- badges: a short-lived signed proof of who a player is, for the game
@@ -581,6 +619,7 @@ export class Accounts {
             case "/api/staff/log": return done(await this.log(t));
             case "/api/staff/undo": return done(await this.undo(t, b.id));
             case "/api/owner/announce": return done(await this.setNotice(t, "announcement", b.text));
+            case "/api/owner/refresh": return done(await this.setRefresh(t, b));
             case "/api/owner/shout": return done(await this.setNotice(t, "shout", b.text, b.options));
             case "/api/data/put": return done(await this.putData(t, b.gen, b.index, b.total, b.chunk));
             case "/api/data/info": return done(await this.dataInfo(t));

@@ -401,3 +401,9 @@ button, select, input { font: inherit; }
 .link-btn { text-decoration: none; display: inline-flex; align-items: center; }
 
 .profile-signed #profile-name-row { display: none; }
+.refresh-when { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.refresh-when select, .refresh-when input { color: var(--text); background: var(--ctl); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; }
+.refresh-when input[type=number] { width: 90px; }
+#owner-tools h3 + .hint + .row, #owner-tools textarea + .check { margin-top: 8px; }
+#owner-tools .check { margin: 8px 0; }
+#owner-tools h3:not(:first-child) { margin-top: 22px; }

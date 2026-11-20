@@ -1429,7 +1429,7 @@ show();
         try {
             const sent = await account.api("/api/owner/announce", { text });
             if (sent.announcement) markSeen(sent.announcement.id);
-            say($("ann-note"), "Sent. Everyone online sees it within about 20 seconds, once.");
+            say($("ann-note"), "Sent. Everyone online sees it within about 5 seconds, once.");
             refreshSite();
         } catch (e) {
             say($("ann-note"), e.message, true);
@@ -1441,6 +1441,39 @@ show();
             say($("ann-note"), "Withdrawn. People who haven't seen it yet won't.");
         } catch (e) {
             say($("ann-note"), e.message, true);
+        }
+    });
+    // ---- refresh everyone
+    const rfWhen = $("rf-when");
+    const rfShow = () => {
+        $("rf-minutes").hidden = $("rf-minutes-unit").hidden = rfWhen.value !== "in";
+        $("rf-at").hidden = rfWhen.value !== "at";
+    };
+    rfWhen.addEventListener("change", rfShow);
+    rfShow();
+    $("rf-send").addEventListener("click", async () => {
+        const body = { text: $("rf-text").value.trim(), game: $("rf-game").checked };
+        if (rfWhen.value === "in") body.in = Math.round(Number($("rf-minutes").value) * 60);
+        else if (rfWhen.value === "at") {
+            body.at = new Date($("rf-at").value).getTime();
+            if (!Number.isFinite(body.at)) return say($("rf-note"), "Pick a date and time.", true);
+        } else body.in = 0;
+        if (rfWhen.value === "in" && !(body.in > 0)) return say($("rf-note"), "Pick how many minutes.", true);
+        try {
+            const sent = await account.api("/api/owner/refresh", body);
+            say($("rf-note"), rfWhen.value === "now" ? "Refreshing everyone within about 5 seconds." : `Scheduled for ${new Date(sent.refresh.at).toLocaleString()}.`);
+            refreshSite();
+        } catch (e) {
+            say($("rf-note"), e.message, true);
+        }
+    });
+    $("rf-cancel").addEventListener("click", async () => {
+        try {
+            await account.api("/api/owner/refresh", { cancel: true });
+            say($("rf-note"), "Cancelled. Pages that haven't reloaded yet won't.");
+            refreshSite();
+        } catch (e) {
+            say($("rf-note"), e.message, true);
         }
     });
     $("ann-preview").addEventListener("click", () => showNotice({ title: "Notice", text: $("ann-input").value || "(nothing yet)", by: acct?.me }));

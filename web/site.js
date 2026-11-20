@@ -111,14 +111,139 @@ function gameShout() {
     };
 }
 
+const REFRESH_CSS = `
+.zh-refresh { position: fixed; z-index: 2147482100; left: 50%; bottom: 14px; transform: translateX(-50%); display: flex; align-items: center; gap: 10px;
+  max-width: min(560px, 94vw); padding: 8px 10px 8px 14px; border-radius: 999px; color: #f4ecff; border: 1px solid transparent;
+  font: 14px/1.35 ui-rounded, "Ubuntu", system-ui, -apple-system, "Segoe UI", sans-serif; box-shadow: 0 8px 30px rgba(0, 0, 0, .45);
+  background-image: linear-gradient(rgba(21, 11, 37, .95), rgba(13, 7, 25, .95)), linear-gradient(135deg, #b44cff, #ff8a1f); background-origin: border-box; background-clip: padding-box, border-box; }
+.zh-refresh[hidden] { display: none; }
+.zh-refresh .zh-rtext { min-width: 0; overflow-wrap: anywhere; }
+.zh-refresh .zh-rtext small { display: block; color: #a99bc4; font-size: 12px; }
+.zh-refresh time { font-variant-numeric: tabular-nums; font-weight: 700; color: #ffd23f; white-space: nowrap; }
+.zh-refresh button { flex: none; cursor: pointer; color: #f4ecff; background: rgba(180, 76, 255, .22); border: 1px solid rgba(180, 76, 255, .5); border-radius: 999px; padding: 4px 10px; font: inherit; font-size: 12px; }
+.zh-refresh button:hover, .zh-refresh button:focus-visible { background: rgba(180, 76, 255, .4); outline: none; }
+.zh-refresh.zh-mini { padding: 5px 6px 5px 12px; font-size: 12px; }
+.zh-refresh.zh-mini .zh-rtext small { display: none; }
+`;
+const HIDDEN = "horizon-refresh-hidden";
+const DONE = "horizon-refreshed"; // per tab (sessionStorage): every open tab reloads once
+
+/** "1:05", "12:30:00" or "2d 3h" for a number of milliseconds. */
+export function clock(ms) {
+    const s = Math.max(0, Math.ceil(ms / 1000));
+    const d = Math.floor(s / 86400);
+    if (d) return `${d}d ${Math.floor((s % 86400) / 3600)}h`;
+    const h = Math.floor(s / 3600);
+    const m = String(Math.floor((s % 3600) / 60)).padStart(2, "0");
+    const sec = String(s % 60).padStart(2, "0");
+    return h ? `${h}:${m}:${sec}` : `${Number(m)}:${sec}`;
+}
+
+/**
+ * The owner's scheduled refresh: a live countdown (with the owner's message when there is one) that a
+ * player can hide, leaving a small timer they can open again, and the reload itself. A page reloads
+ * once per refresh, and only if it was open before the time came, so nobody who arrives later is bounced.
+ * The game page only takes part when the owner chose to include games.
+ */
+function refreshWatcher({ game }) {
+    let box = null;
+    let shown = null; // the refresh being counted down
+    let offset = 0; // server clock minus this page's
+    let firstServerNow = null;
+    let timer = 0;
+    const tick = () => {
+        if (!shown || !box) return;
+        const left = shown.at - (Date.now() + offset);
+        const time = box.querySelector("time");
+        time.textContent = left > 0 ? clock(left) : "now";
+        box.querySelector(".zh-rtext b").textContent = left > 0 ? "Page refreshes in " : "Refreshing";
+        if (left <= 0) {
+            time.textContent = "";
+            if (!safe(() => sessionStorage.getItem(DONE) === String(shown.id), false)) {
+                safe(() => sessionStorage.setItem(DONE, String(shown.id)));
+                globalThis.horizonNoLeavePrompt = true;
+                clearInterval(timer);
+                setTimeout(() => location.reload(), 600);
+            }
+        }
+    };
+    const build = () => {
+        const css = document.createElement("style");
+        css.textContent = REFRESH_CSS;
+        document.head.append(css);
+        box = document.createElement("div");
+        box.className = "zh-refresh";
+        box.setAttribute("role", "status");
+        const text = document.createElement("div");
+        text.className = "zh-rtext";
+        const line = document.createElement("span");
+        const b = document.createElement("b");
+        b.style.fontWeight = "600";
+        line.append(b, document.createElement("time"));
+        const note = document.createElement("small");
+        text.append(line, note);
+        const button = document.createElement("button");
+        button.type = "button";
+        button.addEventListener("click", () => {
+            const hidden = box.classList.toggle("zh-mini");
+            safe(() => localStorage.setItem(HIDDEN, hidden ? String(shown.id) : ""));
+            button.textContent = hidden ? "Show" : "Hide";
+            button.title = hidden ? "Show the message" : "Make this small";
+        });
+        box.append(text, button);
+        document.body.append(box);
+    };
+    return (site) => {
+        const refresh = site?.refresh ?? null;
+        if (Number.isFinite(site?.now)) offset = site.now - Date.now();
+        if (firstServerNow === null && Number.isFinite(site?.now)) firstServerNow = site.now;
+        // Not this page's to act on: gone, or the game page when games aren't included.
+        if (!refresh || (game && !refresh.game)) {
+            shown = null;
+            if (box) box.hidden = true;
+            clearInterval(timer);
+            return;
+        }
+        // A page that opened after the time passed was never asked to refresh.
+        if (firstServerNow >= refresh.at && !safe(() => sessionStorage.getItem(DONE) === String(refresh.id), false)) {
+            safe(() => sessionStorage.setItem(DONE, String(refresh.id)));
+        }
+        if (safe(() => sessionStorage.getItem(DONE) === String(refresh.id), false) && refresh.at <= site.now) {
+            shown = null;
+            if (box) box.hidden = true;
+            return;
+        }
+        if (!box) build();
+        if (!shown || shown.id !== refresh.id) {
+            shown = refresh;
+            const mini = safe(() => localStorage.getItem(HIDDEN), "") === String(refresh.id);
+            box.classList.toggle("zh-mini", mini);
+            const button = box.querySelector("button");
+            button.textContent = mini ? "Show" : "Hide";
+            button.title = mini ? "Show the message" : "Make this small";
+        }
+        shown = refresh;
+        const note = box.querySelector("small");
+        note.replaceChildren();
+        if (refresh.text) richText(note, refresh.text);
+        note.hidden = !refresh.text;
+        box.hidden = false;
+        clearInterval(timer);
+        tick();
+        timer = setInterval(tick, 250);
+    };
+}
+
 export function watchSite({ game = false } = {}) {
     let leaving = false;
     const drawShout = game ? gameShout() : null;
+    const drawRefresh = refreshWatcher({ game });
     document.addEventListener("horizon:site", (event) => {
         const site = event.detail;
         if (!site) return;
         const { status, announcement } = site;
         drawShout?.(site);
+        drawRefresh(site);
         const reason = status.ipBanned ? "ip" : status.banned ? "banned" : status.kickedUntil ? "kicked" : "";
         document.documentElement.dataset.blocked = reason;
 
